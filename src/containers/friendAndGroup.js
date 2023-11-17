@@ -1,8 +1,8 @@
 const FriendAndGroup = () => {
-  return (
-    <>
-      <div>FriendAndGroup</div>
-    </>
-  );
+    return (
+        <>
+            <div>FriendAndGroup</div>
+        </>
+    );
 };
 export default FriendAndGroup;

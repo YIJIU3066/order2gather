@@ -1,7 +1,8 @@
+
 const Home = () => {
   return (
     <>
-      <div>首頁內容wwwww</div>
+      <div className="text-2xl text-blue">首頁內容</div>
     </>
   );
 };

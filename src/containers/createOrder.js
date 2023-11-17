@@ -1,8 +1,8 @@
 const CreateOrder = () => {
-  return (
-    <>
-      <div>CreateOrder</div>
-    </>
-  );
+    return (
+        <>
+            <div>CreateOrder</div>
+        </>
+    );
 };
 export default CreateOrder;
