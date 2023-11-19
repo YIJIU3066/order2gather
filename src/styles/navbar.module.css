@@ -1,0 +1,32 @@
+.dropdown_item{
+  cursor: pointer;
+  display: block;
+  padding: 1rem;
+  font-weight: 500;
+  white-space: nowrap; 
+  min-width: 100px; 
+}
+
+.dropdown_item:hover {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  color: #fff;
+  font-size: 1.125rem;
+  border-radius: 0.25rem;
+  z-index: 10;
+}
+
+.dropdown:hover{
+  color: #f59e0b;
+}
