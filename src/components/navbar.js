@@ -15,7 +15,7 @@ const NavBar = () => {
 
   return (
     <nav className="bg-blue w-full">
-      <div className="max-w-screen-xl flex items-center justify-between mx-2 p-2">
+      <div className="flex items-center justify-between mx-4 p-2">
         <div className="flex w-2/3 items-center " id="navbar-left">
           <img src="/images/house.png" className="h-6" alt="House" />
           <div className="flex relative" id="navbar-dropdown">
@@ -66,13 +66,13 @@ const NavBar = () => {
                 </div>
               </li>
 
-              <li>
+              <li className="ml-14">
                 <button
                   id="dropdownNavbarLink"
                   onClick={() => toggleDropdown("Order")}
-                  className={`${styles.dropdown} ml-14`}
+                  className={`${styles.dropdown} `}
                 >
-                  Order{" "}
+                  Order {" "}
                   <svg
                     className="w-2.5 h-2.5 ms-2.5"
                     aria-hidden="true"
@@ -96,7 +96,7 @@ const NavBar = () => {
                   } font-normal bg-white divide-y divide-gray-100 rounded-lg shadow`}
                 >
                   <ul
-                    className="pt-2 text-base text-white bg-blue absolute ml-14"
+                    className="pt-2 text-base text-white bg-blue absolute"
                   >
                     <li>
                       <div className={`${styles.dropdown_item}`}>
@@ -124,8 +124,8 @@ const NavBar = () => {
             </ul>
           </div>
         </div>
-        <div className="w-1/3" id="navbar-login">
-          <div className="flex flex-row-reverse items-center justify-between w-full py-2 px-3 text-lg font-medium text-white hover:text-gray-700 cursor-pointer rounded z">
+        <div className="" id="navbar-login">
+          <div className="flex flex-row-reverse w-full py-2 px-3 text-lg font-medium text-white hover:text-gray-700 cursor-pointer rounded z">
             Log in
           </div>
         </div>
