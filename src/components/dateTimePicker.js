@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { getYear, getMonth } from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
+import "../styles/datapicker.css"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCalendar } from '@fortawesome/free-solid-svg-icons'
 
@@ -38,7 +39,7 @@ const Picker = () => {
     prevMonthButtonDisabled,
     nextMonthButtonDisabled,
   }) => (
-    <div className="flex justify-around text-base text-center ">
+    <div className="flex justify-around text-base text-center mx-2">
       <button
         aria-label="Previous Month"
         className="justify-center items-center mx-2"
@@ -49,17 +50,17 @@ const Picker = () => {
       <select
         value={getYear(date)}
         onChange={({ target: { value } }) => changeYear(value)}
-        className="border-2 p-2 mr-2 text-gray-900 text-base rounded-md focus:ring-blue focus:border-blue focus:outline-none block "
+        className="p-2 text-gray-700 text-sm font-semibold rounded-md focus:ring-blue focus:border-blue focus:outline-none mr-2"
       >
         {years.map((option) => (
-          <option key={option} value={option} className="">
+          <option key={option} value={option} className="select-option">
             {option}
           </option>
         ))}
       </select>
 
       <select
-        className="border-2 text-gray-900 text-base rounded-md focus:ring-blue focus:border-blue focus:outline-none block p-2"
+        className="p-2 text-gray-700 text-sm font-semibold rounded-md focus:ring-blue focus:border-blue focus:outline-none mr-2"
         value={months[getMonth(date)]}
         onChange={({ target: { value } }) => changeMonth(months.indexOf(value))}
       >
@@ -101,11 +102,13 @@ const Picker = () => {
           {
             name: "offset",
             options: {
-              offset: [0, 5],
+              offset: [50, 0],
             },
           },
         ]}
-        className="shadow appearance-none border-2 rounded py-2 px-3 text-base cursor-pointer leading-tight focus:outline-none focus:shadow-outline focus:border-blue"
+        useWeekdaysShort={true}
+        // formatWeekDay={nameOfDay => nameOfDay.substr(0,3)}
+        className="shadow appearance-none border-2 rounded py-2 px-3 text-base text-gray-900 cursor-pointer leading-tight focus:outline-none focus:shadow-outline focus:border-blue"
       />
       {/* <DatePickerWrapperStyles /> */}
     </>

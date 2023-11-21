@@ -3,9 +3,10 @@ import NavBar from "../components/navbar";
 import Picker from "../components/dateTimePicker";
 import styles from "../styles/createOrder.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const CreateOrder = () => {
+
   const handleSave = () => {
     console.log("handleSave");
   };
@@ -13,14 +14,15 @@ const CreateOrder = () => {
   const handleDelete = () => {
     console.log("handleDelete");
   };
+
   return (
     <>
       <NavBar />
-      <div className="flex justify-center text-3xl font-semibold text-blue my-4">
+      <div className="flex justify-center text-3xl font-semibold text-blue my-6">
         ORDER EVENT
       </div>
 
-      <div className="createOrderSetting p-4 text-lg my-10 mx-14">
+      <div className="createOrderSetting text-lg my-14 mx-14 flex flex-col items-center">
         <table className="table-auto">
           <tbody>
             <tr className="border-b">
@@ -50,26 +52,36 @@ const CreateOrder = () => {
                   icon={faMagnifyingGlass}
                   style={{ color: "#7A989A", marginRight: "12px" }}
                 />
-                <input className={`${styles.create_input}`} placeholder="Search A Restaurant..."/>
+                <input
+                  className={`${styles.create_input}`}
+                  placeholder="Search a Restaurant..."
+                />
               </td>
             </tr>
             <tr>
               <td className={`${styles.create_column_name}`}>Orderers</td>
               <td className={`${styles.create_column_content}`}>
-                <input className={`${styles.create_input}`} />
+                <FontAwesomeIcon
+                  icon={faPlus}
+                  style={{ color: "#7A989A", marginRight: "12px" }}
+                />
+                <input
+                  className={`${styles.create_input}`}
+                  placeholder="Add Group or Friends"
+                />
               </td>
             </tr>
           </tbody>
         </table>
-        <div className="buttonContainer mt-6 p-4">
+        <div className="buttonContainer mt-14 p-4">
           <button
-            className="bg-yellow hover:bg-blue text-white font-bold py-3 px-4 rounded text-center"
+            className="bg-yellow hover:bg-green text-white font-bold py-3 px-4 rounded text-center"
             onClick={() => handleSave()}
           >
             Save & Launch
           </button>
           <button
-            className="bg-red hover:bg-blue text-white font-bold py-3 px-4 ml-4 rounded text-center"
+            className="bg-red hover:bg-yellow text-white font-bold py-3 px-4 ml-4 rounded text-center"
             onClick={() => handleDelete()}
           >
             Delete

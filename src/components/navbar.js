@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import styles from "../styles/navbar.module.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHouse } from "@fortawesome/free-solid-svg-icons";
 
 const NavBar = () => {
   const [isAboutMeOpen, setIsAboutMeOpen] = useState(false);
@@ -17,7 +19,8 @@ const NavBar = () => {
     <nav className="bg-blue w-full">
       <div className="flex items-center justify-between mx-4 p-2">
         <div className="flex w-2/3 items-center " id="navbar-left">
-          <img src="/images/house.png" className="h-6" alt="House" />
+          <FontAwesomeIcon icon={faHouse} style={{color:"#ffffff"}} size="xl"/>
+          {/* <img src="/images/house.png" className="h-6" alt="House" /> */}
           <div className="flex relative" id="navbar-dropdown">
             <ul className="flex font-medium mx-6 rtl:space-x-reverse">
               <li>
@@ -49,9 +52,7 @@ const NavBar = () => {
                     isAboutMeOpen ? "block" : "hidden"
                   } font-normal bg-white divide-y divide-gray-100 rounded-lg shadow`}
                 >
-                  <ul
-                    className="pt-2 text-base text-white bg-blue absolute"
-                  >
+                  <ul className="pt-2 text-base text-white bg-blue absolute">
                     <li>
                       <div className={`${styles.dropdown_item}`}>
                         My Restaurant
@@ -66,13 +67,13 @@ const NavBar = () => {
                 </div>
               </li>
 
-              <li className="ml-14">
+              <li className="ml-10">
                 <button
                   id="dropdownNavbarLink"
                   onClick={() => toggleDropdown("Order")}
                   className={`${styles.dropdown} `}
                 >
-                  Order {" "}
+                  Order{" "}
                   <svg
                     className="w-2.5 h-2.5 ms-2.5"
                     aria-hidden="true"
@@ -95,9 +96,7 @@ const NavBar = () => {
                     isOrderOpen ? "block" : "hidden"
                   } font-normal bg-white divide-y divide-gray-100 rounded-lg shadow`}
                 >
-                  <ul
-                    className="pt-2 text-base text-white bg-blue absolute"
-                  >
+                  <ul className="pt-2 text-base text-white bg-blue absolute">
                     <li>
                       <div className={`${styles.dropdown_item}`}>
                         Create Order
