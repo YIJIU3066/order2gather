@@ -1,0 +1,31 @@
+.create_column_name{
+  padding: 1rem;
+  padding-right: 4rem;
+  border-right: 1px;
+  color: #7A989A;
+  font-weight: 500;
+
+}
+
+.create_input{
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem; 
+  padding-left: 0.75rem;
+  padding-right: 0.75rem; 
+  border-radius: 0.25rem; 
+  border-width: 2px; 
+  font-size: 1rem;
+  line-height: 1.5rem; 
+  line-height: 1.25; 
+  appearance: none; 
+  cursor: pointer; 
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); 
+}
+
+.create_input:focus{
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: #7A989A;
+}
+
+
