@@ -8,6 +8,7 @@ import AllRestaurant from './allRestaurant';
 import FriendAndGroup from './friendAndGroup';
 import Report from './report';
 import History from './history';
+import FriendList from './friendList';
 const App = () => {
     return (
         <Router>
@@ -20,6 +21,7 @@ const App = () => {
                 <Route path="/friendAndGroup" element={<FriendAndGroup />} />
                 <Route path="/report" element={<Report />} />
                 <Route path="/history" element={<History />} />
+                <Route path="/friendList" element={<FriendList/>}/>
             </Routes>
         </Router>
     );
