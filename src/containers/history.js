@@ -1,8 +1,95 @@
+import NavBar from "../components/navbar";
+import { Link, useNavigate } from "react-router-dom";
+
 const History = () => {
-    return (
-        <>
-            <div>History</div>
-        </>
-    );
+  const navigate = useNavigate();
+  const history_list = [
+    {
+      id: 1,
+      orderTime: "2023-11-01",
+      restaurant: "Restaurant AAAA",
+      host: "Host 1",
+    },
+    {
+      id: 2,
+      orderTime: "2023-11-02",
+      restaurant: "Restaurant B",
+      host: "Host 2",
+    },
+    {
+      id: 3,
+      orderTime: "2023-11-03",
+      restaurant: "Restaurant C",
+      host: "Host 3",
+    },
+    {
+      id: 4,
+      orderTime: "2023-11-03",
+      restaurant: "Restaurant C",
+      host: "Host 4",
+    },
+  ];
+
+  const handleRowClick = (id) => {
+    // 導航至相應的詳細頁面，假設路由設置為 `/historyOrderDetail/:id`
+    navigate(`/historyOrderDetail/${id}`);
+  };
+
+  return (
+    <>
+      <NavBar />
+      <div className="history_container flex flex-col justify-center items-center ">
+        <div className="flex justify-center text-3xl font-semibold text-blue my-6">
+          History Order
+        </div>
+        <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div className="inline-block min-w-full py-2 sm:px-6 lg:px-8">
+            <div className="overflow-hidden">
+              <table className="min-w-full text-center text-base font-normal">
+                <thead className="border-b font-semibold">
+                  <tr>
+                    <th scope="col" className="px-12 py-4">
+                      #
+                    </th>
+                    <th scope="col" className="px-12 py-4">
+                      Order Time
+                    </th>
+                    <th scope="col" className="px-12 py-4">
+                      Restaurant
+                    </th>
+                    <th scope="col" className="px-12 py-4">
+                      Host
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {history_list.map((history, index) => (
+                    <tr
+                      className="border-b hover:bg-blue hover:text-white cursor-pointer"
+                      key={index}
+                      onClick={() => handleRowClick(history.id)}
+                    >
+                      <td className="whitespace-nowrap px-12 py-4 font-medium">
+                        {history.id}
+                      </td>
+                      <td className="whitespace-nowrap px-12 py-4">
+                        {history.orderTime}
+                      </td>
+                      <td className="whitespace-nowrap px-12 py-4">
+                        {history.restaurant}
+                      </td>
+                      <td className="whitespace-nowrap px-12 py-4">
+                        {history.host}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 };
 export default History;

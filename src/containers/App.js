@@ -9,6 +9,7 @@ import FriendAndGroup from "./friendAndGroup";
 import Report from "./report";
 import History from "./history";
 import RestaurantDetail from "./restaurantDetail";
+import HistoryOrderDetail from "./historyOrderDetail";
 
 const App = () => {
   return (
@@ -26,6 +27,11 @@ const App = () => {
           exact
           path="/restaurantDetail/:id"
           element={<RestaurantDetail />}
+        />
+        <Route
+          exact
+          path="/historyOrderDetail/:id"
+          element={<HistoryOrderDetail />}
         />
       </Routes>
     </Router>
