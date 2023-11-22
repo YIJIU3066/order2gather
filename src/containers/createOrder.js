@@ -1,7 +1,7 @@
 import { useState } from "react";
 import NavBar from "../components/navbar";
 import Picker from "../components/dateTimePicker";
-import styles from "../styles/createOrder.module.css";
+import styles from "../styles/form.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
 
@@ -22,66 +22,66 @@ const CreateOrder = () => {
         ORDER EVENT
       </div>
 
-      <div className="createOrderSetting text-lg my-14 mx-14 flex flex-col items-center">
+      <div className="createOrderSetting text-lg my-10 mx-14 flex flex-col items-center">
         <table className="table-auto">
           <tbody>
             <tr className="border-b">
-              <td className={`${styles.create_column_name}`}>Order Deadline</td>
-              <td className={`${styles.create_column_content}`}>
+              <td className={`${styles.form_name}`}>Order Deadline</td>
+              <td>
                 <Picker />
               </td>
             </tr>
             <tr className="border-b">
-              <td className={`${styles.create_column_name}`}>
+              <td className={`${styles.form_name}`}>
                 Estimated Arrival
               </td>
-              <td className={`${styles.create_column_content}`}>
+              <td>
                 <Picker />
               </td>
             </tr>
             <tr className="border-b">
-              <td className={`${styles.create_column_name}`}>Order End</td>
-              <td className={`${styles.create_column_content}`}>
+              <td className={`${styles.form_name}`}>Order End</td>
+              <td>
                 <Picker />
               </td>
             </tr>
             <tr className="border-b">
-              <td className={`${styles.create_column_name}`}>Restaurant</td>
-              <td className={`${styles.create_column_content}`}>
+              <td className={`${styles.form_name}`}>Restaurant</td>
+              <td>
                 <FontAwesomeIcon
                   icon={faMagnifyingGlass}
                   style={{ color: "#7A989A", marginRight: "12px" }}
                 />
                 <input
-                  className={`${styles.create_input}`}
+                  className={`${styles.form_input}`}
                   placeholder="Search a Restaurant..."
                 />
               </td>
             </tr>
             <tr>
-              <td className={`${styles.create_column_name}`}>Orderers</td>
-              <td className={`${styles.create_column_content}`}>
+              <td className={`${styles.form_name}`}>Orderers</td>
+              <td>
                 <FontAwesomeIcon
                   icon={faPlus}
                   style={{ color: "#7A989A", marginRight: "12px" }}
                 />
                 <input
-                  className={`${styles.create_input}`}
+                  className={`${styles.form_input}`}
                   placeholder="Add Group or Friends"
                 />
               </td>
             </tr>
           </tbody>
         </table>
-        <div className="buttonContainer mt-14 p-4">
+        <div className="buttonContainer mt-8">
           <button
-            className="bg-yellow hover:bg-green text-white font-bold py-3 px-4 rounded text-center"
+            className="bg-yellow hover:bg-green text-white font-bold py-2 px-3 rounded text-center"
             onClick={() => handleSave()}
           >
             Save & Launch
           </button>
           <button
-            className="bg-red hover:bg-yellow text-white font-bold py-3 px-4 ml-4 rounded text-center"
+            className="bg-red hover:bg-yellow text-white font-bold py-2 px-3 ml-4 rounded text-center"
             onClick={() => handleDelete()}
           >
             Delete

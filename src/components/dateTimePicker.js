@@ -108,7 +108,7 @@ const Picker = () => {
         ]}
         useWeekdaysShort={true}
         // formatWeekDay={nameOfDay => nameOfDay.substr(0,3)}
-        className="shadow appearance-none border-2 rounded py-2 px-3 text-base text-gray-900 cursor-pointer leading-tight focus:outline-none focus:shadow-outline focus:border-blue"
+        className="shadow appearance-none border-2 rounded py-2 px-3 text-base text-gray-700 cursor-pointer leading-tight focus:outline-none focus:shadow-outline focus:border-blue"
       />
       {/* <DatePickerWrapperStyles /> */}
     </>

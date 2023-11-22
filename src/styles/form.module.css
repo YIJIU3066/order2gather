@@ -1,19 +1,18 @@
-.create_column_name{
-  padding: 1rem;
+.form_name{
+  padding: 1.5rem;
   padding-right: 4rem;
-  border-right: 1px;
+  /* border-right: 1px; */
   color: #7A989A;
-  font-weight: 500;
-
+  font-weight: 600;
 }
 
-.create_input{
+.form_input{
   padding-top: 0.5rem;
   padding-bottom: 0.5rem; 
   padding-left: 0.75rem;
   padding-right: 0.75rem; 
   border-radius: 0.25rem; 
-  border-width: 2px; 
+  border-width: 3px; 
   font-size: 1rem;
   line-height: 1.5rem; 
   line-height: 1.25; 
@@ -23,9 +22,17 @@
   
 }
 
-.create_input:focus{
+.form_input:focus{
   outline: none;
   border-color: #7A989A;
+  border-width: 3px;
 }
 
+.form_content{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1.5rem;
+}
 
