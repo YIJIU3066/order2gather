@@ -30,9 +30,9 @@ const History = () => {
     },
   ];
 
-  const handleRowClick = (id) => {
+  const handleRowClick = (id, history) => {
     // 導航至相應的詳細頁面，假設路由設置為 `/historyOrderDetail/:id`
-    navigate(`/historyOrderDetail/${id}`);
+    navigate(`/historyOrderDetail/${id}`, { state: { history: history } });
   };
 
   return (
@@ -42,11 +42,11 @@ const History = () => {
         <div className="flex justify-center text-3xl font-semibold text-blue my-6">
           History Order
         </div>
-        <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="inline-block min-w-full py-2 sm:px-6 lg:px-8">
+        <div className="overflow-x-auto">
+          <div className="inline-block min-w-full py-2">
             <div className="overflow-hidden">
-              <table className="min-w-full text-center text-base font-normal">
-                <thead className="border-b font-semibold">
+              <table className="min-w-full text-center text-base font-normal text-gray-900">
+                <thead className="border-b font-semibold text-blue">
                   <tr>
                     <th scope="col" className="px-12 py-4">
                       #
@@ -67,7 +67,7 @@ const History = () => {
                     <tr
                       className="border-b hover:bg-blue hover:text-white cursor-pointer"
                       key={index}
-                      onClick={() => handleRowClick(history.id)}
+                      onClick={() => handleRowClick(history.id, history)}
                     >
                       <td className="whitespace-nowrap px-12 py-4 font-medium">
                         {history.id}

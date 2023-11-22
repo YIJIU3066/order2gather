@@ -92,7 +92,7 @@ const NavBar = () => {
                     isOrderOpen ? "block" : "hidden"
                   } font-normal bg-white divide-y divide-gray-100 rounded-lg shadow`}
                 >
-                  <ul className="pt-2 text-base text-white bg-blue absolute">
+                  <ul className="pt-2 text-base text-white bg-blue absolute z-50">
                     <li>
                       <Link to="/createOrder">
                         <div className={`${styles.dropdown_item}`}>
