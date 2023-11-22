@@ -1,6 +1,7 @@
 import Navbar from "../components/navbar.js";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHandshake, faUserGroup } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom';
 
 const FriendAndGroup = () => {
     return (
@@ -11,9 +12,11 @@ const FriendAndGroup = () => {
             </div>
             <div className="flex p-10 items-center justify-around flex-wrap gap-6">
                 <div className="flex items-center flex-col justify-center gap-2">
-                    <button className="bg-blue rounded-3xl w-80 h-24">
-                    <   FontAwesomeIcon icon={faHandshake} style={{color: "#ffffff"}} size="4x" />
-                    </button>
+                    <Link to="/friendList">
+                        <button className="bg-blue rounded-3xl w-80 h-24">
+                            <FontAwesomeIcon icon={faHandshake} style={{color: "#ffffff"}} size="4x" />
+                        </button>
+                    </Link>
                     <p className="text-blue text-xl font-bold">Friend</p>
                 </div>
                 <div className="flex items-center flex-col justify-center gap-2">
