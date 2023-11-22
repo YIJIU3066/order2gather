@@ -7,13 +7,13 @@ const AddItem = ({ onClick, hintText }) => {
 
   return (
     <button
-      className="rounded-full bg-yellow h-10 w-10 flex items-center justify-center mx-4 cursor-pointer relative"
+      className="rounded-full bg-yellow h-10 w-10 flex items-center justify-center mx-4 cursor-pointer relative z-0"
       onClick={onClick}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
     >
       {showTooltip && (
-        <span className="absolute left-full ml-2 w-max bg-yellow text-white px-3 py-2 rounded text-xs  font-normal duration-100">
+        <span className="absolute left-full ml-2 w-max bg-yellow text-white px-3 py-2 rounded text-xs font-normal duration-100">
           {hintText}
         </span>
       )}
