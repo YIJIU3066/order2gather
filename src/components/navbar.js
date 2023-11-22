@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect,useRef  } from "react";
+import { Link } from "react-router-dom";
 import styles from "../styles/navbar.module.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHouse, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
 const NavBar = () => {
   const [isAboutMeOpen, setIsAboutMeOpen] = useState(false);
   const [isOrderOpen, setIsOrderOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const toggleDropdown = (item) => {
     if (item === "About") {
@@ -13,12 +17,33 @@ const NavBar = () => {
     }
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsAboutMeOpen(false);
+        setIsOrderOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <nav className="bg-blue w-full">
       <div className="flex items-center justify-between mx-4 p-2">
         <div className="flex w-2/3 items-center " id="navbar-left">
-          <img src="/images/house.png" className="h-6" alt="House" />
-          <div className="flex relative" id="navbar-dropdown">
+          <Link to="/">
+            <FontAwesomeIcon
+              icon={faHouse}
+              style={{ color: "#ffffff" }}
+              size="xl"
+              className="cursor-pointer"
+            />
+          </Link>
+          <div className="flex relative" id="navbar-dropdown" ref={dropdownRef}>
             <ul className="flex font-medium mx-6 rtl:space-x-reverse">
               <li>
                 <button
@@ -26,22 +51,7 @@ const NavBar = () => {
                   onClick={() => toggleDropdown("About")}
                   className={`${styles.dropdown}`}
                 >
-                  About Me{" "}
-                  <svg
-                    className="w-2.5 h-2.5 ms-2.5"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 10 6"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="m1 1 4 4 4-4"
-                    />
-                  </svg>
+                  About Me <FontAwesomeIcon icon={faChevronDown} size="sm" />
                 </button>
                 <div
                   id="dropdownNavbar"
@@ -49,45 +59,32 @@ const NavBar = () => {
                     isAboutMeOpen ? "block" : "hidden"
                   } font-normal bg-white divide-y divide-gray-100 rounded-lg shadow`}
                 >
-                  <ul
-                    className="pt-2 text-base text-white bg-blue absolute"
-                  >
+                  <ul className="pt-2 text-base text-white bg-blue absolute">
                     <li>
-                      <div className={`${styles.dropdown_item}`}>
-                        My Restaurant
-                      </div>
+                      <Link to="/allRestaurant">
+                        <div className={`${styles.dropdown_item}`}>
+                          My Restaurant
+                        </div>
+                      </Link>
                     </li>
                     <li>
-                      <div className={`${styles.dropdown_item}`}>
-                        My Friend & Group
-                      </div>
+                      <Link to="/friendAndGroup">
+                        <div className={`${styles.dropdown_item}`}>
+                          My Friend & Group
+                        </div>
+                      </Link>
                     </li>
                   </ul>
                 </div>
               </li>
 
-              <li className="ml-14">
+              <li className="ml-10">
                 <button
                   id="dropdownNavbarLink"
                   onClick={() => toggleDropdown("Order")}
                   className={`${styles.dropdown} `}
                 >
-                  Order {" "}
-                  <svg
-                    className="w-2.5 h-2.5 ms-2.5"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 10 6"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="m1 1 4 4 4-4"
-                    />
-                  </svg>
+                  Order <FontAwesomeIcon icon={faChevronDown} size="sm" />
                 </button>
                 <div
                   id="dropdownNavbar"
@@ -95,28 +92,34 @@ const NavBar = () => {
                     isOrderOpen ? "block" : "hidden"
                   } font-normal bg-white divide-y divide-gray-100 rounded-lg shadow`}
                 >
-                  <ul
-                    className="pt-2 text-base text-white bg-blue absolute"
-                  >
+                  <ul className="pt-2 text-base text-white bg-blue absolute">
                     <li>
-                      <div className={`${styles.dropdown_item}`}>
-                        Create Order
-                      </div>
+                      <Link to="/createOrder">
+                        <div className={`${styles.dropdown_item}`}>
+                          Create Order
+                        </div>
+                      </Link>
                     </li>
                     <li>
-                      <div className={`${styles.dropdown_item}`}>
-                        Order History
-                      </div>
+                      <Link to="/history">
+                        <div className={`${styles.dropdown_item}`}>
+                          Order History
+                        </div>
+                      </Link>
                     </li>
                     <li>
-                      <div className={`${styles.dropdown_item}`}>
-                        View Order
-                      </div>
+                      <Link to="/allOrder">
+                        <div className={`${styles.dropdown_item}`}>
+                          View Order
+                        </div>
+                      </Link>
                     </li>
                     <li>
-                      <div className={`${styles.dropdown_item}`}>
-                        Order Report
-                      </div>
+                      <Link to="/report">
+                        <div className={`${styles.dropdown_item}`}>
+                          Order Report
+                        </div>
+                      </Link>
                     </li>
                   </ul>
                 </div>
