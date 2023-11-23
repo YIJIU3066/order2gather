@@ -1,5 +1,6 @@
 import NavBar from "../components/navbar";
 import React, { useState } from 'react';
+import '../styles/allOrderUI.css'
 import { Link, useNavigate } from "react-router-dom";
 const AllOrder = () => {
 
@@ -10,8 +11,8 @@ const AllOrder = () => {
     const navigate = useNavigate();
 
     const handleOpenClick = (id) => {
-        // 導航至相應的詳細頁面，假設路由設置為 `/historyOrderDetail/:id`
-        navigate(`/historyOrderDetail/${id}`);
+        // 導航至相應的詳細頁面，假設路由設置為 `/ordering/:id`
+        navigate(`/ordering/${id}`);
     };
 
     const handleDeliverClick = (id) => {
@@ -100,7 +101,7 @@ const AllOrder = () => {
             id: 1,
             restaurant: "Restaurant BBB",
             deliverTime: "2023-07-29 13:00",
-            host: "Host 1",
+            host: "Host 2",
         },
         {
             id: 2,
@@ -112,13 +113,13 @@ const AllOrder = () => {
             id: 3,
             restaurant: "Restaurant DD",
             deliverTime: "2023-07-29 20:00",
-            host: "Host 1",
+            host: "Host 2",
         },
         {
             id: 4,
             restaurant: "Restaurant EE",
             deliverTime: "2023-07-30 20:00",
-            host: "Host 5",
+            host: "Host 3",
         },
     ];
 
@@ -128,118 +129,114 @@ const AllOrder = () => {
 
     return (    
         <>
-            <NavBar/>        
+            <NavBar/>
+            <div className="triangle-left"></div>      
             <div className="flex p-10 pb-0 pt-4 items-center justify-center">
                 <h2 className="text-blue font-bold text-4xl">My Order</h2>
             </div>        
             <div className="flex p-10 pb-0 pt-4 items-center justify-left">
                 <h2 className="text-grey font-bold text-2xl">Open</h2>
             </div>
-            <div>
-                <h1>Order</h1>
-                <p>Displaying items with id: {openVarValue}, {openVarValue + 1}, and {openVarValue + 2}</p>
-                
-                
-                <div className="flex p-1 items-start justify-around flex-wrap gap-6">
-                    <button onClick={decreaseOpenButtonClick}>Decrease</button>
-                    {filteredOpenOrder.map(item => (
-                        <div key={item.id} className="flex flex-col items-start">
-                        <tr
-                        className="border-b hover:text-white cursor-pointer"
-                        key={item.id}
-                        onClick={() => handleOpenClick(item.id)}
+            <div className="flex p-1 justify-around flex-wrap gap-6">
+                <button onClick={decreaseOpenButtonClick} className="button-with-left-triangle "></button>
+                {filteredOpenOrder.map(item => (
+                <div key={item.id} className="flex flex-col items-start">
+                    <div
+                    className="border-b hover:text-white cursor-pointer"
+                    key={item.id}
+                    onClick={() => handleOpenClick(item.id)}
+                    >
+                        <div
+                            className={`p-0 pl-1 pr-20 w-180 h-24 items-start ${
+                            item.id === openVarValue
+                                ? 'bg-blue'
+                                : item.id === openVarValue + 1
+                                ? 'bg-brown'
+                                : item.id === openVarValue + 2
+                                ? 'bg-green'
+                                : ''
+                            }`}
                         >
+                        <strong className="items-start p-0"></strong> {item.restaurant}
+                        </div>
+                    </div>
+                    
+                    <ul className="mt-2">
+                    <li>
+                        <strong>Open until:</strong>
+                        <div>{item.openTime}</div>
+                    </li>
+                    <li>
+                        <strong>Estimated delivery time:</strong>
+                        <div>{item.deliverTime}</div>
+                    </li>
+                    </ul>
+                    {item.host === myName && (
+                        <div key={item.id} className="flex flex-col items-center">
                             <div
-                                className={`p-0 pl-1 pr-20 w-180 h-24 items-start ${
-                                item.id === openVarValue
-                                    ? 'bg-blue'
-                                    : item.id === openVarValue + 1
-                                    ? 'bg-brown'
-                                    : item.id === openVarValue + 2
-                                    ? 'bg-green'
-                                    : ''
-                                }`}
+                            className="border-b hover:text-white cursor-pointer"
+                            key={item.id}
+                            onClick={() => handleDashboardClick(item.id)}
                             >
-                            <strong className="items-start p-0"></strong> {item.restaurant}
+                                <div className="p-0 pl-2 pr-20 w-160 h-18 rounded-2xl bg-red text-center">Dashboard</div>
                             </div>
-                        </tr>
-                        
-                        <ul className="mt-2">
-                          <li>
-                            <strong>Open Time:</strong> {item.openTime}
-                          </li>
-                          <li>
-                            <strong>Deliver Time:</strong> {item.deliverTime}
-                          </li>
-                          <li>
-                            <strong>Host:</strong> {item.host}
-                          </li>
-                        </ul>
-                        {item.host === myName && (
-                            <div key={item.id} className="flex flex-col items-center">
-                                <tr
-                                className="border-b hover:text-white cursor-pointer"
-                                key={item.id}
-                                onClick={() => handleDashboardClick(item.id)}
-                                >
-                                <div
-                                    className={"p-0 pl-1 pr-20 w-160 h-18 items-center bg-red"}
-                                >
-                                    <div className="items-start p-0">Dashboard</div>
-                                </div>
-                                </tr>
-                            </div>
-                            )}
-                      </div>
-                    ))}
-                    <button onClick={increaseOpenButtonClick}>Increase</button>
+                        </div>
+                    )}
                 </div>
+                ))}
+                <button onClick={increaseOpenButtonClick} className="button-with-right-triangle "></button>
             </div>        
             <div className="flex p-10 pb-0 pt-4 items-center justify-left">
                 <h2 className="text-grey font-bold text-2xl">Delivering</h2>
             </div>
-            <div>
-                <h1>Order</h1>
-                <p>Displaying items with id: {deliverVarValue}, {deliverVarValue + 1}, and {deliverVarValue + 2}</p>
-                
-                
-                <div className="flex p-1 items-center justify-around flex-wrap gap-6">
-                    <button onClick={decreaseDeliverButtonClick}>Decrease</button>
-                    {filteredDeliverOrder.map(item => (
-                        <div key={item.id} className="flex flex-col items-start">
-                        <tr
-                        className="border-b hover:text-white cursor-pointer"
-                        key={item.id}
-                        onClick={() => handleDeliverClick(item.id)}
+
+            <div className="flex p-1 justify-around flex-wrap gap-6">    
+                <button onClick={decreaseDeliverButtonClick} className="button-with-left-triangle "></button>
+                {filteredDeliverOrder.map(item => (
+                <div key={item.id} className="flex flex-col items-start">
+                    <div
+                    className="border-b hover:text-white cursor-pointer"
+                    key={item.id}
+                    onClick={() => handleDeliverClick(item.id)}
+                    >
+                        <div
+                            className={`p-0 pl-1 pr-20 w-180 h-24 items-start ${
+                            item.id === deliverVarValue
+                                ? 'bg-blue'
+                                : item.id === deliverVarValue + 1
+                                ? 'bg-brown'
+                                : item.id === deliverVarValue + 2
+                                ? 'bg-green'
+                                : ''
+                            }`}
                         >
-                            <div
-                                className={`p-0 pl-1 pr-20 w-180 h-24 items-start ${
-                                item.id === deliverVarValue
-                                    ? 'bg-blue'
-                                    : item.id === deliverVarValue + 1
-                                    ? 'bg-brown'
-                                    : item.id === deliverVarValue + 2
-                                    ? 'bg-green'
-                                    : ''
-                                }`}
-                            >
-                            <strong className="items-start p-0"></strong> {item.restaurant}
+                        <strong className="items-start p-0"></strong> {item.restaurant}
                         </div>
-                        </tr>
-                        
-                        <ul className="mt-2">
-                          <li>
-                            <strong>Deliver Time:</strong> {item.deliverTime}
-                          </li>
-                          <li>
-                            <strong>Host:</strong> {item.host}
-                          </li>
-                        </ul>
-                      </div>
-                    ))}
-                    <button onClick={increaseDeliverButtonClick}>Increase</button>
+                    </div>
+                    
+                    <ul className="mt-2">
+                    <li>
+                        <strong>Estimated delivery time:</strong>
+                        <div>{item.deliverTime}</div>
+                    </li>
+                    </ul>
+                    {item.host === myName && (
+                        <div key={item.id} className="flex flex-col items-center">
+                            <div
+                            className="border-b hover:text-white cursor-pointer"
+                            key={item.id}
+                            onClick={() => handleDashboardClick(item.id)}
+                            >
+                                <div className="p-0 pl-2 pr-20 w-160 h-18 rounded-2xl bg-red text-center">Dashboard</div>
+                            </div>
+                        </div>
+                    )}
                 </div>
-            </div>
+                ))}
+                <button onClick={increaseDeliverButtonClick} className="button-with-right-triangle "></button>
+            </div> 
+
+
         </>
     );
         
