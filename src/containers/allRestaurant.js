@@ -3,7 +3,7 @@ import NavBar from "../components/navbar";
 import RestaurantCard from "../components/restaurantCard";
 import SearchBar from "../components/searchBar";
 import AddItem from "../components/addItem";
-import RestaurantAddForm from "../components/restaurantAddForm";
+import AddRestaurantForm from "../components/addRestaurantForm"
 
 const AllRestaurant = () => {
   const [showRestaurantForm, setShowRestaurantForm] = useState(false);
@@ -44,7 +44,7 @@ const AllRestaurant = () => {
       </div>
       {showRestaurantForm && (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100">
-          <RestaurantAddForm
+          <AddRestaurantForm
             onClose={handleCloseRestaurantForm}
             onSave={handleSaveRestaurant}
           />

@@ -1,0 +1,219 @@
+import React, { useState, useRef, useEffect } from "react";
+import styles from "../styles/form.module.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUpload, faXmark } from "@fortawesome/free-solid-svg-icons";
+import Swal from "sweetalert2";
+
+const AddRestaurantForm = ({ onSave, onClose }) => {
+  const user = 1;
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [telephone, setTelephone] = useState("");
+  const [opentime, setOpentime] = useState("");
+  // const [menu, setMenu] = useState(null);
+  const [menus, setMenus] = useState([]);
+  const [menuURLs, setMenuURLs] = useState([]);
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    console.log(menus);
+    if (menus.length < 1) return;
+
+    // Create new image URLs from the menus
+    const newImageUrls = menus.map((menu) => URL.createObjectURL(menu));
+    setMenuURLs(newImageUrls);
+
+    // Clean up previous image URLs when menus change
+    return () => {
+      menus.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [menus]);
+
+  const handleMenuChange = (event) => {
+    console.log("handleMenuUpload");
+    const file = event.target.files[0];
+    setMenus([...menus, file]);
+  };
+
+  const handleMenuUpload = () => {
+    fileInputRef.current.click();
+    if (menus) {
+      console.log("Selected File:", menus);
+    } else {
+      console.log("Please select a file.");
+    }
+  };
+
+  const handleDeleteMenu = (indexToDelete) => {
+    const updatedMenus = [...menus];
+    updatedMenus.splice(indexToDelete, 1); // 刪除指定索引的菜單圖片
+
+    // 更新 state 中的 menus
+    setMenus(updatedMenus);
+
+    // 釋放被刪除的圖片的 URL
+    const updatedMenuURLs = [...menuURLs];
+    URL.revokeObjectURL(updatedMenuURLs[indexToDelete]); // 釋放被刪除圖片的 URL
+    updatedMenuURLs.splice(indexToDelete, 1);
+
+    // 更新 state 中的 menuURLs
+    setMenuURLs(updatedMenuURLs);
+  };
+
+  const handleSave = () => {
+    // 檢查表單是否有效
+    if (name && telephone) {
+      onSave({ name, address, telephone });
+      setName("");
+      setAddress("");
+      setTelephone("");
+      setOpentime("");
+      // setMenu("");
+      setMenus([]);
+
+      const restaurant = {
+        uid: user,
+        name: name,
+        address: address,
+        phone: telephone,
+        openHour: opentime,
+        menu: menus,
+      };
+      // 資料存到後端
+    } else {
+      Swal.fire({
+        title: "Error!",
+        text: "Please fill in all required fields",
+        icon: "warning",
+        iconColor: "#CF9546",
+        showCancelButton: true,
+        confirmButtonColor: "#7A989A",
+        cancelButtonColor: "#C67052",
+        confirmButtonText: "OK!",
+        cancelButtonText: "Quit Create",
+      });
+    }
+  };
+
+  const handleClose = () => {
+    onClose();
+  };
+
+  return (
+    <div className="restaurant_form_container w-full h-full flex justify-center items-center">
+      <div className="w-fit border-8 px-20 border-blue p-4 rounded shadow flex flex-col items-center bg-slate-50 relative">
+        <div
+          className="cursor-pointer absolute top-0 right-0 px-6 py-4"
+          onClick={() => handleClose()}
+        >
+          <FontAwesomeIcon
+            icon={faXmark}
+            size="2xl"
+            style={{ color: "#7A989A" }}
+          />
+        </div>
+        <div className="flex justify-center text-3xl font-semibold text-blue my-4">
+          Add Restaurant
+        </div>
+
+        <div className="input_container text-lg mt-4 mx-14 flex flex-col items-center overflow-x-auto">
+          <table className="table-auto">
+            <tbody>
+              <tr className="border-b">
+                <td className={`${styles.form_name}`}>Restaurant Name*</td>
+                <td>
+                  <input
+                    className={`${styles.form_input}`}
+                    placeholder="Restaurant Name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className={`${styles.form_name}`}>Address</td>
+                <td>
+                  <input
+                    className={`${styles.form_input}`}
+                    placeholder="Address"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                  />
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className={`${styles.form_name}`}>Telephone*</td>
+                <td>
+                  <input
+                    className={`${styles.form_input}`}
+                    placeholder="Phone Number"
+                    value={telephone}
+                    onChange={(e) => setTelephone(e.target.value)}
+                  />
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className={`${styles.form_name}`}>Open Time</td>
+                <td>
+                  <input
+                    className={`${styles.form_input}`}
+                    placeholder="Open Time"
+                    value={opentime}
+                    onChange={(e) => setOpentime(e.target.value)}
+                  />
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className={`${styles.form_name}`}>Menu</td>
+                <td className="flex items-center py-3">
+                  {menus &&
+                    menuURLs.map((menuSrc, index) => (
+                      <div className="relative inline-block" key={index}>
+                        <button
+                          className="cursor-pointer bg-red/[0.8] hover:bg-yellow/[0.8] w-4 h-4 rounded-full absolute -top-2 right-0 flex justify-center items-center"
+                          onClick={() => handleDeleteMenu(index)}
+                        >
+                          <FontAwesomeIcon
+                            icon={faXmark}
+                            size="2xs"
+                            style={{ color: "#ffffff" }}
+                          />
+                        </button>
+                        <img
+                          src={menuSrc}
+                          alt="Selected"
+                          className="w-28 mr-2"
+                        />
+                      </div>
+                    ))}
+                  <button
+                    className="bg-green hover:bg-yellow text-white font-bold py-2 px-3 rounded text-center text-base"
+                    onClick={() => handleMenuUpload()}
+                  >
+                    <FontAwesomeIcon icon={faUpload} className="pr-3" />
+                    Upload
+                  </button>
+                  <input
+                    type="file"
+                    onChange={handleMenuChange}
+                    className="hidden"
+                    ref={fileInputRef}
+                    // multiple
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button
+          className="bg-yellow hover:bg-green text-white font-bold py-2 px-6 my-6 rounded text-center"
+          onClick={() => handleSave()}
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  );
+};
+export default AddRestaurantForm;

@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const CreateOrder = () => {
-
   const handleSave = () => {
     console.log("handleSave");
   };
@@ -32,9 +31,7 @@ const CreateOrder = () => {
               </td>
             </tr>
             <tr className="border-b">
-              <td className={`${styles.form_name}`}>
-                Estimated Arrival
-              </td>
+              <td className={`${styles.form_name}`}>Estimated Arrival</td>
               <td>
                 <Picker />
               </td>
@@ -48,27 +45,31 @@ const CreateOrder = () => {
             <tr className="border-b">
               <td className={`${styles.form_name}`}>Restaurant</td>
               <td>
-                <FontAwesomeIcon
-                  icon={faMagnifyingGlass}
-                  style={{ color: "#7A989A", marginRight: "12px" }}
-                />
-                <input
-                  className={`${styles.form_input}`}
-                  placeholder="Search a Restaurant..."
-                />
+                <label className="cursor-pointer">
+                  <FontAwesomeIcon
+                    icon={faMagnifyingGlass}
+                    style={{ color: "#7A989A", marginRight: "12px" }}
+                  />
+                  <input
+                    className={`${styles.form_input}`}
+                    placeholder="Search a Restaurant..."
+                  />
+                </label>
               </td>
             </tr>
             <tr>
               <td className={`${styles.form_name}`}>Orderers</td>
               <td>
-                <FontAwesomeIcon
-                  icon={faPlus}
-                  style={{ color: "#7A989A", marginRight: "12px" }}
-                />
-                <input
-                  className={`${styles.form_input}`}
-                  placeholder="Add Group or Friends"
-                />
+                <label className="cursor-pointer">
+                  <FontAwesomeIcon
+                    icon={faPlus}
+                    style={{ color: "#7A989A", marginRight: "12px" }}
+                  />
+                  <input
+                    className={`${styles.form_input}`}
+                    placeholder="Add Group or Friends"
+                  />
+                </label>
               </td>
             </tr>
           </tbody>

@@ -4,7 +4,6 @@ const RestaurantCard = ({ restaurant, index }) => {
   const colors = ["#7A989A", "#C1AE8D", "#849271"];
   const currentColor = colors[index % colors.length];
 
-  console.log(`/restaurantDetail/${restaurant.id}`);
   return (
     <>
       <Link

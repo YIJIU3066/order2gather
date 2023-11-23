@@ -2,13 +2,12 @@ import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { getYear, getMonth } from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
-import "../styles/datapicker.css"
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCalendar } from '@fortawesome/free-solid-svg-icons'
+import "../styles/datapicker.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 
 const Picker = () => {
   const [date, setDate] = useState(new Date());
-  const currentYear = getYear(new Date());
   const startYear = 2010;
   const endYear = 2025;
   const years = Array.from(
@@ -83,34 +82,38 @@ const Picker = () => {
   useEffect(() => {
     console.log(date);
   }, [date]);
-  
+
   return (
     <>
-      <FontAwesomeIcon icon={faCalendar} style={{ color: "#7A989A", marginRight: "12px" }}/>
-      <DatePicker
-        id="orderEnd"
-        selected={date}
-        onChange={(date) => setDate(date)}
-        timeInputLabel="Time"
-        showTimeSelect
-        // showTimeInput
-        // todayButton="Today"
-        timeIntervals={10}
-        dateFormat="yyyy/MM/dd h:mm aa"
-        renderCustomHeader={renderCustomHeader}
-        popperModifiers={[
-          {
-            name: "offset",
-            options: {
-              offset: [50, 0],
+      <label className="cursor-pointer">
+        <FontAwesomeIcon
+          icon={faCalendar}
+          style={{ color: "#7A989A", marginRight: "12px" }}
+        />
+        <DatePicker
+          id="orderEnd"
+          selected={date}
+          onChange={(date) => setDate(date)}
+          timeInputLabel="Time"
+          showTimeSelect
+          // showTimeInput
+          // todayButton="Today"
+          timeIntervals={10}
+          dateFormat="yyyy/MM/dd h:mm aa"
+          renderCustomHeader={renderCustomHeader}
+          popperModifiers={[
+            {
+              name: "offset",
+              options: {
+                offset: [50, 0],
+              },
             },
-          },
-        ]}
-        useWeekdaysShort={true}
-        // formatWeekDay={nameOfDay => nameOfDay.substr(0,3)}
-        className="shadow appearance-none border-2 rounded py-2 px-3 text-base text-gray-700 cursor-pointer leading-tight focus:outline-none focus:shadow-outline focus:border-blue"
-      />
-      {/* <DatePickerWrapperStyles /> */}
+          ]}
+          useWeekdaysShort={true}
+          // formatWeekDay={nameOfDay => nameOfDay.substr(0,3)}
+          className="shadow appearance-none border-2 rounded py-2 px-3 text-base text-gray-700 cursor-pointer leading-tight focus:outline-none focus:shadow-outline focus:border-blue"
+        />
+      </label>
     </>
   );
 };
