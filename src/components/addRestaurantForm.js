@@ -15,9 +15,9 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
   const [menuURLs, setMenuURLs] = useState([]);
   const fileInputRef = useRef(null);
   const [fullscreenImageIndex, setFullscreenImageIndex] = useState(null);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
-    console.log(menus);
     if (menus.length < 1) return;
 
     // Create new image URLs from the menus
@@ -136,12 +136,12 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
           Add Restaurant
         </div>
 
-        <div className="input_container text-lg mt-4 mx-14 flex flex-col items-center overflow-x-auto">
+        <div className="input_container text-lg mt-4 mx-14 flex flex-col items-center overflow-x-auto overflow-y-auto h-1/2 w-[95%]">
           <table className="">
             <tbody>
               <tr className="border-b">
                 <td className={`${styles.form_name}`}>Restaurant Name*</td>
-                <td>
+                <td className="pr-6">
                   <input
                     className={`${styles.form_input}`}
                     placeholder="Restaurant Name"
@@ -153,7 +153,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
               </tr>
               <tr className="border-b">
                 <td className={`${styles.form_name}`}>Address</td>
-                <td>
+                <td className="pr-6">
                   <input
                     className={`${styles.form_input}`}
                     placeholder="Address"
@@ -164,7 +164,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
               </tr>
               <tr className="border-b">
                 <td className={`${styles.form_name}`}>Telephone*</td>
-                <td>
+                <td className="pr-6">
                   <input
                     className={`${styles.form_input}`}
                     placeholder="Phone Number"
@@ -175,7 +175,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
               </tr>
               <tr className="border-b">
                 <td className={`${styles.form_name}`}>Open Time</td>
-                <td>
+                <td className="pr-6">
                   <input
                     className={`${styles.form_input}`}
                     placeholder="Open Time"
@@ -185,59 +185,82 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
                 </td>
               </tr>
               <tr className="border-b">
-                <td className={`${styles.form_name}`}>Menu</td>
-                <td className="flex items-center py-3">
-                  <div className="menu_container overflow-x-auto w-80 flex items-center">
-                    {menus &&
-                      menuURLs.map((menuSrc, index) => (
-                        <div className="relative m-2 w-20" key={index}>
-                          <button
-                            className="cursor-pointer bg-transport bg-red/[0.8] hover:bg-yellow/[0.8] w-4 h-4 rounded-full absolute -top-2 -right-2 flex justify-center items-center"
-                            onClick={() => handleDeleteMenu(index)}
+                <td className={`${styles.form_name}`}>
+                  <div className="flex items-center">
+                    Menu
+                    <button
+                      className="border-2 bg-blue hover:bg-blue text-white focus:outline-none shadow-md font-bold py-3 px-3 mx-3 rounded text-center text-base relative flex justify-center items-center"
+                      onClick={() => handleMenuUpload()}
+                      type="submit"
+                      onMouseEnter={() => setShowTooltip(true)}
+                      onMouseLeave={() => setShowTooltip(false)}
+                    >
+                      {showTooltip && (
+                        <span className="absolute left-full w-max bg-blue text-white px-2 py-1.5 ml-1.5 shadow-md rounded text-xs font-normal duration-100">
+                          Upload Menu
+                        </span>
+                      )}
+                      <FontAwesomeIcon
+                        icon={faUpload}
+                        style={{ color: "#fff" }}
+                      />
+                    </button>
+                    <input
+                      type="file"
+                      id="fileInput"
+                      name="fileInput"
+                      onChange={handleMenuChange}
+                      className="hidden"
+                      ref={fileInputRef}
+                      accept="image/*"
+                    />
+                  </div>
+                </td>
+                <td className="pr-6">
+                  <div className="flex items-center justify-center my-2">
+                    <div className="menu_container overflow-x-auto w-80 flex items-center justify-start h-[130px]">
+                      {menus &&
+                        menuURLs.map((menuSrc, index) => (
+                          <div
+                            className="relative mr-2 w-[150px] h-[100px] min-w-[150px] min-h-[100px] bg-black flex justify-center items-center"
+                            key={index}
                           >
-                            <FontAwesomeIcon
-                              icon={faXmark}
-                              size="2xs"
-                              style={{ color: "#ffffff" }}
-                            />
-                          </button>
-                          <img
-                            src={menuSrc}
-                            alt="Selected"
-                            className="w-full h-auto menu_img cursor-pointer"
-                            onClick={() => handleFullScreen(index)}
-                          />
-                          {/* 全螢幕圖片 */}
-                          {fullscreenImageIndex === index && (
-                            <div
-                              className={`${styles_img.zoom_img_container}`}
-                              onClick={handleCloseFullScreen}
-                            >
+                            <div className="relative w-full h-full">
+                              <button
+                                className="cursor-pointer bg-transport bg-red/[0.8] hover:bg-yellow/[0.8] w-4 h-4 shadow-md rounded-full absolute -top-2 -right-2 flex justify-center items-center"
+                                onClick={() => handleDeleteMenu(index)}
+                              >
+                                <FontAwesomeIcon
+                                  icon={faXmark}
+                                  size="2xs"
+                                  style={{ color: "#ffffff" }}
+                                />
+                              </button>
                               <img
                                 src={menuSrc}
-                                alt="Fullscreen"
-                                className={`${styles_img.zoom_img}`}
+                                alt="Selected"
+                                className="w-full h-full object-cover menu_img cursor-pointer"
+                                onClick={() => handleFullScreen(index)}
                               />
                             </div>
-                          )}
-                        </div>
-                      ))}
+
+                            {/* 全螢幕圖片 */}
+                            {fullscreenImageIndex === index && (
+                              <div
+                                className={`${styles_img.zoom_img_container}`}
+                                onClick={handleCloseFullScreen}
+                              >
+                                <img
+                                  src={menuSrc}
+                                  alt="Fullscreen"
+                                  className={`${styles_img.zoom_img}`}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                    </div>
                   </div>
-                  <button
-                    className="bg-green hover:bg-yellow text-white font-bold py-2 px-3 rounded text-center text-base"
-                    onClick={() => handleMenuUpload()}
-                  >
-                    <FontAwesomeIcon icon={faUpload} className="pr-3" />
-                    Upload
-                  </button>
-                  <input
-                    type="file"
-                    onChange={handleMenuChange}
-                    className="hidden"
-                    ref={fileInputRef}
-                    accept="image/*"
-                    // multiple
-                  />
                 </td>
               </tr>
             </tbody>
