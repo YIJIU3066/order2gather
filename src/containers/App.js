@@ -11,7 +11,7 @@ import Report from "./report";
 import History from "./history";
 import RestaurantDetail from "./restaurantDetail";
 import HistoryOrderDetail from "./historyOrderDetail";
-
+import FriendList from './friendList';
 const App = () => {
   return (
     <Router>
@@ -25,6 +25,7 @@ const App = () => {
         <Route path="/friendAndGroup" element={<FriendAndGroup />} />
         <Route path="/report" element={<Report />} />
         <Route path="/history" element={<History />} />
+        <Route path="/friendList" element={<FriendList/>}/>
         <Route
           exact
           path="/restaurantDetail/:id"

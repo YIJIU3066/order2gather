@@ -9,7 +9,7 @@ const SearchBar = () => {
           icon={faMagnifyingGlass}
           style={{ color: "#7A989A", marginRight: "12px" }}
         />
-        <input className="" placeholder="SEARCH" />
+        <input className="focus:outline-none" placeholder="SEARCH" />
       </div>
     </>
   );
