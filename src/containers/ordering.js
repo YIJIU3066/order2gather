@@ -1,7 +1,9 @@
+import NavBar from "../components/navbar";
+import AddItem from "../components/addItem";
 const Ordering = () => {
     return (
         <>
-            <div>Ordering</div>
+            <NavBar/>
         </>
     );
 };
