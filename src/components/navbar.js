@@ -128,9 +128,11 @@ const NavBar = () => {
           </div>
         </div>
         <div className="" id="navbar-login">
-          <div className="flex flex-row-reverse w-full py-2 px-3 text-lg font-medium text-white hover:text-gray-700 cursor-pointer rounded z">
-            Log in
-          </div>
+          <Link to="/login">
+            <div className="flex flex-row-reverse w-full py-2 px-3 text-lg font-medium text-white hover:text-gray-700 cursor-pointer rounded z">
+              Log in
+            </div>
+          </Link>
         </div>
       </div>
     </nav>

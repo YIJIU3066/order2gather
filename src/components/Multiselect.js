@@ -21,7 +21,7 @@ const Multiselect = ({ list, selectedItems, setSelected }) => {
     }
 
     return (
-        <div className="w-full autcomplete-wrapper">
+        <div className="w-full autcomplete-wrapper relative">
             <div className="w-full autcomplete">
                 <div className="w-full flex flex-col items-center mx-auto">
                     <div className="w-full">

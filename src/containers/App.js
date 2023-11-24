@@ -11,9 +11,12 @@ import History from './history';
 import RestaurantDetail from "./restaurantDetail";
 import HistoryOrderDetail from "./historyOrderDetail";
 import FriendList from './friendList';
+import Login from './Login';
+import { AuthProvider } from "../context/AuthContext";
 const App = () => {
-    return (
-        <Router>
+  return (
+    <Router>
+          <AuthProvider>
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/hostDashboard" element={<HostDashboard />} />
@@ -34,7 +37,9 @@ const App = () => {
                   path="/historyOrderDetail/:id"
                   element={<HistoryOrderDetail />}
                 />
+                <Route path="/login" element={<Login />} />
             </Routes>
+          </AuthProvider>
         </Router>
     );
 };

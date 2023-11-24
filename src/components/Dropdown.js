@@ -3,7 +3,7 @@ import React from 'react';
 
 const Dropdown = ({list, addItem}) => {
     return (
-        <div id="dropdown" className="w-[48%] absolute shadow top-100 bg-white z-40 lef-0 rounded max-h-select overflow-y-auto ">
+        <div id="dropdown" className="w-full absolute shadow top-100 bg-white z-40 lef-0 rounded max-h-select overflow-y-auto ">
             <div className="flex flex-col w-full h-40 overflow-y-scroll">
                 { list.map((item, key) => {
                     return <div key={key} 
