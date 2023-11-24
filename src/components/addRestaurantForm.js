@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import styles from "../styles/form.module.css";
+import styles_img from "../styles/addRestaurant.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faXmark } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
@@ -10,10 +11,10 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
   const [address, setAddress] = useState("");
   const [telephone, setTelephone] = useState("");
   const [opentime, setOpentime] = useState("");
-  // const [menu, setMenu] = useState(null);
   const [menus, setMenus] = useState([]);
   const [menuURLs, setMenuURLs] = useState([]);
   const fileInputRef = useRef(null);
+  const [fullscreenImageIndex, setFullscreenImageIndex] = useState(null);
 
   useEffect(() => {
     console.log(menus);
@@ -30,9 +31,19 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
   }, [menus]);
 
   const handleMenuChange = (event) => {
-    console.log("handleMenuUpload");
     const file = event.target.files[0];
-    setMenus([...menus, file]);
+    if (file && file.type.startsWith("image/")) {
+      setMenus([...menus, file]);
+    } else {
+      Swal.fire({
+        title: "Error!",
+        text: "Please select an image file",
+        icon: "error",
+        iconColor: "#CF9546",
+        confirmButtonColor: "#7A989A",
+        confirmButtonText: "OK",
+      });
+    }
   };
 
   const handleMenuUpload = () => {
@@ -95,6 +106,15 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
     }
   };
 
+  //點擊圖片全螢幕
+  const handleFullScreen = (index) => {
+    setFullscreenImageIndex(index);
+  };
+
+  const handleCloseFullScreen = () => {
+    setFullscreenImageIndex(null);
+  };
+
   const handleClose = () => {
     onClose();
   };
@@ -117,7 +137,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
         </div>
 
         <div className="input_container text-lg mt-4 mx-14 flex flex-col items-center overflow-x-auto">
-          <table className="table-auto">
+          <table className="">
             <tbody>
               <tr className="border-b">
                 <td className={`${styles.form_name}`}>Restaurant Name*</td>
@@ -167,26 +187,42 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
               <tr className="border-b">
                 <td className={`${styles.form_name}`}>Menu</td>
                 <td className="flex items-center py-3">
-                  {menus &&
-                    menuURLs.map((menuSrc, index) => (
-                      <div className="relative inline-block" key={index}>
-                        <button
-                          className="cursor-pointer bg-red/[0.8] hover:bg-yellow/[0.8] w-4 h-4 rounded-full absolute -top-2 right-0 flex justify-center items-center"
-                          onClick={() => handleDeleteMenu(index)}
-                        >
-                          <FontAwesomeIcon
-                            icon={faXmark}
-                            size="2xs"
-                            style={{ color: "#ffffff" }}
+                  <div className="menu_container overflow-x-auto w-80 flex items-center">
+                    {menus &&
+                      menuURLs.map((menuSrc, index) => (
+                        <div className="relative m-2 w-20" key={index}>
+                          <button
+                            className="cursor-pointer bg-transport bg-red/[0.8] hover:bg-yellow/[0.8] w-4 h-4 rounded-full absolute -top-2 -right-2 flex justify-center items-center"
+                            onClick={() => handleDeleteMenu(index)}
+                          >
+                            <FontAwesomeIcon
+                              icon={faXmark}
+                              size="2xs"
+                              style={{ color: "#ffffff" }}
+                            />
+                          </button>
+                          <img
+                            src={menuSrc}
+                            alt="Selected"
+                            className="w-full h-auto menu_img cursor-pointer"
+                            onClick={() => handleFullScreen(index)}
                           />
-                        </button>
-                        <img
-                          src={menuSrc}
-                          alt="Selected"
-                          className="w-28 mr-2"
-                        />
-                      </div>
-                    ))}
+                          {/* 全螢幕圖片 */}
+                          {fullscreenImageIndex === index && (
+                            <div
+                              className={`${styles_img.zoom_img_container}`}
+                              onClick={handleCloseFullScreen}
+                            >
+                              <img
+                                src={menuSrc}
+                                alt="Fullscreen"
+                                className={`${styles_img.zoom_img}`}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                  </div>
                   <button
                     className="bg-green hover:bg-yellow text-white font-bold py-2 px-3 rounded text-center text-base"
                     onClick={() => handleMenuUpload()}
@@ -199,6 +235,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
                     onChange={handleMenuChange}
                     className="hidden"
                     ref={fileInputRef}
+                    accept="image/*"
                     // multiple
                   />
                 </td>
