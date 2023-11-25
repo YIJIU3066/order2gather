@@ -1,0 +1,33 @@
+.button-with-left-triangle {
+    position: relative;
+  }
+  
+.button-with-left-triangle::before {
+    content: "";
+    position: absolute;
+    top: 50%; /* 垂直置中 */
+    left: 10px; /* 調整三角形距離左側的位置 */
+    width: 0;
+    height: 0;
+    border-top: 12px solid transparent; /* 調整三角形大小 */
+    border-bottom: 12px solid transparent;
+    border-right: 16px solid #7A989A; /* 設定三角形顏色 */
+    transform: translateY(-50%); /* 保持垂直置中 */
+}
+
+.button-with-right-triangle {
+    position: relative;
+  }
+  
+.button-with-right-triangle::before {
+    content: "";
+    position: absolute;
+    top: 50%; /* 垂直置中 */
+    right: 10px; /* 調整三角形距離左側的位置 */
+    width: 0;
+    height: 0;
+    border-top: 12px solid transparent; /* 調整三角形大小 */
+    border-bottom: 12px solid transparent;
+    border-left: 16px solid #7A989A; /* 設定三角形顏色 */
+    transform: translateY(-50%); /* 保持垂直置中 */
+}
