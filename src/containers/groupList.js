@@ -36,7 +36,7 @@ export default function GroupList() {
         setGroupList((prevList) => {
             let newList = []
             prevList.forEach(it => {
-                if (it.name === key) newList.push({...it, checked: !it.checked});
+                if (it.id === parseInt(key)) newList.push({...it, checked: !it.checked});
                 else newList.push(it);
             })
             return newList
@@ -80,7 +80,7 @@ export default function GroupList() {
                             if (index < showGroups[1] && index >= showGroups[0]) {
                                 return (
                                     <>
-                                        <input type="checkbox" value={group.name} checked={group.checked} onChange={handleClick} className="accent-blue w-4 h-4 border-blue" />
+                                        <input type="checkbox" value={group.id} checked={group.checked} onChange={handleClick} className="accent-blue w-4 h-4 border-blue" />
                                         <Link to={`/groupDetail/${group.id}`} state={{ group: group, friendList: mockFriends }} className="text-2xl text-blue font-bold justify-self-start col-span-4 p-4">
                                             <div>
                                                 <p >{group.name}</p>
