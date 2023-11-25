@@ -1,6 +1,5 @@
-import React, { useState } from 'react'
-import Multiselect from './Multiselect'
-import { Link, useNavigate } from "react-router-dom";
+import React from 'react'
+import { useNavigate } from "react-router-dom";
 
 export default function SuccessMessage({success, setConfirmOpen}) {
     const navigate = useNavigate();
@@ -14,7 +13,7 @@ export default function SuccessMessage({success, setConfirmOpen}) {
     }
 
     const handleSubmit = () => {
-        setConfirmOpen(false);
+        navigate("/");
     }
 
     return (
@@ -34,9 +33,7 @@ export default function SuccessMessage({success, setConfirmOpen}) {
             <div className="grid grid-cols-3 w-4/5 gap-3 my-4 items-center">
                 <div></div>
                 <div></div>
-                <Link to="/">
-                    <button onClick={handleSubmit} className="text-center bg-blue text-white text-xl py-1.5 px-5 rounded-md">Finish</button>
-                </Link>
+                <button onClick={handleSubmit} className="text-center bg-blue text-white text-xl py-1.5 px-5 rounded-md">Finish</button>
             </div>
         </div>
     </div>
