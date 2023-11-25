@@ -1,5 +1,5 @@
 import NavBar from "../components/navbar";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import OrderingSuccessMessage from '../components/orderingMessage';
 import Showmenu from '../components/showMenu';
 
@@ -32,6 +32,18 @@ const Ordering = () => {
             quantity: 3
         },
     ])
+    const [totalPrice, setTotalPrice] = useState(0);
+    useEffect(() => {
+        const calculateTotalPrice = () => {
+            const totalPrice = foodList.reduce((accumulator, food) => {
+                const price = parseInt(food.price, 10);
+                const quantity = food.quantity;
+                return accumulator + price * quantity;
+            }, 0);
+            setTotalPrice(totalPrice);
+        };
+        calculateTotalPrice();
+    }, [foodList]);
     const [newFood, setNewFood] = useState([
         {
             id: 0,
@@ -247,6 +259,17 @@ const Ordering = () => {
                                 </div>
                             </div>
                         </>
+                    )}
+                    {confirmOrder === 1 && (
+                        <div className="p-4 pt-0 w-180 h-18 items-start grid grid-cols-4 gap-2">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div className="flex items-center justify-center">
+                                <div className="text-center text-blue font-bold">Total:</div>
+                                <div className="text-center text-blue font-bold underline">${totalPrice}</div>
+                            </div>
+                        </div>
                     )}
                 </ul>
             </div>
