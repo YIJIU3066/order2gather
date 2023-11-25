@@ -129,7 +129,7 @@ const AllOrder = () => {
 
     return (    
         <>
-            <NavBar/>   
+            <NavBar/>
             <div className="flex p-10 pb-0 pt-4 items-center justify-center">
                 <h2 className="text-blue font-bold text-4xl">My Order</h2>
             </div>        
