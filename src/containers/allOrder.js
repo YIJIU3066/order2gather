@@ -1,7 +1,7 @@
 import NavBar from "../components/navbar";
 import React, { useState } from 'react';
 import '../styles/allOrderUI.css'
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const AllOrder = () => {
 
     const [openVarValue, setOpenVarValue] = useState(0);
