@@ -1,7 +1,7 @@
 import NavBar from "../components/navbar";
 import React, { useState } from 'react';
 import '../styles/allOrderUI.css'
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const AllOrder = () => {
 
     const [openVarValue, setOpenVarValue] = useState(0);
@@ -137,7 +137,7 @@ const AllOrder = () => {
                 <h2 className="text-grey font-bold text-2xl">Open</h2>
             </div>
             <div className="flex p-1 justify-around flex-wrap gap-6">
-                <button onClick={decreaseOpenButtonClick} className="button-with-left-triangle "></button>
+                <button onClick={decreaseOpenButtonClick} className="button-with-left-triangle"></button>
                 {filteredOpenOrder.map(item => (
                 <div key={item.id} className="flex flex-col items-start">
                     <div
