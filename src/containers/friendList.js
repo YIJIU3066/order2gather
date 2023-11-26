@@ -4,17 +4,26 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import ListNav from "../components/listNav"
 import AddFriendForm from '../components/addFriendForm';
+import AddItem from '../components/addItem';
 
-const mockGroups = ["Cook", "Teacher", "Boss", "Gang", "Chicken", "Lawyer", "DEA"]
+const mockGroups = [
+    {name: "Cook", id: 1}, 
+    {name: "Teacher", id: 2}, 
+    {name: "Boss", id: 3}, 
+    {name: "Gang", id: 4}, 
+    {name: "Chicken", id: 5}, 
+    {name: "Lawyer", id: 6}, 
+    {name: "DEA", id: 7}
+]
 
 const mockFriends = [
-    {nickname: 'Walter', gmail: "chemistryisart@gmail.com", groups: ["Cook", "Teacher", "Boss"], checked: false},
-    {nickname: 'Jesse', gmail: "yoyoyo@gmail.com", groups: ["Cook", "Gang"], checked: false},
-    {nickname: 'Gus', gmail: "lospoloshermanos@gmail.com", groups: ["Boss", "Chicken"], checked: false},
-    {nickname: 'Skyler', gmail: "mynameisskylerwhiteyo@gmail.com", groups: [], checked: false},
-    {nickname: 'Saul', gmail: "bettercallsaul@gmail.com", groups: ["Lawyer"], checked: false},
-    {nickname: 'Hank', gmail: "coolmineral@gmail.com", groups: ["DEA"], checked: false},
-    {nickname: 'Mike', gmail: "waltuh@gmail.com", groups: ["Chicken"], checked: false},
+    {name: 'Walter', gmail: "chemistryisart@gmail.com", groups: [{name: "Cook", id: 1}, {name: "Teacher", id: 2}, {name: "Boss", id: 3}], checked: false},
+    {name: 'Jesse', gmail: "yoyoyo@gmail.com", groups: [{name: "Cook", id: 1}, {name: "Gang", id: 4}], checked: false},
+    {name: 'Gus', gmail: "lospoloshermanos@gmail.com", groups: [{name: "Boss", id: 3}, {name: "Chicken", id: 5}], checked: false},
+    {name: 'Skyler', gmail: "mynameisskylerwhiteyo@gmail.com", groups: [], checked: false},
+    {name: 'Saul', gmail: "bettercallsaul@gmail.com", groups: [{name: "Lawyer", id: 6}], checked: false},
+    {name: 'Hank', gmail: "coolmineral@gmail.com", groups: [{name: "DEA", id: 7}], checked: false},
+    {name: 'Mike', gmail: "waltuh@gmail.com", groups: [{name: "Chicken", id: 5}], checked: false},
 ]
 
 export default function FriendList() {
@@ -58,11 +67,7 @@ export default function FriendList() {
                 <h2 className="text-blue font-bold text-4xl">Friend</h2>
             </div>
             <div className="grid grid-cols-5 gap-2 px-[10vw] justify-items-center">
-                <button>
-                    <div className="min-w-fit text-3xl text-white bg-yellow w-8 h-8 rounded-full flex items-center justify-center" onClick={handleClickAdd}>
-                        <p className="mb-2">+</p>
-                    </div>
-                </button>
+                <AddItem onClick={handleClickAdd} hintText="Add New Friend!" />
                 <p className="text-2xl font-bold text-blue">Nickname</p>
                 <p className="text-2xl font-bold text-blue">Gmail</p>
                 <p className="text-2xl font-bold text-blue">In Group</p>
@@ -77,12 +82,12 @@ export default function FriendList() {
                                 <>
                                     <div class="grid grid-cols-5 gap-2 px-[10vw] justify-items-center items-center">
                                         <input type="checkbox" value={friend.gmail} checked={friend.checked} onChange={handleClick} className="accent-blue w-4 h-4 border-blue" />
-                                        <p className="text-xl text-blue font-bold">{friend.nickname}</p>
+                                        <p className="text-xl text-blue font-bold">{friend.name}</p>
                                         <p className="text-lg break-all text-blue">{friend.gmail}</p>
                                         <div className="flex flex-wrap">
                                             {
                                                 friend.groups.map((group) => {
-                                                    return (<div className="bg-yellow text-white rounded-lg p-1 m-1 font-bold text-center">{group}</div>)
+                                                    return (<div className="bg-yellow text-white rounded-lg p-1 m-1 font-bold text-center">{group.name}</div>)
                                                 })
                                             }
                                         </div>

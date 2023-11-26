@@ -6,7 +6,6 @@ export default function AddFriendForm({ groups, setAddOpen, addFriend }) {
     const [nickname, setNickname] = useState("");
     const [gmail, setGmail] = useState("");
     const [group, setGroup] = useState([]);
-    console.log(nickname, gmail, group);
 
     const handleClose = () => {
         setAddOpen(false);
@@ -14,7 +13,7 @@ export default function AddFriendForm({ groups, setAddOpen, addFriend }) {
 
     const handleSubmit = () => {
         if (nickname && gmail) {
-            addFriend({nickname, gmail, groups: group, checked: false});
+            addFriend({name: nickname, gmail, groups: group, checked: false});
             setAddOpen(false);
         }
     }
@@ -31,7 +30,7 @@ export default function AddFriendForm({ groups, setAddOpen, addFriend }) {
                 <input value={nickname} onChange={(e) => setNickname(e.target.value)} placeholder="Amy" type="text" className="rounded-md focus:border-blue border-2 border-solid focus:outline-none focus:ring-0 bg-slate-50 col-span-2 text-grey p-1" />
                 <p className="text-lg text-blue">Group</p>
                 <div className="col-span-2">
-                    <Multiselect list={groups} selectedItems={group} setSelected={setGroup}/>
+                    <Multiselect list={groups} selectedItems={group} setSelected={setGroup} isGroup={true}/>
                 </div>
                 <div></div>
                 <div></div>
