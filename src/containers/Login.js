@@ -7,7 +7,6 @@ export default function Login() {
     const [response, setResponse] = useState({});
 
     useEffect(() => {
-        // pass response.access_token to BE and request https://www.googleapis.com/oauth2/v3/userinfo?access_token=<ACCESS TOKEN>
         console.log(response)
     }, [response])
 

@@ -9,17 +9,11 @@ export default AuthContext
 
 export const AuthProvider = ({ children }) => {
 
-  const BASE_URL = (window.location.origin === "http://localhost:3000" ? "http://localhost:8000" : window.location.origin)
+  const BASE_URL = (window.location.origin === "http://localhost:3000" ? "http://localhost:8080" : window.location.origin)
 
   const [accessToken, setAccessToken] = useState(() =>
     localStorage.getItem("accessToken")
         ? JSON.parse(localStorage.getItem("accessToken"))
-        : null
-  )
-
-  const [refreshToken, setRefreshToken] = useState(() =>
-    localStorage.getItem("refreshToken")
-        ? JSON.parse(localStorage.getItem("refreshToken"))
         : null
   )
 
@@ -28,7 +22,8 @@ export const AuthProvider = ({ children }) => {
         ? jwtDecode(JSON.parse(localStorage.getItem("accessToken")))
         : null
   )
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const navigate = useNavigate()
 
@@ -36,7 +31,7 @@ export const AuthProvider = ({ children }) => {
     let response = null
     try {
       response = await axios({
-        url: BASE_URL + "/api/auth/login", // to be corrected
+        url: BASE_URL + "/auth/login",
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -47,11 +42,10 @@ export const AuthProvider = ({ children }) => {
       })
 
       if (response.status === 200) {
-        setAccessToken(response.data.access)
-        setRefreshToken(response.data.refresh)
-        setUser(jwtDecode(response.data.access))
-        localStorage.setItem("accessToken", JSON.stringify(response.data.access))
-        localStorage.setItem("refreshToken", JSON.stringify(response.data.refresh))
+        setAccessToken(response.data.jwt)
+        setUser(jwtDecode(response.data.jwt))
+        setIsLoggedIn(true);
+        localStorage.setItem("accessToken", JSON.stringify(response.data.jwt))
         return 'success'
       } else {
 
@@ -69,31 +63,21 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logoutUser = () => {
-    setAccessToken(null)
-    setRefreshToken(null)
-    setUser(null)
-    localStorage.removeItem("accessToken")
-    localStorage.removeItem("refreshToken")
-    navigate('/')
-  }
-
-  const getRefreshToken = async () => {
-    const response = await axios.post('api/auth/refresh/', { // url to be corrected
-        refresh: refreshToken,
-    });
-    return response.data;
+    setAccessToken(null);
+    setUser(null);
+    localStorage.removeItem("accessToken");
+    setIsLoggedIn(false);
+    navigate('/');
   }
 
   const contextData = {
     user,
     setUser,
     accessToken,
-    refreshToken,
     setAccessToken,
-    setRefreshToken,
     loginUser,
     logoutUser,
-    getRefreshToken
+    isLoggedIn
   }
 
   useEffect(() => {
