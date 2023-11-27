@@ -79,10 +79,6 @@ const Picker = () => {
     </div>
   );
 
-  useEffect(() => {
-    console.log(date);
-  }, [date]);
-
   return (
     <>
       <label className="cursor-pointer">

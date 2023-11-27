@@ -78,16 +78,12 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
       if (result.isConfirmed) {
         const updatedMenus = [...menus];
         updatedMenus.splice(indexToDelete, 1); 
-
-        // 更新 state 中的 menus
         setMenus(updatedMenus);
-
-        // 释放被删除的图片的 URL
+   
         const updatedMenuURLs = [...menuURLs];
         URL.revokeObjectURL(updatedMenuURLs[indexToDelete]);
         updatedMenuURLs.splice(indexToDelete, 1);
 
-        // 更新 state 中的 menuURLs
         setMenuURLs(updatedMenuURLs);
 
         Swal.fire({
@@ -170,7 +166,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
   };
 
   return (
-    <div className="restaurant_form_container w-full h-full flex justify-center items-center overflow-auto min-h-fit">
+    <div className="restaurant_form_container w-full h-full flex justify-center items-center overflow-auto ">
       <div className="w-fit border-8 px-20 border-blue p-4 rounded shadow flex flex-col items-center bg-slate-50 relative">
         <div
           className="cursor-pointer absolute top-0 right-0 px-6 py-4"
@@ -191,7 +187,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
             <tbody>
               <tr className="border-b">
                 <td className={`${styles.form_name}`}>Restaurant Name*</td>
-                <td className="pr-6">
+                <td className="">
                   <input
                     className={`${styles.form_input}`}
                     placeholder="Restaurant Name"
@@ -203,7 +199,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
               </tr>
               <tr className="border-b">
                 <td className={`${styles.form_name}`}>Address</td>
-                <td className="pr-6">
+                <td className="">
                   <input
                     className={`${styles.form_input}`}
                     placeholder="Address"
@@ -214,7 +210,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
               </tr>
               <tr className="border-b">
                 <td className={`${styles.form_name}`}>Telephone*</td>
-                <td className="pr-6">
+                <td className="">
                   <input
                     className={`${styles.form_input}`}
                     placeholder="Phone Number"
@@ -225,7 +221,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
               </tr>
               <tr className="border-b">
                 <td className={`${styles.form_name}`}>Open Time</td>
-                <td className="pr-6">
+                <td className="">
                   <input
                     className={`${styles.form_input}`}
                     placeholder="Open Time"
@@ -234,7 +230,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
                   />
                 </td>
               </tr>
-              <tr className="border-b">
+              <tr className="">
                 <td className={`${styles.form_name}`}>
                   <div className="flex items-center">
                     Menu
@@ -266,7 +262,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
                     />
                   </div>
                 </td>
-                <td className="pr-6">
+                <td className="">
                   <div className="flex items-center justify-center my-2">
                     <div className="menu_container overflow-x-auto w-80 flex items-center justify-start h-[130px]">
                       {menus &&
