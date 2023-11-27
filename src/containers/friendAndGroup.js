@@ -20,9 +20,11 @@ const FriendAndGroup = () => {
                     <p className="text-blue text-xl font-bold">Friend</p>
                 </div>
                 <div className="flex items-center flex-col justify-center gap-2">
-                    <button className="bg-brown rounded-3xl w-80 h-24">
-                        <FontAwesomeIcon icon={faUserGroup} style={{color: "#ffffff"}} size="4x" />
-                    </button>
+                    <Link to="/groupList">
+                        <button className="bg-brown rounded-3xl w-80 h-24">
+                            <FontAwesomeIcon icon={faUserGroup} style={{color: "#ffffff"}} size="4x" />
+                        </button>
+                    </Link>
                     <p className="text-brown text-xl font-bold">Group</p>
                 </div>
             </div>
