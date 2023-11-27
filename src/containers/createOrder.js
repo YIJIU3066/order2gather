@@ -7,11 +7,11 @@ import { faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 const CreateOrder = () => {
   const handleSave = () => {
-    console.log('handleSave');
+    // console.log('handleSave');
   };
 
   const handleDelete = () => {
-    console.log('handleDelete');
+    // console.log('handleDelete');
   };
 
   return (
