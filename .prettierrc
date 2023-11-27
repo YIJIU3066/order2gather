@@ -12,6 +12,5 @@
   "singleQuote": true,
   "tabWidth": 2,
   "trailingComma": "es5",
-  "useTabs": false,
-  "indent": ["warn", 2]
+  "useTabs": false
 }
