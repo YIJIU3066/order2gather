@@ -14,35 +14,40 @@ import HistoryOrderDetail from './historyOrderDetail';
 import FriendList from './friendList';
 import GroupList from './groupList';
 import GroupDetail from './groupDetail';
+import Login from './Login';
+import { AuthProvider } from '../context/AuthContext';
 const App = () => {
   return (
     <Router>
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/hostDashboard' element={<HostDashboard />} />
-        <Route path='/allOrder' element={<AllOrder />} />
-        <Route path='/ordering' element={<Ordering />} />
-        <Route path='/createOrder' element={<CreateOrder />} />
-        <Route path='/allRestaurant' element={<AllRestaurant />} />
-        <Route path='/friendAndGroup' element={<FriendAndGroup />} />
-        <Route path='/report' element={<Report />} />
-        <Route path='/history' element={<History />} />
-        <Route path='/friendList' element={<FriendList />} />
-        <Route path='/groupList' element={<GroupList />} />
-        <Route
-          exact
-          path='/restaurantDetail/:id'
-          element={<RestaurantDetail />}
-        />
-        <Route
-          exact
-          path='/historyOrderDetail/:id'
-          element={<HistoryOrderDetail />}
-        />
-        <Route exact path='/hostDashboard/:id' element={<HostDashboard />} />
-        <Route exact path='/ordering/:id' element={<Ordering />} />
-        <Route exact path='/groupDetail/:id' element={<GroupDetail />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='/hostDashboard' element={<HostDashboard />} />
+          <Route path='/allOrder' element={<AllOrder />} />
+          <Route path='/ordering' element={<Ordering />} />
+          <Route path='/createOrder' element={<CreateOrder />} />
+          <Route path='/allRestaurant' element={<AllRestaurant />} />
+          <Route path='/friendAndGroup' element={<FriendAndGroup />} />
+          <Route path='/report' element={<Report />} />
+          <Route path='/history' element={<History />} />
+          <Route path='/friendList' element={<FriendList />} />
+          <Route path='/groupList' element={<GroupList />} />
+          <Route
+            exact
+            path='/restaurantDetail/:id'
+            element={<RestaurantDetail />}
+          />
+          <Route
+            exact
+            path='/historyOrderDetail/:id'
+            element={<HistoryOrderDetail />}
+          />
+          <Route exact path='/hostDashboard/:id' element={<HostDashboard />} />
+          <Route exact path='/ordering/:id' element={<Ordering />} />
+          <Route exact path='/groupDetail/:id' element={<GroupDetail />} />
+          <Route path='/login' element={<Login />} />
+        </Routes>
+      </AuthProvider>
     </Router>
   );
 };
