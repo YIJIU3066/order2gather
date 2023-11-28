@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import Multiselect from './Multiselect';
 
-export default function AddFriendForm({ groups, setAddOpen, addFriend }) {
-  const [nickname, setNickname] = useState('');
-  const [gmail, setGmail] = useState('');
-  const [group, setGroup] = useState([]);
+export default function AddGroupForm({ friends, setAddOpen, addGroup }) {
+  const [groupName, setGroupName] = useState('');
+  const [friend, setFriend] = useState([]);
 
   const handleClose = () => {
     setAddOpen(false);
   };
 
   const handleSubmit = () => {
-    if (nickname && gmail) {
-      addFriend({ name: nickname, gmail, groups: group, checked: false });
+    if (groupName && friend.length) {
+      addGroup({ groupName, friend });
       setAddOpen(false);
     }
   };
@@ -22,7 +21,7 @@ export default function AddFriendForm({ groups, setAddOpen, addFriend }) {
       <div className='md:w-1/3 sm:w-2/3 border-8 border-blue p-4 rounded shadow flex flex-col items-center bg-slate-50 relative'>
         <div className='grid grid-cols-3 w-4/5 gap-3 my-4 items-center'>
           <h2 className='text-2xl text-blue font-bold my-2 mr-auto col-span-2'>
-            Add Friend
+            Add Group
           </h2>
           <button
             onClick={handleClose}
@@ -30,29 +29,21 @@ export default function AddFriendForm({ groups, setAddOpen, addFriend }) {
           >
             X
           </button>
-          <p className='text-lg text-blue'>Email</p>
+          <p className='text-lg text-blue'>Name</p>
           <input
-            value={gmail}
-            onChange={(e) => setGmail(e.target.value)}
-            placeholder='e.g. amy@gmail.com'
+            value={groupName}
+            onChange={(e) => setGroupName(e.target.value)}
+            placeholder='e.g. Team Potato'
             type='text'
             className='rounded-md focus:border-blue border-2 border-solid focus:outline-none focus:ring-0 bg-slate-50 col-span-2 text-grey p-1'
           />
-          <p className='text-lg text-blue'>Nickname</p>
-          <input
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            placeholder='Amy'
-            type='text'
-            className='rounded-md focus:border-blue border-2 border-solid focus:outline-none focus:ring-0 bg-slate-50 col-span-2 text-grey p-1'
-          />
-          <p className='text-lg text-blue'>Group</p>
+          <p className='text-lg text-blue'>Member</p>
           <div className='col-span-2'>
             <Multiselect
-              list={groups}
-              selectedItems={group}
-              setSelected={setGroup}
-              isGroup={true}
+              list={friends}
+              selectedItems={friend}
+              setSelected={setFriend}
+              isGroup={false}
             />
           </div>
           <div></div>
