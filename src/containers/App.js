@@ -8,6 +8,7 @@ import CreateOrder from "./createOrder";
 import AllRestaurant from "./allRestaurant";
 import FriendAndGroup from "./friendAndGroup";
 import Report from "./report";
+import Reports from "./reports";
 import History from "./history";
 import RestaurantDetail from "./restaurantDetail";
 import HistoryOrderDetail from "./historyOrderDetail";
@@ -23,6 +24,7 @@ const App = () => {
         <Route path="/createOrder" element={<CreateOrder />} />
         <Route path="/allRestaurant" element={<AllRestaurant />} />
         <Route path="/friendAndGroup" element={<FriendAndGroup />} />
+        <Route path="/reports" element={<Reports />} />
         <Route path="/report" element={<Report />} />
         <Route path="/history" element={<History />} />
         <Route path="/friendList" element={<FriendList/>}/>

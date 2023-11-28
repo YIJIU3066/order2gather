@@ -65,7 +65,7 @@ const Home = () => {
           <p className="text-brown text-xl font-bold">View Order</p>
         </div>
         <div className="flex items-center flex-col justify-center gap-2 mr-80">
-          <Link to="/report">
+          <Link to="/reports">
             <button className="bg-green rounded-3xl w-40 h-14">
             </button>
           </Link>
