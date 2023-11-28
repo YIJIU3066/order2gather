@@ -1,13 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import styles from '../styles/navbar.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouse, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import AuthContext from '../context/AuthContext';
 
 const NavBar = () => {
   const [isAboutMeOpen, setIsAboutMeOpen] = useState(false);
   const [isOrderOpen, setIsOrderOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const { isLoggedIn, logoutUser } = useContext(AuthContext);
 
   const toggleDropdown = (item) => {
     if (item === 'About') {
@@ -128,9 +130,20 @@ const NavBar = () => {
           </div>
         </div>
         <div className='' id='navbar-login'>
-          <div className='flex flex-row-reverse w-full py-2 px-3 text-lg font-medium text-white hover:text-gray-700 cursor-pointer rounded z'>
-            Log in
-          </div>
+          {isLoggedIn ? (
+            <div
+              onClick={() => logoutUser}
+              className='flex flex-row-reverse w-full py-2 px-3 text-lg font-medium text-white hover:text-gray-700 cursor-pointer rounded z'
+            >
+              Log out
+            </div>
+          ) : (
+            <Link to='/login'>
+              <div className='flex flex-row-reverse w-full py-2 px-3 text-lg font-medium text-white hover:text-gray-700 cursor-pointer rounded z'>
+                Log in
+              </div>
+            </Link>
+          )}
         </div>
       </div>
     </nav>
