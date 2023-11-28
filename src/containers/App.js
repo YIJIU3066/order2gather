@@ -48,6 +48,11 @@ const App = () => {
           path="/ordering/:id"
           element={<Ordering />}
         />
+        <Route
+          exact
+          path="/report/:type/:id"
+          element={<Report />}
+        />
       </Routes>
     </Router>
   );

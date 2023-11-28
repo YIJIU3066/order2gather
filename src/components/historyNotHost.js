@@ -20,7 +20,7 @@ const HistoryNotHost = ({ history, order_items, totalPrice }) => {
               Back
             </button>
           </Link>
-          <Link to="/report">
+          <Link to="/report/write/0">
             <button className="bg-yellow hover:bg-green text-white font-bold py-2 px-6 ml-6 rounded text-center">
               Report
             </button>
