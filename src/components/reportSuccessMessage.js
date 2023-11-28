@@ -1,41 +1,54 @@
-import React from 'react'
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-export default function SuccessMessage({success, setReportSent}) {
-    const navigate = useNavigate();
-    const handleClose = () => {
-        if(success === false){
-            setReportSent(false);
-        }
-        else{
-            navigate("/");
-        }
+export default function SuccessMessage({ success, setReportSent }) {
+  const navigate = useNavigate();
+  const handleClose = () => {
+    if (success === false) {
+      setReportSent(false);
+    } else {
+      navigate('/');
     }
+  };
 
-    const handleSubmit = () => {
-        navigate("/");
-    }
+  const handleSubmit = () => {
+    navigate('/');
+  };
 
-    return (
-    <div className="w-full h-full flex justify-center items-center">
-        <div className="md:w-1/3 sm:w-2/3 border-8 border-blue p-4 rounded shadow flex flex-col items-center bg-slate-50 relative">
-            <div className="grid grid-cols-3 w-4/5 gap-3 my-4 items-center">
-                <h2 className="text-2xl text-blue font-bold my-2 mr-auto col-span-2"></h2>
-                <button onClick={handleClose} className="text-3xl right-3 top-2 text-blue justify-self-end">X</button>
-                <div></div>
-            </div>    
-            {success === false && (
-                <p className="text-lg text-blue text-2xl">Report sending fails! Please try again!</p>
-            )}
-            {success === true && (
-                <p className="text-lg text-blue text-2xl">Report is sent successfully!</p>
-            )} 
-            <div className="grid grid-cols-3 w-4/5 gap-3 my-4 items-center">
-                <div></div>
-                <div></div>
-                <button onClick={handleSubmit} className="text-center bg-blue text-white text-xl py-1.5 px-5 rounded-md">Finish</button>
-            </div>
+  return (
+    <div className='w-full h-full flex justify-center items-center'>
+      <div className='md:w-1/3 sm:w-2/3 border-8 border-blue p-4 rounded shadow flex flex-col items-center bg-slate-50 relative'>
+        <div className='grid grid-cols-3 w-4/5 gap-3 my-4 items-center'>
+          <h2 className='text-2xl text-blue font-bold my-2 mr-auto col-span-2'></h2>
+          <button
+            onClick={handleClose}
+            className='text-3xl right-3 top-2 text-blue justify-self-end'
+          >
+            X
+          </button>
+          <div></div>
         </div>
+        {success === false && (
+          <p className='text-lg text-blue text-2xl'>
+            Report sending fails! Please try again!
+          </p>
+        )}
+        {success === true && (
+          <p className='text-lg text-blue text-2xl'>
+            Report is sent successfully!
+          </p>
+        )}
+        <div className='grid grid-cols-3 w-4/5 gap-3 my-4 items-center'>
+          <div></div>
+          <div></div>
+          <button
+            onClick={handleSubmit}
+            className='text-center bg-blue text-white text-xl py-1.5 px-5 rounded-md'
+          >
+            Finish
+          </button>
+        </div>
+      </div>
     </div>
-    )
+  );
 }
