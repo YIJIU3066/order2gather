@@ -31,7 +31,7 @@ const HistoryOrderDetail = () => {
       totalPrice: 240,
     },
     {
-      orderer: 'Solar',
+      orderer: 'Amy',
       items: [
         {
           id: 1,
