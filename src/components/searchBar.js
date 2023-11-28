@@ -1,15 +1,16 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 
 const SearchBar = () => {
   return (
     <>
-      <div className="searchbar px-4 py-2 rounded-lg border-blue border-4 w-fit">
+      <div className='searchbar px-4 py-2 rounded-lg border-blue border-4 w-fit'>
         <FontAwesomeIcon
           icon={faMagnifyingGlass}
-          style={{ color: "#7A989A", marginRight: "12px" }}
+          style={{ color: '#7A989A', marginRight: '12px' }}
         />
-        <input className="focus:outline-none" placeholder="SEARCH" />
+        <input className='focus:outline-none' placeholder='SEARCH' />
       </div>
     </>
   );

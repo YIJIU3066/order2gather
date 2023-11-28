@@ -1,74 +1,69 @@
-import { createContext, useState, useEffect } from "react"
-import { jwtDecode } from "jwt-decode"
-import axios from "axios"
-import { useNavigate } from "react-router-dom"
+import React, { createContext, useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const AuthContext = createContext()
+const AuthContext = createContext();
 
-export default AuthContext
+export default AuthContext;
 
 export const AuthProvider = ({ children }) => {
-
-  const BASE_URL = (window.location.origin === "http://localhost:3000" ? "http://localhost:8080" : window.location.origin)
+  const BASE_URL =
+    window.location.origin === 'http://localhost:3000'
+      ? 'http://localhost:8080'
+      : window.location.origin;
 
   const [accessToken, setAccessToken] = useState(() =>
-    localStorage.getItem("accessToken")
-        ? JSON.parse(localStorage.getItem("accessToken"))
-        : null
-  )
+    localStorage.getItem('accessToken')
+      ? JSON.parse(localStorage.getItem('accessToken'))
+      : null
+  );
 
   const [user, setUser] = useState(() =>
-    localStorage.getItem("accessToken")
-        ? jwtDecode(JSON.parse(localStorage.getItem("accessToken")))
-        : null
-  )
+    localStorage.getItem('accessToken')
+      ? jwtDecode(JSON.parse(localStorage.getItem('accessToken')))
+      : null
+  );
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const loginUser = async (access_token) => {
-    let response = null
+    let response = null;
     try {
       response = await axios({
-        url: BASE_URL + "/auth/login",
-        method: "POST",
+        url: BASE_URL + '/auth/login',
+        method: 'POST',
         headers: {
-            "Content-Type": "application/json"
+          'Content-Type': 'application/json',
         },
         data: JSON.stringify({
-          access_token
-        })
-      })
+          access_token,
+        }),
+      });
 
       if (response.status === 200) {
-        setAccessToken(response.data.jwt)
-        setUser(jwtDecode(response.data.jwt))
+        setAccessToken(response.data.jwt);
+        setUser(jwtDecode(response.data.jwt));
         setIsLoggedIn(true);
-        localStorage.setItem("accessToken", JSON.stringify(response.data.jwt))
-        return 'success'
+        localStorage.setItem('accessToken', JSON.stringify(response.data.jwt));
+        return 'success';
       } else {
-
-        return response.data.message
-
+        return response.data.message;
       }
-
     } catch (error) {
-
-      return error.response.data.message
-
+      return error.response.data.message;
     }
-
-    
   };
 
   const logoutUser = () => {
     setAccessToken(null);
     setUser(null);
-    localStorage.removeItem("accessToken");
+    localStorage.removeItem('accessToken');
     setIsLoggedIn(false);
     navigate('/');
-  }
+  };
 
   const contextData = {
     user,
@@ -77,19 +72,19 @@ export const AuthProvider = ({ children }) => {
     setAccessToken,
     loginUser,
     logoutUser,
-    isLoggedIn
-  }
+    isLoggedIn,
+  };
 
   useEffect(() => {
     if (accessToken) {
-      setUser(jwtDecode(accessToken))
+      setUser(jwtDecode(accessToken));
     }
-    setLoading(false)
+    setLoading(false);
   }, [accessToken, loading]);
 
   return (
     <AuthContext.Provider value={contextData}>
       {loading ? null : children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
