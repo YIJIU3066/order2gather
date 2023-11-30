@@ -1,35 +1,53 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import NavBar from '../components/navbar';
 import { Link, useNavigate } from 'react-router-dom';
+import useAxios from '../hooks/useAxios';
 
 const History = () => {
   const navigate = useNavigate();
-  const history_list = [
-    {
-      id: 1,
-      orderTime: '2023-11-01',
-      restaurant: 'Restaurant AAAA',
-      host: 'Host 1',
-    },
-    {
-      id: 2,
-      orderTime: '2023-11-02',
-      restaurant: 'Restaurant B',
-      host: 'Host 2',
-    },
-    {
-      id: 3,
-      orderTime: '2023-11-03',
-      restaurant: 'Restaurant C',
-      host: 'Host 3',
-    },
-    {
-      id: 4,
-      orderTime: '2023-11-03',
-      restaurant: 'Restaurant C',
-      host: 'Host 4',
-    },
-  ];
+  const axiosInstance = useAxios();
+
+  const [history_list, setHistoryList] = useState([]);
+  useEffect(() => {
+    const getAllHistory = async () => {
+      try {
+        const response = await axiosInstance.get('/history/get');
+        console.log(response);
+        setHistoryList(response.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    getAllHistory();
+  }, []);
+
+  // const history_list = [
+  //   {
+  //     id: 1,
+  //     orderTime: '2023-11-01',
+  //     restaurant: 'Restaurant AAAA',
+  //     host: 'Host 1',
+  //   },
+  //   {
+  //     id: 2,
+  //     orderTime: '2023-11-02',
+  //     restaurant: 'Restaurant B',
+  //     host: 'Host 2',
+  //   },
+  //   {
+  //     id: 3,
+  //     orderTime: '2023-11-03',
+  //     restaurant: 'Restaurant C',
+  //     host: 'Host 3',
+  //   },
+  //   {
+  //     id: 4,
+  //     orderTime: '2023-11-03',
+  //     restaurant: 'Restaurant C',
+  //     host: 'Host 4',
+  //   },
+  // ];
 
   const handleRowClick = (id, history) => {
     // 導航至相應的詳細頁面，假設路由設置為 `/historyOrderDetail/:id`
