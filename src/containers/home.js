@@ -1,9 +1,21 @@
 import NavBar from '../components/navbar';
-import React from 'react';
+import React, { useState } from 'react';
 import '../styles/home.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Home = () => {
+  const navigate = useNavigate();
+  const [inputValue, setInputValue] = useState('');
+  const [oid, setOid] = useState(0);
+  const handleKeyDown = (event) => {
+    //Todo:
+    // add user to order and receive order id
+    // suppose order id is 0
+    // Add secret key type check
+    if (event.key === 'Enter' && inputValue !== '') {
+      navigate(`/ordering/${oid}`);
+    }
+  };
   return (
     <>
       <NavBar />
@@ -26,14 +38,20 @@ const Home = () => {
                   type='text'
                   placeholder='Enter code here'
                   className='input mr-2'
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
                 />
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div className='flex p-1 items-center justify-around flex-wrap gap-6'>
-        <div className='flex items-center flex-col justify-center gap-2 ml-80'>
+      <div className='flex p-1 justify-around flex-wrap gap-6'>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div className='flex items-center flex-col justify-center gap-2'>
           <Link to='/allRestaurant'>
             <button className='bg-blue rounded-3xl w-40 h-14'></button>
           </Link>
@@ -45,15 +63,21 @@ const Home = () => {
           </Link>
           <p className='text-brown text-xl font-bold'>My Friends</p>
         </div>
-        <div className='flex items-center flex-col justify-center gap-2 mr-80'>
+        <div className='flex items-center flex-col justify-center gap-2'>
           <Link to='/history'>
             <button className='bg-green rounded-3xl w-40 h-14'></button>
           </Link>
           <p className='text-green text-xl font-bold'>Order History</p>
         </div>
+        <div></div>
+        <div></div>
+        <div></div>
       </div>
-      <div className='flex p-1 items-center justify-around flex-wrap gap-6'>
-        <div className='flex items-center flex-col justify-center gap-2 ml-80'>
+      <div className='flex p-1 justify-around flex-wrap gap-6'>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div className='flex items-center flex-col justify-center gap-2'>
           <Link to='/createOrder'>
             <button className='bg-blue rounded-3xl w-40 h-14'></button>
           </Link>
@@ -65,12 +89,15 @@ const Home = () => {
           </Link>
           <p className='text-brown text-xl font-bold'>View Order</p>
         </div>
-        <div className='flex items-center flex-col justify-center gap-2 mr-80'>
+        <div className='flex items-center flex-col justify-center gap-2'>
           <Link to='/report'>
             <button className='bg-green rounded-3xl w-40 h-14'></button>
           </Link>
           <p className='text-green text-xl font-bold'>View Report</p>
         </div>
+        <div></div>
+        <div></div>
+        <div></div>
       </div>
     </>
   );
