@@ -1,18 +1,97 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import NavBar from '../components/navbar';
 import Picker from '../components/dateTimePicker';
+import RestaurantSearchBlock from '../components/restaurantSearchBlock';
 import styles from '../styles/form.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
+import useAxios from '../hooks/useAxios';
+
+import AuthContext from '../context/AuthContext';
 
 const CreateOrder = () => {
-  const handleSave = () => {
-    // console.log('handleSave');
+  const fakeAccessToken =
+    'eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjYsImlhdCI6MTcwMTQxNjYyNCwiZXhwIjoxNzAxNDIwMjI0fQ.cSibJUpHpYURPrnG9sMaPfJFhj9QThziWEnMPhTRK9I';
+
+  const axiosInstance = useAxios(fakeAccessToken);
+  const { user } = useContext(AuthContext);
+
+  const [orderInfo, setOrderInfo] = useState({
+    rid: null,
+    hostID: null,
+    memberList: [],
+    createTime: null,
+    stopOrderingTime: null,
+    estimatedArrivalTime: null,
+    endEventTime: null,
+    totalPrice: 0,
+    totalPeople: null,
+    status: 1,
+  });
+
+  //獲得目前時間
+  const getCurrentTime = () => {
+    const currentTime = new Date();
+
+    const utcOffset = -8 * 60;
+    const adjustedDate = new Date(currentTime.getTime() + utcOffset * 60000);
+    const formattedDate = adjustedDate.toISOString().slice(0, 19);
+
+    return formattedDate;
+  };
+
+  const currentTime = getCurrentTime();
+
+  // 設定order event 預設資訊
+  useEffect(() => {
+    if (user) {
+      console.log('user', user);
+      setOrderInfo((prevOrderInfo) => ({
+        ...prevOrderInfo,
+        hostID: user.uid,
+        stopOrderingTime: currentTime,
+        estimatedArrivalTime: currentTime,
+        endEventTime: currentTime,
+      }));
+    } else {
+      setOrderInfo((prevOrderInfo) => ({
+        ...prevOrderInfo,
+
+        stopOrderingTime: currentTime,
+        estimatedArrivalTime: currentTime,
+        endEventTime: currentTime,
+      }));
+    }
+  }, []);
+
+  const handleSave = async () => {
+    setOrderInfo({
+      ...orderInfo,
+      rid: 1,
+      hostID: user.id,
+      memberList: [1, 2, 5],
+      createTime: currentTime,
+      totalPrice: 0,
+      totalPeople: 2,
+      status: 1,
+    });
+
+    if (orderInfo) {
+      try {
+        // await axiosInstance.post('/orderEvent/create', orderInfo);
+      } catch (error) {
+        console.log('Error fetching data:', error);
+      }
+    }
   };
 
   const handleDelete = () => {
     // console.log('handleDelete');
   };
+
+  useEffect(() => {
+    console.log(orderInfo);
+  }, [orderInfo]);
 
   return (
     <>
@@ -27,19 +106,25 @@ const CreateOrder = () => {
             <tr className='border-b'>
               <td className={`${styles.form_name}`}>Order Deadline</td>
               <td>
-                <Picker />
+                <Picker
+                  setOrderInfo={setOrderInfo}
+                  timetype='stopOrderingTime'
+                />
               </td>
             </tr>
             <tr className='border-b'>
               <td className={`${styles.form_name}`}>Estimated Arrival</td>
               <td>
-                <Picker />
+                <Picker
+                  setOrderInfo={setOrderInfo}
+                  timetype='estimatedArrivalTime'
+                />
               </td>
             </tr>
             <tr className='border-b'>
               <td className={`${styles.form_name}`}>Order End</td>
               <td>
-                <Picker />
+                <Picker setOrderInfo={setOrderInfo} timetype='endEventTime' />
               </td>
             </tr>
             <tr className='border-b'>
@@ -55,6 +140,7 @@ const CreateOrder = () => {
                     placeholder='Search a Restaurant...'
                   />
                 </label>
+                <RestaurantSearchBlock />
               </td>
             </tr>
             <tr>

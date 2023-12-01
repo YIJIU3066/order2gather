@@ -6,7 +6,7 @@ import '../styles/datapicker.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 
-const Picker = () => {
+const Picker = ({ setOrderInfo, timetype }) => {
   const [date, setDate] = useState(new Date());
   const startYear = 2010;
   const endYear = 2025;
@@ -29,6 +29,7 @@ const Picker = () => {
     'December',
   ];
 
+  //日曆 UI 調整
   const renderCustomHeader = ({
     date,
     changeYear,
@@ -77,6 +78,19 @@ const Picker = () => {
     </div>
   );
 
+  //設定時間資料
+  const handleDateChange = (selectedDate) => {
+    setDate(selectedDate);
+    const utcOffset = -8 * 60;
+    const adjustedDate = new Date(selectedDate.getTime() + utcOffset * 60000);
+    const formattedDate = adjustedDate.toISOString().slice(0, 19);
+
+    setOrderInfo((prevOrderInfo) => ({
+      ...prevOrderInfo,
+      [timetype]: formattedDate,
+    }));
+  };
+
   return (
     <>
       <label className='cursor-pointer'>
@@ -87,7 +101,8 @@ const Picker = () => {
         <DatePicker
           id='orderEnd'
           selected={date}
-          onChange={(date) => setDate(date)}
+          // onChange={(date) => setDate(date)}
+          onChange={handleDateChange}
           timeInputLabel='Time'
           showTimeSelect
           // showTimeInput
