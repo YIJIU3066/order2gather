@@ -132,7 +132,7 @@ const NavBar = () => {
         <div className='' id='navbar-login'>
           {isLoggedIn ? (
             <div
-              onClick={() => logoutUser}
+              onClick={() => logoutUser()}
               className='flex flex-row-reverse w-full py-2 px-3 text-lg font-medium text-white hover:text-gray-700 cursor-pointer rounded z'
             >
               Log out
