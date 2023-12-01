@@ -1,18 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Navbar from '../components/navbar';
 import { useGoogleLogin } from '@react-oauth/google';
+import AuthContext from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
 
-    const [response, setResponse] = useState({});
+    const { loginUser } = useContext(AuthContext);
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        console.log(response)
-    }, [response])
+    const handleLogin = async (response) => {
+        const res = await loginUser(response.access_token);
+        if (res === 'success') navigate('/');
+        else alert('Cannot Login');
+    }
 
     const googleLogin = useGoogleLogin({
         onSuccess: Response => {
-            setResponse(Response);
+            handleLogin(Response);
         },
         onError: () => alert("Login failed")
     })
