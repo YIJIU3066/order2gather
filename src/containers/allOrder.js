@@ -70,12 +70,8 @@ const AllOrder = () => {
     },
   ];
 
-  const filteredOpenOrder = openOrder_list.filter((item) => {
-    return (
-      item.id === openVarValue ||
-      item.id === openVarValue + 1 ||
-      item.id === openVarValue + 2
-    );
+  const filteredOpenOrder = openOrder_list.filter((item, index) => {
+    return [openVarValue, openVarValue + 1, openVarValue + 2].includes(index);
   });
 
   function decreaseDeliverButtonClick() {
@@ -126,11 +122,9 @@ const AllOrder = () => {
     },
   ];
 
-  const filteredDeliverOrder = deliverOrder_list.filter((item) => {
-    return (
-      item.id === deliverVarValue ||
-      item.id === deliverVarValue + 1 ||
-      item.id === deliverVarValue + 2
+  const filteredDeliverOrder = deliverOrder_list.filter((item, index) => {
+    return [deliverVarValue, deliverVarValue + 1, deliverVarValue + 2].includes(
+      index
     );
   });
 
@@ -148,7 +142,7 @@ const AllOrder = () => {
           onClick={decreaseOpenButtonClick}
           className='button-with-left-triangle'
         ></button>
-        {filteredOpenOrder.map((item) => (
+        {filteredOpenOrder.map((item, index) => (
           <div key={item.id} className='flex flex-col items-start'>
             <div
               className='border-b hover:text-white cursor-pointer'
@@ -157,11 +151,11 @@ const AllOrder = () => {
             >
               <div
                 className={`p-0 pl-1 pr-20 w-180 h-24 items-start ${
-                  item.id === openVarValue
+                  index === 0
                     ? 'bg-blue'
-                    : item.id === openVarValue + 1
+                    : index === 1
                       ? 'bg-brown'
-                      : item.id === openVarValue + 2
+                      : index === 2
                         ? 'bg-green'
                         : ''
                 }`}
@@ -209,7 +203,7 @@ const AllOrder = () => {
           onClick={decreaseDeliverButtonClick}
           className='button-with-left-triangle '
         ></button>
-        {filteredDeliverOrder.map((item) => (
+        {filteredDeliverOrder.map((item, index) => (
           <div key={item.id} className='flex flex-col items-start'>
             <div
               className='border-b hover:text-white cursor-pointer'
@@ -218,11 +212,11 @@ const AllOrder = () => {
             >
               <div
                 className={`p-0 pl-1 pr-20 w-180 h-24 items-start ${
-                  item.id === deliverVarValue
+                  index === 0
                     ? 'bg-blue'
-                    : item.id === deliverVarValue + 1
+                    : index === 1
                       ? 'bg-brown'
-                      : item.id === deliverVarValue + 2
+                      : index === 2
                         ? 'bg-green'
                         : ''
                 }`}

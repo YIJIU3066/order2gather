@@ -1,9 +1,8 @@
-import axios from "axios"
-import dayjs from "dayjs"
-import { jwtDecode } from "jwt-decode"
-import { useContext } from "react"
-import AuthContext from "../context/AuthContext"
-
+import axios from 'axios';
+import dayjs from 'dayjs';
+import { jwtDecode } from 'jwt-decode';
+import { useContext } from 'react';
+import AuthContext from '../context/AuthContext';
 
 const useAxios = () => {
   const { accessToken, user, logoutUser } = useContext(AuthContext)
@@ -11,19 +10,18 @@ const useAxios = () => {
   
   const axiosInstance = axios.create({
     baseURL: baseUrl,
-    headers: { authorization: `Bearer ${accessToken}` }
-  })
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
 
-  axiosInstance.interceptors.request.use(async req => {
-
-    if (user == null) logoutUser(); 
-    const isExpired = dayjs.unix(user.exp).diff(dayjs()) < (1 / 24);
+  axiosInstance.interceptors.request.use(async (req) => {
+    if (user == null) logoutUser();
+    const isExpired = dayjs.unix(user.exp).diff(dayjs()) < 1 / 24;
     if (isExpired) logoutUser();
 
-    return req
-  })
+    return req;
+  });
 
-  return axiosInstance
-}
+  return axiosInstance;
+};
 
-export default useAxios
+export default useAxios;
