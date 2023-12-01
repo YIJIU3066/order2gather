@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import NavBar from '../components/navbar';
 import RestaurantCard from '../components/restaurantCard';
 import SearchBar from '../components/searchBar';
 import AddItem from '../components/addItem';
 import AddRestaurantForm from '../components/addRestaurantForm';
+import useAxios from '../hooks/useAxios';
+import AuthContext from '../context/AuthContext';
 
 const AllRestaurant = () => {
+  const axiosInstance = useAxios();
+  const { user } = useContext(AuthContext);
+
   const [showRestaurantForm, setShowRestaurantForm] = useState(false);
   const [restaurantList, setRestaurantList] = useState([
     {
@@ -21,6 +26,23 @@ const AllRestaurant = () => {
       telephone: '02-23456789',
     },
   ]);
+
+  useEffect(() => {
+    const getAllRestaurant = async () => {
+      try {
+        const response = await axiosInstance.get('/restaurant/display');
+
+        console.log(response);
+        console.log(response.data);
+        const data = response.data;
+        console.log(typeof data);
+      } catch (error) {
+        console.error('Error fetching data:', error.response);
+      }
+    };
+
+    // getAllRestaurant();
+  }, []);
 
   const handleAddRestaurant = () => {
     setShowRestaurantForm(true);

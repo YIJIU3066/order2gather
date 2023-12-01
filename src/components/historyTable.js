@@ -1,6 +1,6 @@
 import React from 'react';
 const HistoryTable = ({ order_items, totalPrice, notHost }) => {
-  console.log(order_items);
+  // console.log(order_items);
   return (
     <>
       <div className='overflow-x-auto'>

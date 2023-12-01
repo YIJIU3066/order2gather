@@ -1,61 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import NavBar from '../components/navbar';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useAxios from '../hooks/useAxios';
+// import AuthContext from '../context/AuthContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleRight, faAngleLeft } from '@fortawesome/free-solid-svg-icons';
 
 const History = () => {
   const navigate = useNavigate();
-  // const tempAccessToken =
-  //   'eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjYsImlhdCI6MTcwMTQxNjYyNCwiZXhwIjoxNzAxNDIwMjI0fQ.cSibJUpHpYURPrnG9sMaPfJFhj9QThziWEnMPhTRK9I';
-
-  // const axiosInstance = useAxios(tempAccessToken);
-
   const axiosInstance = useAxios();
+  // const { user } = useContext(AuthContext);
+  const [historyList, setHistoryList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10); // 每頁顯示的項目數量
 
-  const [history_list, setHistoryList] = useState([]);
   useEffect(() => {
     const getAllHistory = async () => {
       try {
-        const response = await axiosInstance.get('/history/get');
+        const response = await axiosInstance.get('/history/view');
         console.log(response);
         setHistoryList(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-
     getAllHistory();
   }, []);
 
-  // const history_list = [
-  //   {
-  //     id: 1,
-  //     orderTime: '2023-11-01',
-  //     restaurant: 'Restaurant AAAA',
-  //     host: 'Host 1',
-  //   },
-  //   {
-  //     id: 2,
-  //     orderTime: '2023-11-02',
-  //     restaurant: 'Restaurant B',
-  //     host: 'Host 2',
-  //   },
-  //   {
-  //     id: 3,
-  //     orderTime: '2023-11-03',
-  //     restaurant: 'Restaurant C',
-  //     host: 'Host 3',
-  //   },
-  //   {
-  //     id: 4,
-  //     orderTime: '2023-11-03',
-  //     restaurant: 'Restaurant C',
-  //     host: 'Host 4',
-  //   },
-  // ];
+  //轉換顯示的日期格式
+  const dateFormatTransform = (isoDateString) => {
+    const isoDate = new Date(isoDateString);
 
+    const year = isoDate.getFullYear();
+    const month = String(isoDate.getMonth() + 1).padStart(2, '0'); // 月份是從 0 開始計算的，因此要加 1
+    const day = String(isoDate.getDate()).padStart(2, '0');
+    const hours = String(isoDate.getHours()).padStart(2, '0');
+    const minutes = String(isoDate.getMinutes()).padStart(2, '0');
+    const seconds = String(isoDate.getSeconds()).padStart(2, '0');
+
+    const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    return formattedDate;
+  };
+
+  // 分頁邏輯處理函式，截取當前頁數應該顯示的項目
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = historyList.slice(indexOfFirstItem, indexOfLastItem);
+
+  // 計算總頁數
+  const pageNumbers = Math.ceil(historyList.length / itemsPerPage);
+
+  // 處理頁碼改變的函式
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  //前往細節頁面
   const handleRowClick = (id, history) => {
-    // 導航至相應的詳細頁面，假設路由設置為 `/historyOrderDetail/:id`
     navigate(`/historyOrderDetail/${id}`, { state: { history: history } });
   };
 
@@ -66,15 +65,41 @@ const History = () => {
         <div className='flex justify-center text-3xl font-semibold text-blue my-6'>
           History Order
         </div>
-        <div className='overflow-x-auto'>
-          <div className='inline-block min-w-full py-2'>
+        <div className='overflow-x-auto '>
+          <div className='pageChange px-12 flex justify-end'>
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              style={{
+                visibility: currentPage !== 1 ? 'visible' : 'hidden',
+              }}
+            >
+              <FontAwesomeIcon
+                icon={faAngleLeft}
+                style={{ color: '#7A989A' }}
+                className='pr-4'
+              />
+            </button>
+
+            <div className='text-center text-base'>{`${currentPage}`}</div>
+
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              style={{
+                visibility: currentPage !== pageNumbers ? 'visible' : 'hidden',
+              }}
+            >
+              <FontAwesomeIcon
+                icon={faAngleRight}
+                style={{ color: '#7A989A' }}
+                className='pl-4'
+              />
+            </button>
+          </div>
+          <div className='history_table inline-block min-w-full'>
             <div className='overflow-hidden'>
               <table className='min-w-full text-center text-base font-normal text-gray-900'>
                 <thead className='border-b font-semibold text-blue'>
                   <tr>
-                    <th scope='col' className='px-12 py-4'>
-                      #
-                    </th>
                     <th scope='col' className='px-12 py-4'>
                       Order Time
                     </th>
@@ -87,29 +112,55 @@ const History = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {history_list.map((history, index) => (
+                  {currentItems.map((history, index) => (
                     <tr
                       className='border-b hover:bg-blue hover:text-white cursor-pointer'
                       key={index}
                       onClick={() => handleRowClick(history.id, history)}
                     >
-                      <td className='whitespace-nowrap px-12 py-4 font-medium'>
-                        {history.id}
+                      <td className='whitespace-nowrap px-12 py-4'>
+                        {dateFormatTransform(history.estimatedArrivalTime)}
                       </td>
                       <td className='whitespace-nowrap px-12 py-4'>
-                        {history.orderTime}
+                        {history.rname}
                       </td>
                       <td className='whitespace-nowrap px-12 py-4'>
-                        {history.restaurant}
-                      </td>
-                      <td className='whitespace-nowrap px-12 py-4'>
-                        {history.host}
+                        {history.hostName}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+          </div>
+          <div className='pageChange px-12 py-2 flex justify-end'>
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              style={{
+                visibility: currentPage !== 1 ? 'visible' : 'hidden',
+              }}
+            >
+              <FontAwesomeIcon
+                icon={faAngleLeft}
+                style={{ color: '#7A989A' }}
+                className='pr-4'
+              />
+            </button>
+
+            <div className='text-center text-base'>{`${currentPage}`}</div>
+
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              style={{
+                visibility: currentPage !== pageNumbers ? 'visible' : 'hidden',
+              }}
+            >
+              <FontAwesomeIcon
+                icon={faAngleRight}
+                style={{ color: '#7A989A' }}
+                className='pl-4'
+              />
+            </button>
           </div>
         </div>
       </div>

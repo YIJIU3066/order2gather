@@ -2,7 +2,21 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import HistoryTable from './historyTable';
 
-const HistoryNotHost = ({ history, order_items, totalPrice }) => {
+const HistoryNotHost = ({ history, order_items, totalPrice, historyInfo }) => {
+  //轉換顯示的日期格式
+  const dateFormatTransform = (isoDateString) => {
+    const isoDate = new Date(isoDateString);
+    const year = isoDate.getFullYear();
+    const month = String(isoDate.getMonth() + 1).padStart(2, '0'); // 月份是從 0 開始計算的，因此要加 1
+    const day = String(isoDate.getDate()).padStart(2, '0');
+    const hours = String(isoDate.getHours()).padStart(2, '0');
+    const minutes = String(isoDate.getMinutes()).padStart(2, '0');
+    const seconds = String(isoDate.getSeconds()).padStart(2, '0');
+
+    const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    return formattedDate;
+  };
+
   return (
     <>
       <div className='history_container flex flex-col justify-center items-center '>
@@ -10,8 +24,10 @@ const HistoryNotHost = ({ history, order_items, totalPrice }) => {
           Your Order
         </div>
         <div className='order_basic_info flex justify-between my-4 text-gray-900'>
-          <div className='px-4'>Order Time: {history.orderTime}</div>
-          <div className='px-4'>Restaurant: {history.restaurant}</div>
+          <div className='px-4'>
+            Order Time: {dateFormatTransform(history.estimatedArrivalTime)}
+          </div>
+          <div className='px-4'>Restaurant: {history.rname}</div>
           <div className='px-4'>Host: {history.host}</div>
         </div>
         <HistoryTable

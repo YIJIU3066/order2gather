@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import NavBar from '../components/navbar';
 import Picker from '../components/dateTimePicker';
 import RestaurantSearchBlock from '../components/restaurantSearchBlock';
@@ -6,25 +6,53 @@ import styles from '../styles/form.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
 import useAxios from '../hooks/useAxios';
-
 import AuthContext from '../context/AuthContext';
+import Swal from 'sweetalert2';
 
 const CreateOrder = () => {
   const axiosInstance = useAxios();
   const { user } = useContext(AuthContext);
 
+  //rid, totalPeople 還要改!
   const [orderInfo, setOrderInfo] = useState({
-    rid: null,
+    rid: 2,
     hostID: null,
-    memberList: [],
+    // memberList: [],
+    memberList: [6],
     createTime: null,
     stopOrderingTime: null,
     estimatedArrivalTime: null,
     endEventTime: null,
     totalPrice: 0,
-    totalPeople: null,
+    // totalPeople: null,
+    totalPeople: 2,
     status: 1,
   });
+
+  const [searchText, setSearchText] = useState('');
+  const [restaurantFocus, setRestaurantFocus] = useState(false);
+  const inputRef = useRef(null);
+
+  const handleInputChange = (event) => {
+    setSearchText(event.target.value);
+  };
+
+  const openRestaurantSearch = () => {
+    setRestaurantFocus(true);
+  };
+
+  const closeRestaurantSearch = (event) => {
+    if (!inputRef.current.contains(event.target)) {
+      setRestaurantFocus(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', closeRestaurantSearch);
+    return () => {
+      document.removeEventListener('mousedown', closeRestaurantSearch);
+    };
+  }, []);
 
   //獲得目前時間
   const getCurrentTime = () => {
@@ -37,45 +65,41 @@ const CreateOrder = () => {
     return formattedDate;
   };
 
-  const currentTime = getCurrentTime();
-
   // 設定order event 預設資訊
   useEffect(() => {
-    if (user) {
-      console.log('user', user);
-      setOrderInfo((prevOrderInfo) => ({
-        ...prevOrderInfo,
-        hostID: user.uid,
-        stopOrderingTime: currentTime,
-        estimatedArrivalTime: currentTime,
-        endEventTime: currentTime,
-      }));
-    } else {
-      setOrderInfo((prevOrderInfo) => ({
-        ...prevOrderInfo,
+    const currentTime = getCurrentTime();
 
-        stopOrderingTime: currentTime,
-        estimatedArrivalTime: currentTime,
-        endEventTime: currentTime,
-      }));
-    }
+    setOrderInfo((prevOrderInfo) => ({
+      ...prevOrderInfo,
+      stopOrderingTime: currentTime,
+      estimatedArrivalTime: currentTime,
+      endEventTime: currentTime,
+    }));
   }, []);
 
   const handleSave = async () => {
-    setOrderInfo({
-      ...orderInfo,
-      rid: 1,
-      hostID: user.id,
-      memberList: [1, 2, 5],
-      createTime: currentTime,
-      totalPrice: 0,
-      totalPeople: 2,
-      status: 1,
-    });
+    const currentTime = getCurrentTime();
 
     if (orderInfo) {
       try {
-        // await axiosInstance.post('/orderEvent/create', orderInfo);
+        const updatedOrderInfo = {
+          ...orderInfo,
+          hostID: user.uid,
+          createTime: currentTime,
+        };
+
+        const response = await axiosInstance.post(
+          '/orderEvent/create',
+          updatedOrderInfo
+        );
+        const secretCode = response.data.SecretCode;
+        Swal.fire({
+          title: `Secret Code: ${secretCode}`,
+          text: 'Create Success! Share the Code to Invite Member',
+          icon: 'success',
+          iconColor: '#CF9546',
+          confirmButtonColor: '#7A989A',
+        });
       } catch (error) {
         console.log('Error fetching data:', error);
       }
@@ -86,9 +110,14 @@ const CreateOrder = () => {
     // console.log('handleDelete');
   };
 
-  useEffect(() => {
-    console.log(orderInfo);
-  }, [orderInfo]);
+  const handleChoose = (selected) => {
+    setSearchText(selected);
+    setRestaurantFocus(false);
+  };
+
+  // useEffect(() => {
+  //   console.log(orderInfo);
+  // }, [orderInfo]);
 
   return (
     <>
@@ -127,17 +156,35 @@ const CreateOrder = () => {
             <tr className='border-b'>
               <td className={`${styles.form_name}`}>Restaurant</td>
               <td>
-                <label className='cursor-pointer'>
-                  <FontAwesomeIcon
-                    icon={faMagnifyingGlass}
-                    style={{ color: '#7A989A', marginRight: '12px' }}
-                  />
-                  <input
-                    className={`${styles.form_input}`}
-                    placeholder='Search a Restaurant...'
-                  />
-                </label>
-                <RestaurantSearchBlock />
+                <div
+                  className='relative flex items-start justify-center'
+                  ref={inputRef}
+                >
+                  <label className='cursor-pointer'>
+                    <FontAwesomeIcon
+                      icon={faMagnifyingGlass}
+                      style={{ color: '#7A989A', marginRight: '12px' }}
+                    />
+                    <input
+                      className={`${styles.form_input}`}
+                      placeholder='Search a Restaurant...'
+                      value={searchText}
+                      onChange={handleInputChange}
+                      onFocus={openRestaurantSearch}
+                      // ref={inputRef}
+                    />
+                  </label>
+                  {restaurantFocus && (
+                    <div
+                    // onClick={handleClickInside}
+                    >
+                      <RestaurantSearchBlock
+                        searchText={searchText}
+                        handleChoose={handleChoose}
+                      />
+                    </div>
+                  )}
+                </div>
               </td>
             </tr>
             <tr>
