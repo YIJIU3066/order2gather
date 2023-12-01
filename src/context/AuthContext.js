@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
           'Content-Type': 'application/json',
         },
         data: JSON.stringify({
-          access_token,
+          accessToken: access_token,
         }),
       });
 
@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
         return response.data.message;
       }
     } catch (error) {
-      return error.response.data.message;
+      return error;
     }
   };
 
