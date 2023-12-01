@@ -2,6 +2,7 @@ import NavBar from '../components/navbar';
 import React, { useState, useEffect } from 'react';
 import OrderingSuccessMessage from '../components/orderingMessage';
 import Showmenu from '../components/showMenu';
+import OrderingEmptyMessage from '../components/orderingEmptyMessage';
 
 const Ordering = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -9,6 +10,7 @@ const Ordering = () => {
   const [success, setSuccess] = useState(false);
   const [addFood, setAddFood] = useState(1);
   const [confirmOrder, setConfirmOrder] = useState(0);
+  const [emptyMessage, setEmptyMessage] = useState(false);
   const Order = {
     id: 0,
     restaurant: 'Restaurant AAAA',
@@ -22,14 +24,14 @@ const Ordering = () => {
       name: 'noodle',
       price: '100',
       note: '',
-      quantity: 1,
+      quantity: 0,
     },
     {
       id: 1,
       name: 'beef',
       price: '200',
       note: '',
-      quantity: 3,
+      quantity: 0,
     },
   ]);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -131,7 +133,11 @@ const Ordering = () => {
     setAddFood(1);
   };
   const handleOrderClick = () => {
-    setConfirmOrder(1);
+    if (totalPrice == 0) {
+      setEmptyMessage(true);
+    } else {
+      setConfirmOrder(1);
+    }
   };
   const handleModifyClick = () => {
     setConfirmOrder(0);
@@ -184,54 +190,53 @@ const Ordering = () => {
             <div className='text-center'>Note</div>
             <div className='text-center'>Quantity</div>
           </div>
-          {foodList.map((food) => (
-            <div
-              key={food.id}
-              className='p-4 mb-4 w-180 h-18 items-start bg-lightgrey grid grid-cols-4 gap-2 rounded-2xl'
-            >
-              <span className='p-2 text-center'>{food.name}</span>
-              <span className='p-2 text-center'>${food.price}</span>
-              {confirmOrder === 1 && (
-                <>
-                  <span className='p-2 text-center'>{food.note}</span>
-                </>
-              )}
-              {confirmOrder === 0 && (
-                <>
-                  <input
-                    className='p-2 text-center border border-blue border-2 rounded-2xl'
-                    type='text'
-                    value={food.note}
-                    onChange={(e) => handleNoteChange(food.id, e.target.value)}
-                  />
-                </>
-              )}
-              {confirmOrder === 0 && (
-                <div className='flex items-center justify-center'>
-                  <button
-                    className='p-2 text-center'
-                    onClick={() => handleDecreaseClick(food.id)}
-                  >
-                    -
-                  </button>
-                  <span className='p-2 text-center border border-blue border-2 rounded-2xl'>
-                    {food.quantity}
-                  </span>
-                  <button
-                    className='p-2 text-center'
-                    onClick={() => handleIncreaseClick(food.id)}
-                  >
-                    +
-                  </button>
+          {foodList.map(
+            (food) =>
+              (food.quantity !== 0 || confirmOrder === 0) && ( //on order or on check w/ quantity > 0
+                <div
+                  key={food.id}
+                  className='p-4 mb-4 w-180 h-18 items-start bg-lightgrey grid grid-cols-4 gap-2 rounded-2xl'
+                >
+                  <span className='p-2 text-center'>{food.name}</span>
+                  <span className='p-2 text-center'>${food.price}</span>
+                  {confirmOrder === 1 ? (
+                    <>
+                      <span className='p-2 text-center'>{food.note}</span>
+                    </>
+                  ) : (
+                    <input
+                      className='p-2 text-center border border-blue border-2 rounded-2xl'
+                      type='text'
+                      value={food.note}
+                      onChange={(e) =>
+                        handleNoteChange(food.id, e.target.value)
+                      }
+                    />
+                  )}
+                  {confirmOrder === 0 ? (
+                    <div className='flex items-center justify-center'>
+                      <button
+                        className='p-2 text-center'
+                        onClick={() => handleDecreaseClick(food.id)}
+                      >
+                        -
+                      </button>
+                      <span className='p-2 text-center border border-blue border-2 rounded-2xl'>
+                        {food.quantity}
+                      </span>
+                      <button
+                        className='p-2 text-center'
+                        onClick={() => handleIncreaseClick(food.id)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  ) : (
+                    <span className='p-2 text-center'>{food.quantity}</span>
+                  )}
                 </div>
-              )}
-              {confirmOrder === 1 && (
-                <>
-                  <span className='p-2 text-center'>{food.quantity}</span>
-                </>
-              )}
-            </div>
-          ))}
+              )
+          )}
           {confirmOrder === 0 && (
             <>
               {addFood === 1 &&
@@ -363,6 +368,11 @@ const Ordering = () => {
       {menuOpen && (
         <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100'>
           <Showmenu menuid={Order.id} setMenuOpen={setMenuOpen} />
+        </div>
+      )}
+      {emptyMessage && (
+        <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100'>
+          <OrderingEmptyMessage setEmptyMessage={setEmptyMessage} />
         </div>
       )}
     </>
