@@ -5,12 +5,12 @@ import useAxios from '../hooks/useAxios';
 
 const History = () => {
   const navigate = useNavigate();
-  const tempAccessToken =
-    'eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjYsImlhdCI6MTcwMTQxNjYyNCwiZXhwIjoxNzAxNDIwMjI0fQ.cSibJUpHpYURPrnG9sMaPfJFhj9QThziWEnMPhTRK9I';
+  // const tempAccessToken =
+  //   'eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjYsImlhdCI6MTcwMTQxNjYyNCwiZXhwIjoxNzAxNDIwMjI0fQ.cSibJUpHpYURPrnG9sMaPfJFhj9QThziWEnMPhTRK9I';
 
-  const axiosInstance = useAxios(tempAccessToken);
+  // const axiosInstance = useAxios(tempAccessToken);
 
-  // const axiosInstance = useAxios();
+  const axiosInstance = useAxios();
 
   const [history_list, setHistoryList] = useState([]);
   useEffect(() => {

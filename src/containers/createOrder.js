@@ -10,10 +10,7 @@ import useAxios from '../hooks/useAxios';
 import AuthContext from '../context/AuthContext';
 
 const CreateOrder = () => {
-  const fakeAccessToken =
-    'eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjYsImlhdCI6MTcwMTQxNjYyNCwiZXhwIjoxNzAxNDIwMjI0fQ.cSibJUpHpYURPrnG9sMaPfJFhj9QThziWEnMPhTRK9I';
-
-  const axiosInstance = useAxios(fakeAccessToken);
+  const axiosInstance = useAxios();
   const { user } = useContext(AuthContext);
 
   const [orderInfo, setOrderInfo] = useState({

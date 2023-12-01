@@ -5,15 +5,15 @@ const RestaurantSearchBlock = () => {
   const [restaurantList, setRestaurantList] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
-  const tempAccessToken =
-    'eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjYsImlhdCI6MTcwMTQzMTMwMCwiZXhwIjoxNzAxNDM0OTAwfQ.E5EgOEZCJZ6h8nq4mxHmznr2OsuLDgkmiDIrhBW8Okc';
-  const axiosInstance = useAxios(tempAccessToken);
+
+  const axiosInstance = useAxios();
 
   useEffect(() => {
     const getAllRestaurant = async () => {
       try {
         const response = await axiosInstance.get('/restaurant/display');
-        const data = JSON.parse(response.data);
+        console.log(response);
+        // const data = JSON.parse(response.data);
         console.log(Object.keys(response));
         console.log(data);
 
