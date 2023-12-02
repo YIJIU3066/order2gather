@@ -6,29 +6,16 @@ const RestaurantSearchBlock = ({ searchText, handleChoose }) => {
   // const [restaurantList, setRestaurantList] = useState([]);
   // const [searchQuery, setSearchQuery] = useState('');
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
-  const [restaurantList, setRestaurantList] = useState([
-    {
-      id: 1,
-      name: '八方雲集',
-      address: '地址地址地址',
-      telephone: '02-12345678',
-    },
-    {
-      id: 2,
-      name: '邱奶奶早餐店',
-      address: '這裡是地址!',
-      telephone: '02-23456789',
-    },
-  ]);
+  const [restaurantList, setRestaurantList] = useState([]);
   const axiosInstance = useAxios();
   const { user } = useContext(AuthContext);
-
+  console.log(user);
   useEffect(() => {
     const getAllRestaurant = async () => {
       try {
         const response = await axiosInstance.get('/restaurant/display');
-        // console.log(response);
-        setRestaurantList(response.data);
+        console.log(response);
+        setRestaurantList(response.data.restaurant);
       } catch (error) {
         console.error('Error fetching data:', error.response);
       }
@@ -51,25 +38,29 @@ const RestaurantSearchBlock = ({ searchText, handleChoose }) => {
 
   const chooseRestaurant = (selected) => {
     console.log(selected);
-    handleChoose(selected);
+    // handleChoose(selected.name);
+    handleChoose({ id: selected.id, name: selected.name });
   };
-  // useEffect(()=>{
-  //   console.log(filteredRestaurants)
-  // },[filteredRestaurants])
+
+  // useEffect(() => {
+  //   console.log(filteredRestaurants);
+  // }, [filteredRestaurants]);
+
   // const handleSearch = (event) => {
   //   setSearchQuery(event.target.value);
   // };
+
   return (
     <div
       className='absolute left-full w-max mx-2 shadow-md bg-slate-50 rounded'
       onClick={(e) => e.stopPropagation}
     >
       <div className=''>
-        {filteredRestaurants &&
+        {filteredRestaurants.length != 0 &&
           filteredRestaurants.map((restaurant) => (
             <div
               key={restaurant.id}
-              onClick={() => chooseRestaurant(restaurant.name)}
+              onClick={() => chooseRestaurant(restaurant)}
               className='px-4 py-2 text-base font-semibold my-2 cursor-pointer flex items-center text-center text-gray-700 hover:bg-blue hover:text-white'
             >
               {restaurant.name}

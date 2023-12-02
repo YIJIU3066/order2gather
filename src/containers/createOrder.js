@@ -8,17 +8,18 @@ import { faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
 import useAxios from '../hooks/useAxios';
 import AuthContext from '../context/AuthContext';
 import Swal from 'sweetalert2';
+import AddOrderer from '../components/addOrderer';
 
 const CreateOrder = () => {
   const axiosInstance = useAxios();
   const { user } = useContext(AuthContext);
 
-  //rid, totalPeople 還要改!
+  //totalPeople 還要改!
   const [orderInfo, setOrderInfo] = useState({
-    rid: 2,
+    rid: null,
     hostID: null,
     // memberList: [],
-    memberList: [6],
+    memberList: [6, 1],
     createTime: null,
     stopOrderingTime: null,
     estimatedArrivalTime: null,
@@ -77,6 +78,7 @@ const CreateOrder = () => {
     }));
   }, []);
 
+  // 把 order event 資訊存到後端
   const handleSave = async () => {
     const currentTime = getCurrentTime();
 
@@ -92,6 +94,7 @@ const CreateOrder = () => {
           '/orderEvent/create',
           updatedOrderInfo
         );
+
         const secretCode = response.data.SecretCode;
         Swal.fire({
           title: `Secret Code: ${secretCode}`,
@@ -110,14 +113,20 @@ const CreateOrder = () => {
     // console.log('handleDelete');
   };
 
+  // 選擇餐廳，並加進 Order Info
   const handleChoose = (selected) => {
-    setSearchText(selected);
+    setSearchText(selected.name);
     setRestaurantFocus(false);
+
+    setOrderInfo((prevOrderInfo) => ({
+      ...prevOrderInfo,
+      rid: selected.id,
+    }));
   };
 
-  // useEffect(() => {
-  //   console.log(orderInfo);
-  // }, [orderInfo]);
+  useEffect(() => {
+    console.log(orderInfo);
+  }, [orderInfo]);
 
   return (
     <>
@@ -175,14 +184,10 @@ const CreateOrder = () => {
                     />
                   </label>
                   {restaurantFocus && (
-                    <div
-                    // onClick={handleClickInside}
-                    >
-                      <RestaurantSearchBlock
-                        searchText={searchText}
-                        handleChoose={handleChoose}
-                      />
-                    </div>
+                    <RestaurantSearchBlock
+                      searchText={searchText}
+                      handleChoose={handleChoose}
+                    />
                   )}
                 </div>
               </td>
@@ -200,6 +205,7 @@ const CreateOrder = () => {
                     placeholder='Add Group or Friends'
                   />
                 </label>
+                {/* <AddOrderer /> */}
               </td>
             </tr>
           </tbody>
