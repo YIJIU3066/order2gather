@@ -19,18 +19,15 @@ const CreateOrder = () => {
   const [orderInfo, setOrderInfo] = useState({
     rid: null,
     hostID: null,
-    // memberList: [],
-    memberList: [6, 1],
+    memberList: [],
     createTime: null,
     stopOrderingTime: null,
     estimatedArrivalTime: null,
     endEventTime: null,
     totalPrice: 0,
-    // totalPeople: null,
-    totalPeople: 2,
+    totalPeople: 0,
     status: 1,
   });
-
   const [searchText, setSearchText] = useState('');
   const [restaurantFocus, setRestaurantFocus] = useState(false);
   const [restaurantList, setRestaurantList] = useState([]);
@@ -42,11 +39,12 @@ const CreateOrder = () => {
 
   const inputRef = useRef(null);
 
+  const allOrderer = new Set();
+
   // 從後端取得目前所有餐廳
   const getAllRestaurant = async () => {
     try {
       const response = await axiosInstance.get('/restaurant/display');
-      console.log(response);
       setRestaurantList(response.data.restaurant);
     } catch (error) {
       console.error('Error fetching data:', error.response);
@@ -148,6 +146,7 @@ const CreateOrder = () => {
       setFriendFocus(false);
     }
   };
+
   useEffect(() => {
     document.addEventListener('mousedown', closeRestaurantSearch);
     return () => {
@@ -155,18 +154,55 @@ const CreateOrder = () => {
     };
   }, []);
 
+  const countAllOrderer = () => {
+    //friend
+    if (checkedList.friends) {
+      checkedList.friends.forEach((friend) => {
+        allOrderer.add(friend.id);
+      });
+      // console.log(Array.from(allOrderer));
+    }
+
+    // group
+    if (checkedList.groups) {
+      checkedList.groups.forEach((group) => {
+        axiosInstance
+          .get('friend/getGroupInfo', {
+            params: {
+              id: group.gid,
+            },
+          })
+          .then((response) => {
+            const members = response.data.members;
+            members.forEach((member) => {
+              allOrderer.add(member.id);
+            });
+            // console.log(Array.from(allOrderer));
+          })
+          .catch((error) => {
+            console.error('Error fetching data:', error.response);
+          });
+      });
+    }
+    const memberList = Array.from(allOrderer);
+    const totalPeople = memberList.length;
+    return { memberList, totalPeople };
+  };
+
   // 把 order event 資訊存到後端
   const handleSave = async () => {
     const currentTime = getCurrentTime();
-
+    const { memberList, totalPeople } = countAllOrderer();
     if (orderInfo) {
       try {
         const updatedOrderInfo = {
           ...orderInfo,
           hostID: user.uid,
           createTime: currentTime,
+          totalPeople: totalPeople,
+          memberList: memberList,
         };
-
+        console.log(updatedOrderInfo);
         const response = await axiosInstance.post(
           '/orderEvent/create',
           updatedOrderInfo
@@ -200,10 +236,6 @@ const CreateOrder = () => {
       rid: selected.id,
     }));
   };
-
-  useEffect(() => {
-    console.log(checkedList);
-  }, [checkedList]);
 
   return (
     <>
@@ -283,7 +315,7 @@ const CreateOrder = () => {
               <td className={`${styles.form_name}`}>Orderers</td>
               <td>
                 <div className='relative flex justify-start'>
-                  <label className='cursor-pointer flex justify-start items-center'>
+                  <div className='cursor-pointer flex justify-start items-center'>
                     <FontAwesomeIcon
                       icon={faPlus}
                       style={{ color: '#7A989A', marginRight: '12px' }}
@@ -296,13 +328,13 @@ const CreateOrder = () => {
                         Friend
                       </button>
                       <button
-                        className='bg-green text-white hover:bg-yellow font-bold py-2 px-5 ml-6 rounded text-center shadow'
+                        className='bg-green text-white hover:bg-yellow font-bold py-2 px-5 ml-5 rounded text-center shadow'
                         onClick={() => handleAddGroup()}
                       >
                         Group
                       </button>
                     </div>
-                  </label>
+                  </div>
                   {friendFocus && (
                     <AddOrderer
                       friendList={friendList}

@@ -53,13 +53,13 @@ const AddOrderer = ({
     <div className='absolute left-full flex '>
       {friendList && (
         <div
-          // className='w-max mx-2 shadow-md bg-slate-50 rounded'
-          className={
-            friendList ? `w-max mx-2 shadow-md bg-slate-50 rounded` : ''
-          }
+          className='w-max mx-2 shadow-md bg-slate-50 rounded'
           onClick={(e) => e.stopPropagation}
         >
-          <ul className='flex flex-col justify-center items-center'>
+          <ul className='flex flex-col justify-center items-center rounded'>
+            <li className='bg-blue w-full flex justify-center items-center text-white  font-semibold px-2 py-1 rounded-t'>
+              Friends
+            </li>
             {friendList.length != 0 &&
               friendList.map((friend) => (
                 <li
@@ -71,7 +71,7 @@ const AddOrderer = ({
                       id='red-checkbox'
                       type='checkbox'
                       checked={friend.checked}
-                      className='appearance-none w-4 h-4 mx-2 rounded focus:outline-none border-2 border-blue checked:bg-blue'
+                      className='appearance-none w-4 h-4 mx-2 rounded focus:outline-none border-2 cursor-pointer border-blue checked:bg-blue'
                       onChange={() => handleCheckboxChange(friend, 'friend')}
                     />
                     <div className='flex justify-center text-base'>
@@ -89,6 +89,10 @@ const AddOrderer = ({
           onClick={(e) => e.stopPropagation}
         >
           <ul className='flex flex-col justify-center items-center'>
+            <li className='bg-green w-full flex justify-center items-center text-white  font-semibold px-2 py-1 rounded-t'>
+              Group
+            </li>
+
             {groupList.length != 0 &&
               groupList.map((group) => (
                 <li
@@ -100,7 +104,7 @@ const AddOrderer = ({
                       id='red-checkbox'
                       type='checkbox'
                       checked={group.checked}
-                      className='appearance-none w-4 h-4 mx-2 rounded focus:outline-none border-2 border-blue checked:bg-blue'
+                      className='appearance-none w-4 h-4 mx-2 rounded focus:outline-none border-2 cursor-pointer border-blue checked:bg-blue'
                       onChange={() => handleCheckboxChange(group, 'group')}
                     />
                     <div className='flex justify-center text-base'>
