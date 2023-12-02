@@ -80,61 +80,64 @@ export default function FriendList() {
   const api = useAxios();
 
   const fetchFriendList = async () => {
-    const res = await api.get("/friend/get");
-    console.log(res.data.groups, res.data.friends)
-    let newList = []
+    const res = await api.get('/friend/get');
+    console.log(res.data.groups, res.data.friends);
+    let newList = [];
     for (const f of res.data.friends) {
       newList.push({
         name: f.nickname,
         gmail: f.email,
         groups: [],
         checked: false,
-        id: f.id
+        id: f.id,
       });
     }
     for (const g of res.data.groups) {
-      const resp = await api.get("/friend/getGroupInfo", {
-          params: {
-            id: g.gid
-          }
-        }
-      );
+      const resp = await api.get('/friend/getGroupInfo', {
+        params: {
+          id: g.gid,
+        },
+      });
       for (const f of newList) {
         for (const m of resp.data.members) {
           if (m.id === f.id) {
-            f.groups.push({ name: g.name, id: g.gid })
+            f.groups.push({ name: g.name, id: g.gid });
           }
         }
       }
     }
     setFriendList(newList);
-    
+
     let gList = [];
     for (const g of res.data.groups) {
       gList.push({
         name: g.name,
         id: g.gid,
-        role: g.role
-      })
+        role: g.role,
+      });
     }
     setGroupList(gList);
-  }
-  
+  };
+
   useEffect(() => {
     fetchFriendList();
   }, []);
 
   const addFriend = async (newFriend) => {
-    const res = await api.post("/friend/add", JSON.stringify({ 
-      email: newFriend.gmail, 
-      nickname: newFriend.name 
-    }), { 
-      headers: {
-        'Content-Type': 'application/json'
+    const res = await api.post(
+      '/friend/add',
+      JSON.stringify({
+        email: newFriend.gmail,
+        nickname: newFriend.name,
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
-    });
+    );
     if (res.status === 200 && res.data.status) {
-      const resp = await api.get("/friend/get");
+      const resp = await api.get('/friend/get');
       let fidList = [];
       for (const f of resp.data.friends) {
         if (f.email === newFriend.gmail) {
@@ -143,21 +146,22 @@ export default function FriendList() {
         }
       }
       for (const g of newFriend.groups) {
-        const res = await api.post("/friend/addUsersToGroup", 
+        const res = await api.post(
+          '/friend/addUsersToGroup',
           JSON.stringify({
             fids: fidList,
-            gid: g.id
-          }), {
+            gid: g.id,
+          }),
+          {
             headers: {
-              'Content-Type': 'application/json'
-            }
+              'Content-Type': 'application/json',
+            },
           }
         );
-        console.log(fidList, g.id, res.data.status)
+        console.log(fidList, g.id, res.data.status);
       }
       fetchFriendList();
-    }
-    else alert("Add Friend Failed");
+    } else alert('Add Friend Failed');
   };
 
   const handleClick = (e) => {
