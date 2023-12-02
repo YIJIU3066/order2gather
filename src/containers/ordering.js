@@ -44,20 +44,20 @@ const Ordering = () => {
     const getOrderDetails = async () => {
       try {
         const response = await axiosInstance.get('/orderEvent/view?oid=3');
-        console.log(response.data);
+        //console.log(response.data);
         setOrder(response.data);
 
         const responseRestaurant = await axiosInstance.get(
           `/restaurant/display?rid=${response.data.rid}`
         );
-        console.log(responseRestaurant.data);
+        //console.log(responseRestaurant.data);
         //console.log(responseRestaurant.data[252])
         //const parsedData = JSON.parse(responseRestaurant.data);
         //console.log(parsedData.food)
-        console.log(typeof responseRestaurant.data);
-        console.log(responseRestaurant.data.food);
+        //console.log(typeof responseRestaurant.data);
+        //console.log(responseRestaurant.data.food);
         setMenu(responseRestaurant.data.menu);
-        console.log(responseRestaurant.data.menu);
+        //console.log(responseRestaurant.data.menu);
         setFoodList(
           responseRestaurant.data.food.map((food) => ({
             ...food,
@@ -75,6 +75,22 @@ const Ordering = () => {
     };
 
     fetchData();
+
+    const getUseerOrders = async (uid, oid) => {
+      try {
+        const response = await axiosInstance.get(
+          '/ordering/getUserOrders',
+          JSON.stringify({
+            uid: uid,
+            oid: oid,
+          })
+        );
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    getUseerOrders(1, 3);
   }, []); // 移除 foodList 作為依賴陣列，確保只在剛進入頁面時執行
   useEffect(() => {
     // 在 foodList 變更時執行 calculateTotalPrice
