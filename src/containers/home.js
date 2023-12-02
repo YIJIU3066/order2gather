@@ -1,24 +1,75 @@
 import NavBar from '../components/navbar';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import '../styles/home.css';
 import { Link, useNavigate } from 'react-router-dom';
+import AuthContext from '../context/AuthContext';
+import useAxios from '../hooks/useAxios';
 
 const Home = () => {
   const navigate = useNavigate();
+  const axiosInstance = useAxios();
   const [inputValue, setInputValue] = useState('');
   const [oid, setOid] = useState(0);
+  const [joinStatus, setJoinStatus] = useState(-1);
+  const { isLoggedIn, logoutUser } = useContext(AuthContext);
   const handleKeyDown = (event) => {
     //Todo:
     // add user to order and receive order id
     // suppose order id is 0
     // Add secret key type check
+    const joinOrder = async () => {
+      try {
+        const response = await axiosInstance.post(
+          '/orderEvent/join?SecretCode={inputValue}'
+        );
+        console.log(response);
+        console.log(response.data.status);
+        setJoinStatus(response.data.status);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
     if (event.key === 'Enter' && inputValue !== '') {
-      navigate(`/ordering/${oid}`);
+      if (isLoggedIn) {
+        joinOrder();
+        if (joinStatus <= 0) {
+        } else {
+          navigate(`/ordering/${oid}`);
+        }
+      } else navigate(`/login`);
     }
   };
+  const handleRestaurantClick = () => {
+    if (isLoggedIn) navigate(`/allRestaurant`);
+    else navigate(`/login`);
+  };
+  const handleFriendsClick = () => {
+    if (isLoggedIn) navigate(`/friendAndGroup`);
+    else navigate(`/login`);
+  };
+  const handleHistoryClick = () => {
+    if (isLoggedIn) navigate(`/history`);
+    else navigate(`/login`);
+  };
+  const handleCreateOrderClick = () => {
+    if (isLoggedIn) navigate(`/createOrder`);
+    else navigate(`/login`);
+  };
+  const handleOrderClick = () => {
+    if (isLoggedIn) navigate(`/allOrder`);
+    else navigate(`/login`);
+  };
+  const handleReportClick = () => {
+    if (isLoggedIn) navigate(`/reports`);
+    else navigate(`/login`);
+  };
+
   return (
     <>
       <NavBar />
+      <div>
+        isloggedin {isLoggedIn === true} {logoutUser} a
+      </div>
       <div className='flex p-10 pb-0 pt-4 items-center justify-center'>
         <h2 className='text-blue font-bold text-4xl'>Order 2Gather</h2>
       </div>
@@ -52,21 +103,24 @@ const Home = () => {
         <div></div>
         <div></div>
         <div className='flex items-center flex-col justify-center gap-2'>
-          <Link to='/allRestaurant'>
-            <button className='bg-blue rounded-3xl w-40 h-14'></button>
-          </Link>
+          <button
+            onClick={() => handleRestaurantClick()}
+            className='bg-blue rounded-3xl w-40 h-14'
+          ></button>
           <p className='text-blue text-xl font-bold'>My Restaurant</p>
         </div>
         <div className='flex items-center flex-col justify-center gap-2'>
-          <Link to='/friendAndGroup'>
-            <button className='bg-brown rounded-3xl w-40 h-14'></button>
-          </Link>
+          <button
+            onClick={() => handleFriendsClick()}
+            className='bg-brown rounded-3xl w-40 h-14'
+          ></button>
           <p className='text-brown text-xl font-bold'>My Friends</p>
         </div>
         <div className='flex items-center flex-col justify-center gap-2'>
-          <Link to='/history'>
-            <button className='bg-green rounded-3xl w-40 h-14'></button>
-          </Link>
+          <button
+            onClick={() => handleHistoryClick()}
+            className='bg-green rounded-3xl w-40 h-14'
+          ></button>
           <p className='text-green text-xl font-bold'>Order History</p>
         </div>
         <div></div>
@@ -78,21 +132,24 @@ const Home = () => {
         <div></div>
         <div></div>
         <div className='flex items-center flex-col justify-center gap-2'>
-          <Link to='/createOrder'>
-            <button className='bg-blue rounded-3xl w-40 h-14'></button>
-          </Link>
+          <button
+            onClick={() => handleCreateOrderClick()}
+            className='bg-blue rounded-3xl w-40 h-14'
+          ></button>
           <p className='text-blue text-xl font-bold'>Create Order</p>
         </div>
         <div className='flex items-center flex-col justify-center gap-2'>
-          <Link to='/allOrder'>
-            <button className='bg-brown rounded-3xl w-40 h-14'></button>
-          </Link>
+          <button
+            onClick={() => handleOrderClick()}
+            className='bg-brown rounded-3xl w-40 h-14'
+          ></button>
           <p className='text-brown text-xl font-bold'>View Order</p>
         </div>
         <div className='flex items-center flex-col justify-center gap-2'>
-          <Link to='/reports'>
-            <button className='bg-green rounded-3xl w-40 h-14'></button>
-          </Link>
+          <button
+            onClick={() => handleReportClick()}
+            className='bg-green rounded-3xl w-40 h-14'
+          ></button>
           <p className='text-green text-xl font-bold'>View Report</p>
         </div>
         <div></div>
