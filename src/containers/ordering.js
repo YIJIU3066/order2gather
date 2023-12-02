@@ -16,7 +16,6 @@ const Ordering = () => {
   const axiosInstance = useAxios();
   const { user } = useContext(AuthContext);
   const [order, setOrder] = useState(null);
-  const [restaurant, setRestaurant] = useState('');
   const Order = {
     id: 0,
     restaurant: 'Restaurant AAAA',
@@ -24,58 +23,45 @@ const Ordering = () => {
     deliverTime: '2023-07-29 12:00',
     host: 'Host 1',
   };
-  const [foodList, setFoodList] = useState([
-    {
-      id: 0,
-      name: 'noodle',
-      price: '100',
-      note: '',
-      quantity: 0,
-    },
-    {
-      id: 1,
-      name: 'beef',
-      price: '200',
-      note: '',
-      quantity: 0,
-    },
-  ]);
+
+  const [foodList, setFoodList] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   useEffect(() => {
     const getOrderDetails = async () => {
       try {
-        const response = await axiosInstance.get('/orderEvent/view?oid=3 ');
+        const response = await axiosInstance.get('/orderEvent/view?oid=3');
         console.log(response.data);
         setOrder(response.data);
-        const response_restaurant = await axiosInstance.get(
-          '/restaurant/display/1'
+
+        const responseRestaurant = await axiosInstance.get(
+          `/restaurant/display?rid=${response.data.rid}`
         );
-        console.log(response_restaurant.data);
-        setRestaurant(response_restaurant.data);
+        console.log(responseRestaurant.data);
+        //console.log(responseRestaurant.data[252])
+        //const parsedData = JSON.parse(responseRestaurant.data);
+        //console.log(parsedData.food)
+        console.log(typeof responseRestaurant.data);
+        console.log(responseRestaurant.data.food);
+        setFoodList(
+          responseRestaurant.data.food.map((food) => ({
+            ...food,
+            note: '',
+            quantity: 0,
+          }))
+        );
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-    const getRestaurantDetails = async () => {
+
+    const fetchData = async () => {
       await getOrderDetails();
-      while (order == null) {
-        if (order == null) {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-        } else {
-          console.log('rid', order.rid);
-          try {
-            const response = await axiosInstance.get(
-              '/restaurant/display/{order.rid}'
-            );
-            console.log(response.data);
-            setRestaurant(response.data);
-          } catch (error) {
-            console.error('Error fetching data:', error);
-          }
-        }
-      }
     };
-    getOrderDetails();
+
+    fetchData();
+  }, []); // 移除 foodList 作為依賴陣列，確保只在剛進入頁面時執行
+  useEffect(() => {
+    // 在 foodList 變更時執行 calculateTotalPrice
     const calculateTotalPrice = () => {
       const totalPrice = foodList.reduce((accumulator, food) => {
         const price = parseInt(food.price, 10);
