@@ -4,6 +4,7 @@ import AddItem from '../components/addItem';
 import AddGroupForm from '../components/addGroupForm';
 import ListNav from '../components/listNav';
 import { Link } from 'react-router-dom';
+import useAxios from '../hooks/useAxios'
 
 const mockFriends = [
   {
@@ -79,8 +80,32 @@ const mockGroups = [
 
 export default function GroupList() {
   const [groupList, setGroupList] = useState([]);
+  const [friendList, setFriendList] = useState([]);
   const [showGroups, setShowGroups] = useState([0, 5]);
   const [addOpen, setAddOpen] = useState(false);
+  const api = useAxios();
+
+  const fetchGroupList = async () => {
+    const res = await api.get("/friend/get");
+    let newGList = [], newFList = []
+    for (const g of res.data.groups) {
+      newGList.push({
+        name: g.name,
+        checked: false,
+        id: g.gid
+      });
+    }
+    for (const f of res.data.friends) {
+      newFList.push({
+        ...f,
+        name: f.nickname,
+        checked: false
+      })
+    }
+    setGroupList(newGList);
+    setFriendList(newFList);
+    console.log(res.data.friends)
+  }
 
   const handleClick = (e) => {
     const key = e.target.value;
@@ -99,27 +124,37 @@ export default function GroupList() {
     setGroupList(groupList.filter((it) => !it.checked));
   };
 
-  const addGroup = ({ groupName, friend }) => {
-    groupList.push({
-      name: groupName,
-      id: mockGroups.length + 1,
-      checked: false,
-    });
-    for (let i = 0; i < friend.length; i++) {
-      for (let j = 0; j < mockFriends.length; j++) {
-        if (mockFriends[j].name === friend[i].name) {
-          mockFriends[j].groups.push({
-            name: groupName,
-            id: mockGroups.length,
-          });
-          break;
+  const addGroup = async ({ groupName, friend }) => {
+    const res = await api.post("/friend/createGroup", 
+      JSON.stringify({
+        name: groupName
+      }), {
+        headers: {
+          'Content-Type': 'application/json'
         }
       }
+    );
+    if (res.status === 200) {
+      let fidList = []
+      for (const f of friend) fidList.push(f.id);
+      console.log(fidList, res.data.gid);
+      const resp = await api.post("/friend/addUsersToGroup", 
+        JSON.stringify({
+          fids: fidList,
+          gid: res.data.gid
+        }), {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      console.log(resp);
     }
+    fetchGroupList();
   };
 
   useEffect(() => {
-    setGroupList(mockGroups);
+    fetchGroupList();
   }, []);
 
   return (
@@ -147,7 +182,7 @@ export default function GroupList() {
                     />
                     <Link
                       to={`/groupDetail/${group.id}`}
-                      state={{ group: group, friendList: mockFriends }}
+                      state={{ group: group, friendList: friendList }}
                       className='text-2xl text-blue font-bold justify-self-start col-span-4 p-4'
                     >
                       <div>
@@ -178,7 +213,7 @@ export default function GroupList() {
       {addOpen && (
         <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100'>
           <AddGroupForm
-            friends={mockFriends}
+            friends={friendList}
             setAddOpen={setAddOpen}
             addGroup={addGroup}
           />
