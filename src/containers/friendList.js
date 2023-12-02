@@ -5,6 +5,7 @@ import { faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import ListNav from '../components/listNav';
 import AddFriendForm from '../components/addFriendForm';
 import AddItem from '../components/addItem';
+import useAxios from '../hooks/useAxios';
 
 const mockGroups = [
   { name: 'Cook', id: 1 },
@@ -73,15 +74,90 @@ const mockFriends = [
 
 export default function FriendList() {
   const [friendList, setFriendList] = useState([]);
+  const [groupList, setGroupList] = useState([]);
   const [showFriends, setShowFriends] = useState([0, 5]);
   const [addOpen, setAddOpen] = useState(false);
+  const api = useAxios();
 
+  const fetchFriendList = async () => {
+    const res = await api.get("/friend/get");
+    console.log(res.data.groups, res.data.friends)
+    let newList = []
+    for (const f of res.data.friends) {
+      newList.push({
+        name: f.nickname,
+        gmail: f.email,
+        groups: [],
+        checked: false,
+        id: f.id
+      });
+    }
+    for (const g of res.data.groups) {
+      const resp = await api.get("/friend/getGroupInfo", {
+          params: {
+            id: g.gid
+          }
+        }
+      );
+      for (const f of newList) {
+        for (const m of resp.data.members) {
+          if (m.id === f.id) {
+            f.groups.push({ name: g.name, id: g.gid })
+          }
+        }
+      }
+    }
+    setFriendList(newList);
+    
+    let gList = [];
+    for (const g of res.data.groups) {
+      gList.push({
+        name: g.name,
+        id: g.gid,
+        role: g.role
+      })
+    }
+    setGroupList(gList);
+  }
+  
   useEffect(() => {
-    setFriendList(mockFriends);
+    fetchFriendList();
   }, []);
 
-  const addFriend = (newFriend) => {
-    setFriendList((prevList) => [...prevList, newFriend]);
+  const addFriend = async (newFriend) => {
+    const res = await api.post("/friend/add", JSON.stringify({ 
+      email: newFriend.gmail, 
+      nickname: newFriend.name 
+    }), { 
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    if (res.status === 200 && res.data.status) {
+      const resp = await api.get("/friend/get");
+      let fidList = [];
+      for (const f of resp.data.friends) {
+        if (f.email === newFriend.gmail) {
+          fidList.push(f.id);
+          break;
+        }
+      }
+      for (const g of newFriend.groups) {
+        const res = await api.post("/friend/addUsersToGroup", 
+          JSON.stringify({
+            fids: fidList,
+            gid: g.id
+          }), {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        console.log(fidList, g.id, res.data.status)
+      }
+      fetchFriendList();
+    }
+    else alert("Add Friend Failed");
   };
 
   const handleClick = (e) => {
@@ -187,7 +263,7 @@ export default function FriendList() {
       {addOpen && (
         <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100'>
           <AddFriendForm
-            groups={mockGroups}
+            groups={groupList}
             setAddOpen={setAddOpen}
             addFriend={addFriend}
           />
