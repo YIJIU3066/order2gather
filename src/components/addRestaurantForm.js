@@ -145,6 +145,15 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
         menu: menus,
       };
       // 資料存到後端
+
+      Swal.fire({
+        title: 'Success!',
+        text: 'Add Restaurant Succussful!',
+        icon: 'success',
+        iconColor: '#CF9546',
+        confirmButtonColor: '#7A989A',
+        confirmButtonText: 'OK!',
+      });
     } else {
       Swal.fire({
         title: 'Error!',
@@ -156,6 +165,14 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
         cancelButtonColor: '#C67052',
         confirmButtonText: 'OK!',
         cancelButtonText: 'Quit Create',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          console.log('Confirmed!');
+          // 可以添加其他您想要執行的操作
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          console.log('Cancelled!');
+          handleClose();
+        }
       });
     }
   };

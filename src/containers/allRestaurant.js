@@ -57,6 +57,10 @@ const AllRestaurant = () => {
     setShowRestaurantForm(false);
   };
 
+  useEffect(() => {
+    console.log(showRestaurantForm);
+  }, [showRestaurantForm]);
+
   return (
     <>
       <NavBar />

@@ -1,45 +1,117 @@
 import React, { useEffect, useState, useContext } from 'react';
-import Multiselect from './Multiselect';
-import AuthContext from '../context/AuthContext';
-import useAxios from '../hooks/useAxios';
 
-const AddOrderer = () => {
-  const axiosInstance = useAxios();
-  const { user } = useContext(AuthContext);
-  const [friendList, setFriendList] = useState([]);
-  const [friend, setFriend] = useState([]);
+const AddOrderer = ({
+  friendList,
+  setFriendList,
+  groupList,
+  setGroupList,
+  checkedList,
+  setCheckedList,
+}) => {
+  const handleCheckboxChange = (selected, type) => {
+    if (type == 'friend') {
+      const updatedFriendList = friendList.map((friend) =>
+        friend.id === selected.id
+          ? { ...friend, checked: !friend.checked }
+          : friend
+      );
+      setFriendList(updatedFriendList);
 
-  useEffect(() => {
-    const getAllFriend = async () => {
-      try {
-        const response = await axiosInstance.get('/friend/get');
-        console.log(response);
-        setFriendList(response.data.friends);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-    getAllFriend();
-  }, []);
+      const updatedCheckedFriends = updatedFriendList
+        .filter((friend) => friend.checked)
+        .map((friend) => ({ id: friend.id, username: friend.username }));
 
-  // 將 email 欄位的值設置為與 username 相同的值
-  const updatedFriendList = friendList.map((friend) => ({
-    ...friend,
-    name: friend.username,
-  }));
+      const updatedCheckedGroups = checkedList.groups || [];
 
-  useEffect(() => {
-    console.log(friendList);
-  }, [friendList]);
+      setCheckedList({
+        friends: updatedCheckedFriends,
+        groups: updatedCheckedGroups,
+      });
+    }
+    if (type == 'group') {
+      const updatedGroupList = groupList.map((group) =>
+        group.gid === selected.gid
+          ? { ...group, checked: !group.checked }
+          : group
+      );
+      setGroupList(updatedGroupList);
+
+      const updatedCheckedGroups = updatedGroupList
+        .filter((group) => group.checked)
+        .map((group) => ({ gid: group.gid, name: group.name }));
+
+      const updatedCheckedFriends = checkedList.friends || [];
+
+      setCheckedList({
+        friends: updatedCheckedFriends,
+        groups: updatedCheckedGroups,
+      });
+    }
+  };
 
   return (
-    <div className=''>
-      <Multiselect
-        list={updatedFriendList}
-        selectedItems={friend}
-        setSelected={setFriend}
-        isGroup={false}
-      />
+    <div className='absolute left-full flex '>
+      {friendList && (
+        <div
+          // className='w-max mx-2 shadow-md bg-slate-50 rounded'
+          className={
+            friendList ? `w-max mx-2 shadow-md bg-slate-50 rounded` : ''
+          }
+          onClick={(e) => e.stopPropagation}
+        >
+          <ul className='flex flex-col justify-center items-center'>
+            {friendList.length != 0 &&
+              friendList.map((friend) => (
+                <li
+                  className='checkbox-wrapper text-base w-full font-semibold m-2 cursor-pointer flex justify-start items-center text-gray-700'
+                  key={friend.id}
+                >
+                  <label className='cursor-pointer flex items-center justify-center'>
+                    <input
+                      id='red-checkbox'
+                      type='checkbox'
+                      checked={friend.checked}
+                      className='appearance-none w-4 h-4 mx-2 rounded focus:outline-none border-2 border-blue checked:bg-blue'
+                      onChange={() => handleCheckboxChange(friend, 'friend')}
+                    />
+                    <div className='flex justify-center text-base'>
+                      {friend.nickname ? friend.nickname : friend.username}
+                    </div>
+                  </label>
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
+      {groupList && (
+        <div
+          className='w-max mx-2 shadow-md bg-slate-50 rounded'
+          onClick={(e) => e.stopPropagation}
+        >
+          <ul className='flex flex-col justify-center items-center'>
+            {groupList.length != 0 &&
+              groupList.map((group) => (
+                <li
+                  className='checkbox-wrapper text-base w-full font-semibold m-2 cursor-pointer flex justify-start items-center text-gray-700'
+                  key={group.gid}
+                >
+                  <label className='cursor-pointer flex items-center justify-center'>
+                    <input
+                      id='red-checkbox'
+                      type='checkbox'
+                      checked={group.checked}
+                      className='appearance-none w-4 h-4 mx-2 rounded focus:outline-none border-2 border-blue checked:bg-blue'
+                      onChange={() => handleCheckboxChange(group, 'group')}
+                    />
+                    <div className='flex justify-center text-base'>
+                      {group.name}
+                    </div>
+                  </label>
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

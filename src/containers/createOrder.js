@@ -9,6 +9,7 @@ import useAxios from '../hooks/useAxios';
 import AuthContext from '../context/AuthContext';
 import Swal from 'sweetalert2';
 import AddOrderer from '../components/addOrderer';
+import AddRestaurantForm from '../components/addRestaurantForm';
 
 const CreateOrder = () => {
   const axiosInstance = useAxios();
@@ -32,7 +33,74 @@ const CreateOrder = () => {
 
   const [searchText, setSearchText] = useState('');
   const [restaurantFocus, setRestaurantFocus] = useState(false);
+  const [restaurantList, setRestaurantList] = useState([]);
+  const [friendFocus, setFriendFocus] = useState(false);
+  const [friendList, setFriendList] = useState([]);
+  const [checkedList, setCheckedList] = useState([]);
+  const [groupList, setGroupList] = useState([]);
+  const [groupFocus, setGroupFocus] = useState(false);
+
   const inputRef = useRef(null);
+
+  // 從後端取得目前所有餐廳
+  const getAllRestaurant = async () => {
+    try {
+      const response = await axiosInstance.get('/restaurant/display');
+      console.log(response);
+      setRestaurantList(response.data.restaurant);
+    } catch (error) {
+      console.error('Error fetching data:', error.response);
+    }
+  };
+
+  // 從後端取得所有朋友
+  const getAllFriend = async () => {
+    try {
+      const response = await axiosInstance.get('/friend/get');
+      setFriendList(response.data.friends);
+      setGroupList(response.data.groups);
+
+      //加上 checked
+      const updatedFriends = response.data.friends.map((friend) => ({
+        ...friend,
+        checked: false,
+      }));
+      const updatedGroups = response.data.groups.map((group) => ({
+        ...group,
+        checked: false,
+      }));
+      setFriendList(updatedFriends);
+      setGroupList(updatedGroups);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  //獲得目前時間
+  const getCurrentTime = () => {
+    const currentTime = new Date();
+    const utcOffset = -8 * 60;
+    const adjustedDate = new Date(currentTime.getTime() + utcOffset * 60000);
+    const formattedDate = adjustedDate.toISOString().slice(0, 19);
+    return formattedDate;
+  };
+
+  // 設定order event 預設資訊
+  useEffect(() => {
+    const currentTime = getCurrentTime();
+
+    setOrderInfo((prevOrderInfo) => ({
+      ...prevOrderInfo,
+      stopOrderingTime: currentTime,
+      estimatedArrivalTime: currentTime,
+      endEventTime: currentTime,
+    }));
+  }, []);
+
+  useEffect(() => {
+    getAllRestaurant();
+    getAllFriend();
+  }, []);
 
   const handleInputChange = (event) => {
     setSearchText(event.target.value);
@@ -48,34 +116,43 @@ const CreateOrder = () => {
     }
   };
 
+  const [showRestaurantForm, setShowRestaurantForm] = useState(false);
+
+  const handleAddRestaurant = () => {
+    setShowRestaurantForm(true);
+  };
+
+  const handleCloseRestaurantForm = () => {
+    setShowRestaurantForm(false);
+  };
+
+  const handleSaveRestaurant = (newRestaurantData) => {
+    setRestaurantList([...restaurantList, newRestaurantData]);
+    setShowRestaurantForm(false);
+  };
+
+  const handleAddFriend = () => {
+    if (friendFocus == true) {
+      setFriendFocus(false);
+    } else {
+      setFriendFocus(true);
+      setGroupFocus(false);
+    }
+  };
+
+  const handleAddGroup = () => {
+    if (groupFocus == true) {
+      setGroupFocus(false);
+    } else {
+      setGroupFocus(true);
+      setFriendFocus(false);
+    }
+  };
   useEffect(() => {
     document.addEventListener('mousedown', closeRestaurantSearch);
     return () => {
       document.removeEventListener('mousedown', closeRestaurantSearch);
     };
-  }, []);
-
-  //獲得目前時間
-  const getCurrentTime = () => {
-    const currentTime = new Date();
-
-    const utcOffset = -8 * 60;
-    const adjustedDate = new Date(currentTime.getTime() + utcOffset * 60000);
-    const formattedDate = adjustedDate.toISOString().slice(0, 19);
-
-    return formattedDate;
-  };
-
-  // 設定order event 預設資訊
-  useEffect(() => {
-    const currentTime = getCurrentTime();
-
-    setOrderInfo((prevOrderInfo) => ({
-      ...prevOrderInfo,
-      stopOrderingTime: currentTime,
-      estimatedArrivalTime: currentTime,
-      endEventTime: currentTime,
-    }));
   }, []);
 
   // 把 order event 資訊存到後端
@@ -125,8 +202,8 @@ const CreateOrder = () => {
   };
 
   useEffect(() => {
-    console.log(orderInfo);
-  }, [orderInfo]);
+    console.log(checkedList);
+  }, [checkedList]);
 
   return (
     <>
@@ -186,26 +263,63 @@ const CreateOrder = () => {
                   {restaurantFocus && (
                     <RestaurantSearchBlock
                       searchText={searchText}
+                      restaurantList={restaurantList}
                       handleChoose={handleChoose}
+                      handleAddRestaurant={handleAddRestaurant}
                     />
                   )}
                 </div>
+                {showRestaurantForm && (
+                  <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100'>
+                    <AddRestaurantForm
+                      onClose={handleCloseRestaurantForm}
+                      onSave={handleSaveRestaurant}
+                    />
+                  </div>
+                )}
               </td>
             </tr>
             <tr>
               <td className={`${styles.form_name}`}>Orderers</td>
               <td>
-                <label className='cursor-pointer'>
-                  <FontAwesomeIcon
-                    icon={faPlus}
-                    style={{ color: '#7A989A', marginRight: '12px' }}
-                  />
-                  <input
-                    className={`${styles.form_input}`}
-                    placeholder='Add Group or Friends'
-                  />
-                </label>
-                {/* <AddOrderer /> */}
+                <div className='relative flex justify-start'>
+                  <label className='cursor-pointer flex justify-start items-center'>
+                    <FontAwesomeIcon
+                      icon={faPlus}
+                      style={{ color: '#7A989A', marginRight: '12px' }}
+                    />
+                    <div className='buttonContainer'>
+                      <button
+                        className='bg-blue text-white hover:bg-yellow font-bold py-2 px-5 rounded text-center shadow'
+                        onClick={() => handleAddFriend()}
+                      >
+                        Friend
+                      </button>
+                      <button
+                        className='bg-green text-white hover:bg-yellow font-bold py-2 px-5 ml-6 rounded text-center shadow'
+                        onClick={() => handleAddGroup()}
+                      >
+                        Group
+                      </button>
+                    </div>
+                  </label>
+                  {friendFocus && (
+                    <AddOrderer
+                      friendList={friendList}
+                      setFriendList={setFriendList}
+                      checkedList={checkedList}
+                      setCheckedList={setCheckedList}
+                    />
+                  )}
+                  {groupFocus && (
+                    <AddOrderer
+                      groupList={groupList}
+                      setGroupList={setGroupList}
+                      checkedList={checkedList}
+                      setCheckedList={setCheckedList}
+                    />
+                  )}
+                </div>
               </td>
             </tr>
           </tbody>
@@ -218,7 +332,7 @@ const CreateOrder = () => {
             Save & Launch
           </button>
           <button
-            className='bg-red hover:bg-yellow text-white font-bold py-2 px-3 ml-4 rounded text-center'
+            className='bg-red hover:bg-yellow text-white font-bold py-2 px-3 ml-6 rounded text-center'
             onClick={() => handleDelete()}
           >
             Delete
