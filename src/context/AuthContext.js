@@ -25,7 +25,11 @@ export const AuthProvider = ({ children }) => {
       : null
   );
   const [loading, setLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem('accessToken')
+      ? true
+      : false
+  );
 
   const navigate = useNavigate();
 
