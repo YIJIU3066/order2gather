@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Multiselect from './Multiselect';
 import { Link, useNavigate } from 'react-router-dom';
+import Base64ImageConverter from './Base64ImageConverter.js';
 
-export default function SuccessMessage({ menuid, setMenuOpen }) {
+export default function SuccessMessage({ menuid, setMenuOpen, menu_photo }) {
   const navigate = useNavigate();
   const handleClose = () => {
     setMenuOpen(false);
@@ -21,8 +22,8 @@ export default function SuccessMessage({ menuid, setMenuOpen }) {
           </button>
           <div></div>
         </div>
-        <div className='md:w-1/3 sm:w-2/3 border-8 border-blue p-4 rounded shadow flex flex-col items-center bg-slate-50 relative'>
-          <div>Menu id {menuid}</div>
+        <div>
+          <Base64ImageConverter base64Image={menu_photo} />
         </div>
       </div>
     </div>

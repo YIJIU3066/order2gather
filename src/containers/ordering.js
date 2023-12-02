@@ -15,8 +15,22 @@ const Ordering = () => {
   const [emptyMessage, setEmptyMessage] = useState(false);
   const axiosInstance = useAxios();
   const { user } = useContext(AuthContext);
-  const [order, setOrder] = useState(null);
-  const Order = {
+  const [Order, setOrder] = useState({
+    id: 0,
+    rname: 'Restaurant AAAA',
+    stopOrderingTime: '2023-07-29 10:00',
+    host: 'Host 1',
+  });
+  const [menu, setMenu] = useState('');
+  const dateFormatTransform = (isoDateString) => {
+    const date = isoDateString.substring(0, 10);
+    const time = isoDateString.substring(11, 16);
+
+    const formattedDate = `${date} ${time}`;
+    return formattedDate;
+  };
+  //const [Order, setOOrder] = useState([]);
+  const mockOrder = {
     id: 0,
     restaurant: 'Restaurant AAAA',
     openDeadline: '2023-07-29 10:00',
@@ -42,6 +56,8 @@ const Ordering = () => {
         //console.log(parsedData.food)
         console.log(typeof responseRestaurant.data);
         console.log(responseRestaurant.data.food);
+        setMenu(responseRestaurant.data.menu);
+        console.log(responseRestaurant.data.menu);
         setFoodList(
           responseRestaurant.data.food.map((food) => ({
             ...food,
@@ -185,14 +201,14 @@ const Ordering = () => {
       <div className='flex pl-20 pr-20 items-center justify-center flex-wrap gap-6'>
         {confirmOrder === 0 && (
           <>
-            <h2 className='text-blue font-bold text-2xl'>{Order.restaurant}</h2>
+            <h2 className='text-blue font-bold text-2xl'>{Order.rname}</h2>
             <h2 className='text-blue font-bold text-1xl flex-grow'>
-              Deadline: {Order.openDeadline}
+              Deadline: {dateFormatTransform(Order.stopOrderingTime)}
             </h2>
             <div
               className='border-b hover:text-white cursor-pointer pl-2 pr-2 w-40 h-10 rounded-2xl bg-yellow'
               key={Order.id}
-              onClick={() => handleMenuClick(Order.id)}
+              onClick={() => handleMenuClick()}
             >
               <h2 className='pt-2 text-center text-white font-bold text-1xl'>
                 Menu
@@ -393,7 +409,11 @@ const Ordering = () => {
       )}
       {menuOpen && (
         <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100'>
-          <Showmenu menuid={Order.id} setMenuOpen={setMenuOpen} />
+          <Showmenu
+            menuid={Order.id}
+            setMenuOpen={setMenuOpen}
+            menu_photo={menu}
+          />
         </div>
       )}
       {emptyMessage && (
