@@ -1,8 +1,10 @@
 import NavBar from '../components/navbar';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import OrderingSuccessMessage from '../components/orderingMessage';
 import Showmenu from '../components/showMenu';
 import OrderingEmptyMessage from '../components/orderingEmptyMessage';
+import useAxios from '../hooks/useAxios';
+import AuthContext from '../context/AuthContext';
 
 const Ordering = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -11,6 +13,10 @@ const Ordering = () => {
   const [addFood, setAddFood] = useState(1);
   const [confirmOrder, setConfirmOrder] = useState(0);
   const [emptyMessage, setEmptyMessage] = useState(false);
+  const axiosInstance = useAxios();
+  const { user } = useContext(AuthContext);
+  const [order, setOrder] = useState(null);
+  const [restaurant, setRestaurant] = useState('');
   const Order = {
     id: 0,
     restaurant: 'Restaurant AAAA',
@@ -36,6 +42,40 @@ const Ordering = () => {
   ]);
   const [totalPrice, setTotalPrice] = useState(0);
   useEffect(() => {
+    const getOrderDetails = async () => {
+      try {
+        const response = await axiosInstance.get('/orderEvent/view?oid=3 ');
+        console.log(response.data);
+        setOrder(response.data);
+        const response_restaurant = await axiosInstance.get(
+          '/restaurant/display/1'
+        );
+        console.log(response_restaurant.data);
+        setRestaurant(response_restaurant.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    const getRestaurantDetails = async () => {
+      await getOrderDetails();
+      while (order == null) {
+        if (order == null) {
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        } else {
+          console.log('rid', order.rid);
+          try {
+            const response = await axiosInstance.get(
+              '/restaurant/display/{order.rid}'
+            );
+            console.log(response.data);
+            setRestaurant(response.data);
+          } catch (error) {
+            console.error('Error fetching data:', error);
+          }
+        }
+      }
+    };
+    getOrderDetails();
     const calculateTotalPrice = () => {
       const totalPrice = foodList.reduce((accumulator, food) => {
         const price = parseInt(food.price, 10);
