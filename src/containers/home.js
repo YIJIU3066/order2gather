@@ -1,42 +1,65 @@
 import NavBar from '../components/navbar';
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import '../styles/home.css';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import useAxios from '../hooks/useAxios';
+import WrongCodeMessage from '../components/wrongCodeMessage';
 
 const Home = () => {
   const navigate = useNavigate();
   const axiosInstance = useAxios();
   const [inputValue, setInputValue] = useState('');
   const [oid, setOid] = useState(0);
-  const [joinStatus, setJoinStatus] = useState(-1);
+  const [oidFind, setOidFind] = useState(false);
+  const [joinStatus, setJoinStatus] = useState(-2);
   const { isLoggedIn, logoutUser } = useContext(AuthContext);
-  const handleKeyDown = (event) => {
-    //Todo:
-    // add user to order and receive order id
-    // suppose order id is 0
-    // Add secret key type check
-    const joinOrder = async () => {
-      try {
-        const response = await axiosInstance.post(
-          '/orderEvent/join?SecretCode={inputValue}'
-        );
-        console.log(response);
-        console.log(response.data.status);
-        setJoinStatus(response.data.status);
-      } catch (error) {
-        console.error('Error fetching data:', error);
+  const [wrongCodeMessage, setWrongCodeMessage] = useState(false);
+  const joinOrder = async () => {
+    try {
+      const response = await axiosInstance.post(
+        `/orderEvent/join?SecretCode=${inputValue}`
+      );
+      setJoinStatus(response.data.status);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const findoid = async () => {
+    try {
+      const response = await axiosInstance.get('/orderEvent/view');
+      console.log('input', inputValue);
+      for (const item of response.data) {
+        if (item.secretCode === inputValue) {
+          setOid(item.id);
+          setOidFind(true);
+        }
       }
-    };
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (joinStatus >= -1) {
+      if (joinStatus >= 0 && oidFind === true) navigate(`/ordering/${oid}`);
+      else {
+        setJoinStatus(-2);
+        setOidFind(false);
+        setWrongCodeMessage(true);
+      }
+    }
+  }, [joinStatus, oidFind, navigate, oid]);
+
+  const handleKeyDown = (event) => {
     if (event.key === 'Enter' && inputValue !== '') {
       if (isLoggedIn) {
         joinOrder();
-        if (joinStatus <= 0) {
-        } else {
-          navigate(`/ordering/${oid}`);
-        }
-      } else navigate(`/login`);
+        findoid();
+      } else {
+        navigate(`/login`);
+      }
     }
   };
   const handleRestaurantClick = () => {
@@ -67,9 +90,6 @@ const Home = () => {
   return (
     <>
       <NavBar />
-      <div>
-        isloggedin {isLoggedIn === true} {logoutUser} a
-      </div>
       <div className='flex p-10 pb-0 pt-4 items-center justify-center'>
         <h2 className='text-blue font-bold text-4xl'>Order 2Gather</h2>
       </div>
@@ -156,6 +176,11 @@ const Home = () => {
         <div></div>
         <div></div>
       </div>
+      {wrongCodeMessage && (
+        <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100'>
+          <WrongCodeMessage setWrongCodeMessage={setWrongCodeMessage} />
+        </div>
+      )}
     </>
   );
 };
