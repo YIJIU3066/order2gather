@@ -1,8 +1,9 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/navbar';
 import { useLocation, Link } from 'react-router-dom';
 import ListNav from '../components/listNav';
 import Multiselect from '../components/Multiselect';
+import useAxios from '../hooks/useAxios'
 
 export default function GroupDetail() {
   const location = useLocation();
@@ -10,28 +11,40 @@ export default function GroupDetail() {
   const [showMembers, setShowMembers] = useState([0, 5]);
   const [memberList, setMemberList] = useState([]);
   const [selectedFriend, setSelectedFriend] = useState([]);
+  const api = useAxios();
 
-  useLayoutEffect(() => {
-    for (let i = 0; i < friendList.length; i++) {
-      for (let j = 0; j < friendList[i].groups.length; j++) {
-        if (
-          friendList[i].groups[j].id === group.id &&
-          !memberList.includes(friendList[i])
-        ) {
-          setMemberList((prevList) => [...prevList, friendList[i]]);
+  const getGroupInfo = async () => {
+    const res = await api.get("/friend/getGroupInfo", {
+        params: {
+          id: group.id
         }
       }
-    }
-    return () => setMemberList([]);
+    );
+    let memList = [];
+    for (const m of res.data.members) memList.push({ ...m, checked: false });
+    setMemberList(memList);
+  }
+
+  useEffect(() => {
+    getGroupInfo();
   }, []);
 
-  const addSelectedFriend = () => {
-    selectedFriend.forEach((it) => {
-      if (!memberList.includes(it)) {
-        setMemberList((prevList) => [...prevList, it]);
+  const addSelectedFriend = async () => {
+    let fidList = [];
+    for (const f of selectedFriend) fidList.push(f.id);
+    console.log(fidList, group.id)
+    const res = await api.post("/friend/addUsersToGroup", 
+      JSON.stringify({
+        fids: fidList,
+        gid: group.id
+      }), {
+        headers: {
+          'Content-Type': 'application/json'
+        }
       }
-    });
+    );
     setSelectedFriend([]);
+    getGroupInfo();
   };
 
   const handleClick = (e) => {
@@ -84,10 +97,11 @@ export default function GroupDetail() {
                     value={member.id}
                     checked={member.checked}
                     className='accent-blue w-4 h-4 border-blue my-4'
+                    key={index}
                   />
-                  <p className='text-2xl text-blue font-bold'>{member.name}</p>
-                  <p className='text-xl text-blue col-span-2'>{member.gmail}</p>
-                  <div></div>
+                  <p className='text-2xl text-blue font-bold' key={index}>{member.username}</p>
+                  <p className='text-xl text-blue col-span-2' key={index}>{member.email}</p>
+                  <div key={index}></div>
                 </div>
               );
             }
