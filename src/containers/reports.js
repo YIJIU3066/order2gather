@@ -60,7 +60,7 @@ const Reports = () => {
                       onClick={() => handleRowClick('read', report.id)}
                     >
                       <td className='whitespace-nowrap px-12 py-4'>
-                        {report.name}|{report.email}
+                        {report.name} | {report.email}
                       </td>
                       <td className='whitespace-nowrap px-12 py-4'>
                         {report.title}

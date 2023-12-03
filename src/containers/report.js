@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import ReportSuccessMessage from '../components/reportSuccessMessage';
 import useAxios from '../hooks/useAxios';
 import AuthContext from '../context/AuthContext';
+import ReportWrittenMessage from '../components/reportWrittenMessage';
 const mock_report = [
   {
     id: 0,
@@ -25,6 +26,7 @@ const Report = () => {
   const [success, setSuccess] = useState(false);
   const [reportSent, setReportSent] = useState(0);
   const { type, id } = useParams(); //write id: report id and read id: order id
+  const [reportWritten, setReportWritten] = useState(false);
   const api = useAxios();
   //check whether type is valid
   useEffect(() => {
@@ -34,23 +36,59 @@ const Report = () => {
   }, [type, navigate]);
   const [reportData, setReportData] = useState([]);
   useEffect(() => {
-    const getRestaurantInfo = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axiosInstance.get(`/orderEvent/view?oid=${id}`);
-        console.log(response);
-        console.log(typeof response.data);
-        setOrder(response.data);
+        const restaurantResponse = await axiosInstance.get(
+          `/orderEvent/view?oid=${id}`
+        );
+        console.log(restaurantResponse);
+        console.log(typeof restaurantResponse.data);
+        setOrder(restaurantResponse.data);
+
+        if (restaurantResponse.data) {
+          if (type === 'read') {
+            try {
+              const reportResponse = await axiosInstance.get('/getUserReport', {
+                params: {
+                  uid: user.uid,
+                  oid: restaurantResponse.data.id,
+                },
+              });
+              console.log(reportResponse);
+              console.log(reportResponse.data[0]);
+              console.log(user.uid);
+              console.log(restaurantResponse.data.id);
+              setReportData([{ details: reportResponse.data[0] }]);
+            } catch (error) {
+              navigate(`/`);
+              console.log('Error fetching report data:', error);
+            }
+          } else {
+            try {
+              const reportResponse = await axiosInstance.get('/getUserReport', {
+                params: {
+                  uid: user.uid,
+                  oid: restaurantResponse.data.id,
+                },
+              });
+              if (reportResponse.data !== '') {
+                setReportWritten(true);
+              }
+            } catch (error) {
+              navigate(`/`);
+              console.log('Error fetching report data:', error);
+            }
+          }
+        }
       } catch (error) {
-        console.log('Error fetching data:', error);
+        navigate(`/`);
+        console.log('Error fetching restaurant data:', error);
       }
     };
-    if (type == 'write') getRestaurantInfo();
-  }, []);
 
-  useEffect(() => {
-    //Todo: 針對寫或讀report
-    setReportData(mock_report);
-  }, []);
+    fetchData();
+  }, [id, type, user.uid]);
+
   const [order, setOrder] = useState([
     {
       createTime: '2023-12-20T07:50:00.000+00:00',
@@ -97,13 +135,15 @@ const Report = () => {
   }
   const handleSendReport = async () => {
     const now = new Date();
+    console.log({ type: typeof now });
+    console.log(type);
     const res = await api.post(
       '/report',
       JSON.stringify({
         uid: user.uid,
         oid: order.id,
-        time: '2023‑12‑10 17:00:30.005',
-        comment: 'Food arrived, guys!',
+        time: normalizeTime(),
+        comment: details,
       }),
       {
         headers: {
@@ -111,11 +151,10 @@ const Report = () => {
         },
       }
     );
-    if (res.data.status === 'success') setSuccess(true);
-    else setSuccess(false);
   };
   const handleReportClick = () => {
     handleSendReport();
+    setSuccess(true);
     setReportSent(1);
   };
   const dateFormatTransform = (isoDateString) => {
@@ -287,6 +326,11 @@ const Report = () => {
             success={success}
             setReportSent={setReportSent}
           />
+        </div>
+      )}
+      {reportWritten && (
+        <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100'>
+          <ReportWrittenMessage setReportWritten={setReportWritten} />
         </div>
       )}
     </>
