@@ -24,7 +24,7 @@ const Report = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [success, setSuccess] = useState(false);
-  const [reportSent, setReportSent] = useState(0);
+  const [reportSent, setReportSent] = useState(false);
   const { type, id } = useParams(); //write id: report id and read id: order id
   const [reportWritten, setReportWritten] = useState(false);
   const api = useAxios();
@@ -155,7 +155,7 @@ const Report = () => {
   const handleReportClick = () => {
     handleSendReport();
     setSuccess(true);
-    setReportSent(1);
+    setReportSent(true);
   };
   const dateFormatTransform = (isoDateString) => {
     if (!isoDateString) {
@@ -206,18 +206,6 @@ const Report = () => {
       </div>
       {type == 'write' && (
         <div>
-          <div className='flex pb-6 pt-4'>
-            <div className='w-1/6'></div>
-            <span className='text-yellow font-bold pr-4 text-2xl'>Title: </span>
-            <input
-              className='flex-grow text-black border border-2 border-yellow rounded-md'
-              type='text'
-              placeholder=' Enter title'
-              value={title}
-              onChange={handleTitleChange}
-            />
-            <div className='w-1/6 be-green'></div>
-          </div>
           <div className='flex items-center'>
             <div className='w-1/6'></div>
             <span className='text-yellow font-bold pr-4 text-2xl'>
@@ -264,22 +252,6 @@ const Report = () => {
       )}
       {type == 'read' && (
         <div>
-          <div className='flex pb-6 pt-4'>
-            <div className='w-1/6'></div>
-            <span className='text-yellow font-bold pr-4 text-2xl'>Title: </span>
-            {reportData.map((item) => (
-              <div
-                key={item.id}
-                className='flex-grow text-black border border-2 border-yellow rounded-md'
-              >
-                <div className='pl-2 text-left text-blue text-1xl'>
-                  {' '}
-                  {item.title}
-                </div>
-              </div>
-            ))}
-            <div className='w-1/6 be-green'></div>
-          </div>
           <div className='flex items-center'>
             <div className='w-1/6'></div>
             <span className='text-yellow font-bold pr-4 text-2xl'>
@@ -318,8 +290,6 @@ const Report = () => {
           </div>
         </div>
       )}
-      <div>{title}</div>
-      <div>{details}</div>
       {reportSent && (
         <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100'>
           <ReportSuccessMessage
