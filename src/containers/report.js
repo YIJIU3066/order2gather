@@ -89,6 +89,19 @@ const Report = () => {
     fetchData();
   }, [id, type, user.uid]);
 
+  useEffect(() => {
+    const getReporterMail = async () => {
+      try {
+        const emailResponse = await axiosInstance.get(`getGmail`, {
+          params: { oid: id },
+        });
+        console.log(emailResponse);
+      } catch (error) {
+        console.log('Error fetching restaurant data:', error);
+      }
+    };
+    if (type === 'read') getReporterMail();
+  }, []);
   const [order, setOrder] = useState([
     {
       createTime: '2023-12-20T07:50:00.000+00:00',
