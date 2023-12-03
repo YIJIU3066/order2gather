@@ -7,71 +7,6 @@ import AddFriendForm from '../components/addFriendForm';
 import AddItem from '../components/addItem';
 import useAxios from '../hooks/useAxios';
 
-const mockGroups = [
-  { name: 'Cook', id: 1 },
-  { name: 'Teacher', id: 2 },
-  { name: 'Boss', id: 3 },
-  { name: 'Gang', id: 4 },
-  { name: 'Chicken', id: 5 },
-  { name: 'Lawyer', id: 6 },
-  { name: 'DEA', id: 7 },
-];
-
-const mockFriends = [
-  {
-    name: 'Walter',
-    gmail: 'chemistryisart@gmail.com',
-    groups: [
-      { name: 'Cook', id: 1 },
-      { name: 'Teacher', id: 2 },
-      { name: 'Boss', id: 3 },
-    ],
-    checked: false,
-  },
-  {
-    name: 'Jesse',
-    gmail: 'yoyoyo@gmail.com',
-    groups: [
-      { name: 'Cook', id: 1 },
-      { name: 'Gang', id: 4 },
-    ],
-    checked: false,
-  },
-  {
-    name: 'Gus',
-    gmail: 'lospoloshermanos@gmail.com',
-    groups: [
-      { name: 'Boss', id: 3 },
-      { name: 'Chicken', id: 5 },
-    ],
-    checked: false,
-  },
-  {
-    name: 'Skyler',
-    gmail: 'mynameisskylerwhiteyo@gmail.com',
-    groups: [],
-    checked: false,
-  },
-  {
-    name: 'Saul',
-    gmail: 'bettercallsaul@gmail.com',
-    groups: [{ name: 'Lawyer', id: 6 }],
-    checked: false,
-  },
-  {
-    name: 'Hank',
-    gmail: 'coolmineral@gmail.com',
-    groups: [{ name: 'DEA', id: 7 }],
-    checked: false,
-  },
-  {
-    name: 'Mike',
-    gmail: 'waltuh@gmail.com',
-    groups: [{ name: 'Chicken', id: 5 }],
-    checked: false,
-  },
-];
-
 export default function FriendList() {
   const [friendList, setFriendList] = useState([]);
   const [groupList, setGroupList] = useState([]);
@@ -176,8 +111,26 @@ export default function FriendList() {
     setAddOpen(true);
   };
 
-  const handleDelete = () => {
-    setFriendList(friendList.filter((it) => !it.checked));
+  const handleDelete = async () => {
+    let deleteList = [];
+    for (const f of friendList) {
+      if (f.checked) {
+        deleteList.push(f.id);
+      }
+    }
+    console.log(deleteList);
+    for (const d of deleteList) {
+      const res = await api.post('/friend/delete', 
+        JSON.stringify({
+          fid: d,
+        }), {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+    }
+    fetchFriendList();
   };
 
   return (
