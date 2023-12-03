@@ -5,16 +5,18 @@ import Showmenu from '../components/showMenu';
 import OrderingEmptyMessage from '../components/orderingEmptyMessage';
 import useAxios from '../hooks/useAxios';
 import AuthContext from '../context/AuthContext';
+import { useParams } from 'react-router-dom';
 
 const Ordering = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [addFood, setAddFood] = useState(1);
+  const [addFood, setAddFood] = useState(0);
   const [confirmOrder, setConfirmOrder] = useState(0);
   const [emptyMessage, setEmptyMessage] = useState(false);
   const axiosInstance = useAxios();
   const { user } = useContext(AuthContext);
+  const { id } = useParams();
   const [Order, setOrder] = useState({
     id: 0,
     rname: 'Restaurant AAAA',
@@ -43,15 +45,14 @@ const Ordering = () => {
   useEffect(() => {
     const getOrderDetails = async () => {
       try {
-        const response = await axiosInstance.get('/orderEvent/view?oid=3');
+        const response = await axiosInstance.get(`/orderEvent/view?oid=${id}`);
         //console.log(response.data);
         setOrder(response.data);
-
         const responseRestaurant = await axiosInstance.get(
           `/restaurant/display?rid=${response.data.rid}`
         );
-        //console.log(responseRestaurant.data);
-        //console.log(responseRestaurant.data[252])
+        console.log(typeof responseRestaurant.data);
+        console.log(responseRestaurant.data);
         //const parsedData = JSON.parse(responseRestaurant.data);
         //console.log(parsedData.food)
         //console.log(typeof responseRestaurant.data);
@@ -75,22 +76,6 @@ const Ordering = () => {
     };
 
     fetchData();
-
-    const getUseerOrders = async (uid, oid) => {
-      try {
-        const response = await axiosInstance.get(
-          '/ordering/getUserOrders',
-          JSON.stringify({
-            uid: uid,
-            oid: oid,
-          })
-        );
-        console.log(response.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-    getUseerOrders(1, 3);
   }, []); // 移除 foodList 作為依賴陣列，確保只在剛進入頁面時執行
   useEffect(() => {
     // 在 foodList 變更時執行 calculateTotalPrice
@@ -206,7 +191,10 @@ const Ordering = () => {
     setConfirmOpen(1);
   };
   const handleMenuClick = () => {
-    setMenuOpen(true);
+    if (menu && menu.length > 0) {
+      // The menu array is not empty
+      setMenuOpen(true);
+    }
   };
   return (
     <>
