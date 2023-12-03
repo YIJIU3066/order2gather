@@ -25,6 +25,7 @@ const Report = () => {
   const [success, setSuccess] = useState(false);
   const [reportSent, setReportSent] = useState(0);
   const { type, id } = useParams(); //write id: report id and read id: order id
+  const api = useAxios();
   //check whether type is valid
   useEffect(() => {
     if (type !== 'read' && type !== 'write') {
@@ -54,7 +55,7 @@ const Report = () => {
     {
       createTime: '2023-12-20T07:50:00.000+00:00',
       endEventTime: '2023-12-02T12:30:00.000+00:00',
-      estimatedArrivalTime: '2023-12-01T07:15:00.000+00:00',
+      estimatedArrivalTime: '2023-12-01T08:15:00.000+00:00',
       hostID: 1,
       id: 3,
       memberList: null,
@@ -82,10 +83,50 @@ const Report = () => {
       navigate(`/reports`);
     }
   };
+  function normalizeTime() {
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.005`;
+  }
+  const handleSendReport = async () => {
+    const now = new Date();
+    const res = await api.post(
+      '/report',
+      JSON.stringify({
+        uid: user.uid,
+        oid: order.id,
+        time: '2023‑12‑10 17:00:30.005',
+        comment: 'Food arrived, guys!',
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    if (res.data.status === 'success') setSuccess(true);
+    else setSuccess(false);
+  };
   const handleReportClick = () => {
-    //TODO: sent report to backend
-    setSuccess(true);
+    handleSendReport();
     setReportSent(1);
+  };
+  const dateFormatTransform = (isoDateString) => {
+    if (!isoDateString) {
+      return 'Invalid Date';
+    }
+    const date = isoDateString.substring(0, 10);
+    const time = isoDateString.substring(11, 16);
+
+    const formattedDate = `${date} ${time}`;
+    return formattedDate;
   };
   return (
     <>
@@ -102,12 +143,12 @@ const Report = () => {
               </div>
               {type == 'write' && (
                 <div className='text-center text-blue text-2xl'>
-                  {order.estimatedArrivalTime}
+                  {dateFormatTransform(order.estimatedArrivalTime)}
                 </div>
               )}
               {type == 'read' && (
                 <div className='text-center text-blue text-2xl'>
-                  {order.estimatedArrivalTime}
+                  {dateFormatTransform(order.estimatedArrivalTime)}
                 </div>
               )}
               {type == 'write' && (
