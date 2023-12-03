@@ -179,7 +179,11 @@ const HostDashboard = () => {
 
   const handleFoodNameOnBlur = async (e, uid, food) => {
     handleFoodNameEdit(uid, food.fid);
-    const res = await api.put("/ordering/modify", 
+    if (!e.target.value) {
+      fetchFoodList();
+      return;
+    }
+    const res = await api.put("/ordering/modify/host", 
       JSON.stringify({
         uid: uid,
         oid: oid,
@@ -203,18 +207,11 @@ const HostDashboard = () => {
 
   const handlePriceOnBlur = async (e, uid, food) => {
     handlePriceEdit(uid, food.fid);
-    console.log({
-      uid: uid,
-      oid: oid,
-      fid: food.fid,
-      num: food.num,
-      price: food.price,
-      hostViewPrice: e.target.value,
-      foodName: food.foodName,
-      hostViewFoodName: food.hostViewFoodName,
-      comment: food.comment
-    })
-    const res = await api.put("/ordering/modify", 
+    if (!e.target.value) {
+      fetchFoodList();
+      return;
+    }
+    const res = await api.put("/ordering/modify/host", 
       JSON.stringify({
         uid: uid,
         oid: oid,
