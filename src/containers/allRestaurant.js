@@ -12,36 +12,20 @@ const AllRestaurant = () => {
   const { user } = useContext(AuthContext);
 
   const [showRestaurantForm, setShowRestaurantForm] = useState(false);
-  const [restaurantList, setRestaurantList] = useState([
-    {
-      id: 1,
-      name: '八方雲集',
-      address: '地址地址地址',
-      telephone: '02-12345678',
-    },
-    {
-      id: 2,
-      name: '邱奶奶早餐店',
-      address: '這裡是地址!',
-      telephone: '02-23456789',
-    },
-  ]);
+  const [restaurantList, setRestaurantList] = useState([]);
 
   useEffect(() => {
     const getAllRestaurant = async () => {
       try {
         const response = await axiosInstance.get('/restaurant/display');
-
         console.log(response);
-        console.log(response.data);
-        const data = response.data;
-        console.log(typeof data);
+        setRestaurantList(response.data.restaurant);
       } catch (error) {
         console.error('Error fetching data:', error.response);
       }
     };
 
-    // getAllRestaurant();
+    getAllRestaurant();
   }, []);
 
   const handleAddRestaurant = () => {
@@ -56,10 +40,6 @@ const AllRestaurant = () => {
     setRestaurantList([...restaurantList, newRestaurantData]);
     setShowRestaurantForm(false);
   };
-
-  useEffect(() => {
-    console.log(showRestaurantForm);
-  }, [showRestaurantForm]);
 
   return (
     <>

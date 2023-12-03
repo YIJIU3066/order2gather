@@ -13,17 +13,11 @@ export const AuthProvider = ({ children }) => {
       ? 'http://localhost:8080'
       : window.location.origin;
 
-  const tempAccessToken =
-    'eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjYsImlhdCI6MTcwMTQxNjYyNCwiZXhwIjoxNzAxNDIwMjI0fQ.cSibJUpHpYURPrnG9sMaPfJFhj9QThziWEnMPhTRK9I';
-
-  const [accessToken, setAccessToken] = useState(
-    localStorage.getItem('accessToken') || tempAccessToken
+  const [accessToken, setAccessToken] = useState(() =>
+    localStorage.getItem('accessToken')
+      ? JSON.parse(localStorage.getItem('accessToken'))
+      : null
   );
-  // const [accessToken, setAccessToken] = useState(() =>
-  //   localStorage.getItem('accessToken')
-  //     ? JSON.parse(localStorage.getItem('accessToken'))
-  //     : null
-  // );
 
   const [user, setUser] = useState(() =>
     localStorage.getItem('accessToken')
@@ -38,7 +32,6 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const loginUser = async (access_token) => {
-    console.log('loginUser');
     let response = null;
     try {
       response = await axios({
@@ -88,7 +81,6 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (accessToken) {
       setUser(jwtDecode(accessToken));
-      console.log(accessToken);
     }
     setLoading(false);
   }, [accessToken, loading]);

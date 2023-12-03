@@ -49,7 +49,7 @@ const RestaurantSearchBlock = ({
             className='text-base w-full font-semibold py-2 px-2 cursor-pointer flex items-center justify-center text-center text-gray-700 hover:bg-blue hover:text-white'
             onClick={addRestaurant}
           >
-            + Add Restanuant
+            + Add Restaurant
           </div>
         </ul>
       </div>

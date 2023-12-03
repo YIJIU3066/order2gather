@@ -14,8 +14,6 @@ import AddRestaurantForm from '../components/addRestaurantForm';
 const CreateOrder = () => {
   const axiosInstance = useAxios();
   const { user } = useContext(AuthContext);
-
-  //totalPeople 還要改!
   const [orderInfo, setOrderInfo] = useState({
     rid: null,
     hostID: null,
@@ -160,7 +158,6 @@ const CreateOrder = () => {
       checkedList.friends.forEach((friend) => {
         allOrderer.add(friend.id);
       });
-      // console.log(Array.from(allOrderer));
     }
 
     // group
@@ -177,13 +174,14 @@ const CreateOrder = () => {
             members.forEach((member) => {
               allOrderer.add(member.id);
             });
-            // console.log(Array.from(allOrderer));
           })
           .catch((error) => {
             console.error('Error fetching data:', error.response);
           });
       });
     }
+
+    allOrderer.add(user.uid);
     const memberList = Array.from(allOrderer);
     const totalPeople = memberList.length;
     return { memberList, totalPeople };
@@ -302,7 +300,7 @@ const CreateOrder = () => {
                   )}
                 </div>
                 {showRestaurantForm && (
-                  <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100'>
+                  <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100 z-50'>
                     <AddRestaurantForm
                       onClose={handleCloseRestaurantForm}
                       onSave={handleSaveRestaurant}

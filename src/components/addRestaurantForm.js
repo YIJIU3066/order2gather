@@ -236,7 +236,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
                   />
                 </td>
               </tr>
-              <tr className='border-b'>
+              {/* <tr className='border-b'>
                 <td className={`${styles.form_name}`}>Open Time</td>
                 <td className=''>
                   <input
@@ -246,7 +246,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
                     onChange={(e) => setOpentime(e.target.value)}
                   />
                 </td>
-              </tr>
+              </tr> */}
               <tr className=''>
                 <td className={`${styles.form_name}`}>
                   <div className='flex items-center'>

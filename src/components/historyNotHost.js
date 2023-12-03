@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import HistoryTable from './historyTable';
 
-const HistoryNotHost = ({ history, order_items, totalPrice, historyInfo }) => {
+const HistoryNotHost = ({ history, orderItem, historyInfo }) => {
   //轉換顯示的日期格式
   const dateFormatTransform = (isoDateString) => {
     const isoDate = new Date(isoDateString);
@@ -12,7 +12,6 @@ const HistoryNotHost = ({ history, order_items, totalPrice, historyInfo }) => {
     const hours = String(isoDate.getHours()).padStart(2, '0');
     const minutes = String(isoDate.getMinutes()).padStart(2, '0');
     const seconds = String(isoDate.getSeconds()).padStart(2, '0');
-
     const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     return formattedDate;
   };
@@ -28,11 +27,11 @@ const HistoryNotHost = ({ history, order_items, totalPrice, historyInfo }) => {
             Order Time: {dateFormatTransform(history.estimatedArrivalTime)}
           </div>
           <div className='px-4'>Restaurant: {history.rname}</div>
-          <div className='px-4'>Host: {history.host}</div>
+          <div className='px-4'>Host: {history.hostName}</div>
         </div>
         <HistoryTable
-          order_items={order_items}
-          totalPrice={totalPrice}
+          orderItems={orderItem[0]}
+          totalPrice={orderItem[0].userTotalPrice}
           notHost={true}
         />
         <div className='buttonContainer mt-8'>
