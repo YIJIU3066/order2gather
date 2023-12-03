@@ -1,7 +1,9 @@
 import NavBar from '../components/navbar';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ReportSuccessMessage from '../components/reportSuccessMessage';
+import useAxios from '../hooks/useAxios';
+import AuthContext from '../context/AuthContext';
 const mock_report = [
   {
     id: 0,
@@ -17,6 +19,8 @@ const mock_report = [
   },
 ];
 const Report = () => {
+  const axiosInstance = useAxios();
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [success, setSuccess] = useState(false);
   const [reportSent, setReportSent] = useState(0);
@@ -29,15 +33,38 @@ const Report = () => {
   }, [type, navigate]);
   const [reportData, setReportData] = useState([]);
   useEffect(() => {
+    const getRestaurantInfo = async () => {
+      try {
+        const response = await axiosInstance.get(`/orderEvent/view?oid=${id}`);
+        console.log(response);
+        console.log(typeof response.data);
+        setOrder(response.data);
+      } catch (error) {
+        console.log('Error fetching data:', error);
+      }
+    };
+    if (type == 'write') getRestaurantInfo();
+  }, []);
+
+  useEffect(() => {
     //Todo: 針對寫或讀report
     setReportData(mock_report);
   }, []);
   const [order, setOrder] = useState([
     {
-      id: 0,
-      restaurant: 'Morning flavor',
-      orderTime: '2023/7/19 12:00', //order delivery time
-      host: 'Olivia@gmail.com', //email
+      createTime: '2023-12-20T07:50:00.000+00:00',
+      endEventTime: '2023-12-02T12:30:00.000+00:00',
+      estimatedArrivalTime: '2023-12-01T07:15:00.000+00:00',
+      hostID: 1,
+      id: 3,
+      memberList: null,
+      rid: 1,
+      rname: 'abcc',
+      secretCode: '490147',
+      status: 1,
+      stopOrderingTime: '2023-12-01T15:30:00.000+00:00',
+      totalPeople: 1,
+      totalPrice: 0,
     },
   ]);
   const [title, setTitle] = useState('');
@@ -68,35 +95,33 @@ const Report = () => {
       </div>
       <div className='flex pl-1/8 pr-1/8 items-center justify-center gap-6'>
         <ul>
-          {reportData.map((item) => (
-            <div key={item.id}>
-              <div className='p-4 w-180 h-18 items-start grid grid-cols-3 gap-2'>
-                <div className='text-center text-blue text-2xl'>
-                  Restaurant: {item.restaurant}
-                </div>
-                {type == 'write' && (
-                  <div className='text-center text-blue text-2xl'>
-                    {item.orderTime}
-                  </div>
-                )}
-                {type == 'read' && (
-                  <div className='text-center text-blue text-2xl'>
-                    {item.reportTime}
-                  </div>
-                )}
-                {type == 'write' && (
-                  <div className='text-center text-blue text-2xl'>
-                    Host: {item.host}
-                  </div>
-                )}
-                {type == 'read' && (
-                  <div className='text-center text-blue text-2xl'>
-                    Reporter: {item.email}
-                  </div>
-                )}
+          <div key={order.id}>
+            <div className='p-4 w-180 h-18 items-start grid grid-cols-3 gap-2'>
+              <div className='text-center text-blue text-2xl'>
+                Restaurant: {order.rname}
               </div>
+              {type == 'write' && (
+                <div className='text-center text-blue text-2xl'>
+                  {order.estimatedArrivalTime}
+                </div>
+              )}
+              {type == 'read' && (
+                <div className='text-center text-blue text-2xl'>
+                  {order.estimatedArrivalTime}
+                </div>
+              )}
+              {type == 'write' && (
+                <div className='text-center text-blue text-2xl'>
+                  Host: {order.hostID}
+                </div>
+              )}
+              {type == 'read' && (
+                <div className='text-center text-blue text-2xl'>
+                  Reporter: {order.hostID}
+                </div>
+              )}
             </div>
-          ))}
+          </div>
         </ul>
       </div>
       {type == 'write' && (
