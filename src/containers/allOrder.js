@@ -1,12 +1,41 @@
 import NavBar from '../components/navbar';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import '../styles/allOrderUI.css';
 import { useNavigate } from 'react-router-dom';
+import useAxios from '../hooks/useAxios';
+import AuthContext from '../context/AuthContext';
 const AllOrder = () => {
   const [openVarValue, setOpenVarValue] = useState(0);
   const [deliverVarValue, setDeliverVarValue] = useState(0);
   const [myName, setMyName] = useState('Host 1');
-
+  const [uid, setUid] = useState(null);
+  const axiosInstance = useAxios();
+  const { user } = useContext(AuthContext);
+  const [orderList, setOrderList] = useState([]);
+  const [code, setCode] = useState('000000');
+  useEffect(() => {
+    setUid(user.uid);
+    const getOrderList = async () => {
+      try {
+        const response = await axiosInstance.get('/orderEvent/view');
+        console.log(response.data);
+        setOrderList(response.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    const getOrderDetails = async () => {
+      try {
+        const response = await axiosInstance.get('/orderEvent/view?oid=3 ');
+        console.log(response.data);
+        setOrderList(response.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    getOrderList();
+    //getOrderDetails();
+  }, []);
   const navigate = useNavigate();
 
   const handleOpenClick = (id) => {
@@ -39,7 +68,26 @@ const AllOrder = () => {
     });
   }
 
-  const openOrder_list = [
+  const currentDateTime = new Date();
+  //轉換顯示的日期格式
+  const dateFormatTransform = (isoDateString) => {
+    const date = isoDateString.substring(0, 10);
+    const time = isoDateString.substring(11, 16);
+
+    const formattedDate = `${date} ${time}`;
+    return formattedDate;
+  };
+  const openOrder_list = orderList.filter((order) => {
+    const openTime = new Date(order.stopOrderingTime);
+    return openTime <= currentDateTime;
+  });
+
+  const deliverOrder_list = orderList.filter((order) => {
+    const openTime = new Date(order.stopOrderingTime);
+    return openTime > currentDateTime;
+  });
+
+  const openOrder_list_mock = [
     {
       id: 0,
       restaurant: 'Restaurant AAAA',
@@ -89,7 +137,7 @@ const AllOrder = () => {
     });
   }
 
-  const deliverOrder_list = [
+  const deliverOrder_list_mock = [
     {
       id: 0,
       restaurant: 'Restaurant AAAA',
@@ -160,21 +208,21 @@ const AllOrder = () => {
                         : ''
                 }`}
               >
-                <strong className='items-start p-0'></strong> {item.restaurant}
+                <strong className='items-start p-0'></strong> {item.rname}
               </div>
             </div>
 
             <ul className='mt-2'>
               <li>
                 <strong>Open until:</strong>
-                <div>{item.openTime}</div>
+                <div>{dateFormatTransform(item.stopOrderingTime)}</div>
               </li>
               <li>
                 <strong>Estimated delivery time:</strong>
-                <div>{item.deliverTime}</div>
+                <div>{dateFormatTransform(item.estimatedArrivalTime)}</div>
               </li>
             </ul>
-            {item.host === myName && (
+            {item.hostID === uid && (
               <div key={item.id} className='flex flex-col items-center'>
                 <div
                   className='border-b hover:text-white cursor-pointer'
@@ -221,17 +269,17 @@ const AllOrder = () => {
                         : ''
                 }`}
               >
-                <strong className='items-start p-0'></strong> {item.restaurant}
+                <strong className='items-start p-0'></strong> {item.rname}
               </div>
             </div>
 
             <ul className='mt-2'>
               <li>
                 <strong>Estimated delivery time:</strong>
-                <div>{item.deliverTime}</div>
+                <div>{dateFormatTransform(item.estimatedArrivalTime)}</div>
               </li>
             </ul>
-            {item.host === myName && (
+            {item.hostID === uid && (
               <div key={item.id} className='flex flex-col items-center'>
                 <div
                   className='border-b hover:text-white cursor-pointer'
