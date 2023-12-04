@@ -21,18 +21,21 @@ const HostDashboard = () => {
   const { user, logoutUser } = useContext(AuthContext);
 
   const fetchFoodList = async () => {
-    const res = await api.get("/orderEvent/organize", {
+    const res = await api.get('/orderEvent/organize', {
       params: {
-        oid: oid
-      }
-    })
+        oid: oid,
+      },
+    });
     if (res.status === 200) {
       let foods = [];
       for (const uIt of res.data.data.orders) {
         for (const fIt of uIt.food) {
           let flag = false;
           for (const existFIt of foods) {
-            if (existFIt.hostViewFoodName === fIt.hostViewFoodName && existFIt.hostViewPrice === fIt.hostViewPrice) {
+            if (
+              existFIt.hostViewFoodName === fIt.hostViewFoodName &&
+              existFIt.hostViewPrice === fIt.hostViewPrice
+            ) {
               flag = true;
               existFIt.Orderers.push({
                 uid: uIt.uid,
@@ -75,13 +78,13 @@ const HostDashboard = () => {
       );
       setTotalPrice(res.data.data.totalPrice);
     }
-  }
+  };
 
   const fetchEventInfo = async () => {
     const res = await api.get('/orderEvent/view', {
       params: {
-        oid: oid
-      }
+        oid: oid,
+      },
     });
     if (res.status === 200) {
       setEndEventTime(res.data.endEventTime);
@@ -89,7 +92,7 @@ const HostDashboard = () => {
       setDeadline(res.data.stopOrderingTime);
       setEstimated(res.data.estimatedArrivalTime);
     }
-  }
+  };
 
   useEffect(() => {
     fetchEventInfo();
@@ -183,7 +186,8 @@ const HostDashboard = () => {
       fetchFoodList();
       return;
     }
-    const res = await api.put("/ordering/modify/host", 
+    const res = await api.put(
+      '/ordering/modify/host',
       JSON.stringify({
         uid: uid,
         oid: oid,
@@ -193,11 +197,12 @@ const HostDashboard = () => {
         hostViewPrice: food.hostViewPrice,
         foodName: food.foodName,
         hostViewFoodName: e.target.value,
-        comment: food.comment
-      }), {
+        comment: food.comment,
+      }),
+      {
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
     if (res.status === 200) {
@@ -211,7 +216,8 @@ const HostDashboard = () => {
       fetchFoodList();
       return;
     }
-    const res = await api.put("/ordering/modify/host", 
+    const res = await api.put(
+      '/ordering/modify/host',
       JSON.stringify({
         uid: uid,
         oid: oid,
@@ -221,11 +227,12 @@ const HostDashboard = () => {
         hostViewPrice: e.target.value,
         foodName: food.foodName,
         hostViewFoodName: food.hostViewFoodName,
-        comment: food.comment
-      }), {
+        comment: food.comment,
+      }),
+      {
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
     if (res.status === 200) {
@@ -234,17 +241,19 @@ const HostDashboard = () => {
   };
 
   const handleInformationOnBlur = async () => {
-    const res = await api.patch(`/orderEvent/update/${oid}`, 
+    const res = await api.patch(
+      `/orderEvent/update/${oid}`,
       JSON.stringify({
         eventId: oid,
         stopOrderingTime: deadline,
         estimatedArrivalTime: estimated,
         endEventTime: endEventTime,
-        status: OrderEventStatus
-      }), {
+        status: OrderEventStatus,
+      }),
+      {
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
     if (res.status === 200) {
@@ -257,21 +266,23 @@ const HostDashboard = () => {
   const handleArrive = async () => {
     if (user === null) logoutUser();
     const time = new Date();
-    const res = await api.post('/notify', 
+    const res = await api.post(
+      '/notify',
       JSON.stringify({
         uid: user.uid,
         oid: oid,
-        comment: "Food arrived, guys!",
-        time: time.toString()
-      }), {
+        comment: 'Food arrived, guys!',
+        time: time.toString(),
+      }),
+      {
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
-    )
+    );
     if (res.data.status === 'success') alert('Successful Notification!');
-    else alert('Oops....Notification Failed...')
-  }
+    else alert('Oops....Notification Failed...');
+  };
 
   return (
     <>
@@ -353,9 +364,7 @@ const HostDashboard = () => {
                       onChange={(e) =>
                         handleFoodNameChange(e, it.uid, foodIt.fid)
                       }
-                      onBlur={(e) =>
-                        handleFoodNameOnBlur(e, it.uid, foodIt)
-                      }
+                      onBlur={(e) => handleFoodNameOnBlur(e, it.uid, foodIt)}
                       className='px-1 w-full border border-blue border-2 rounded-md focus:outline-none focus:ring-0'
                     />
                   ) : (
@@ -363,7 +372,9 @@ const HostDashboard = () => {
                       key={foodIt.fid + it.uid * 100000}
                       className='flex flex-row items-center gap-2'
                     >
-                      <p key={foodIt.hostviewFoodName}>{foodIt.hostViewFoodName}</p>
+                      <p key={foodIt.hostviewFoodName}>
+                        {foodIt.hostViewFoodName}
+                      </p>
                       <FontAwesomeIcon
                         key={foodIt.fid + it.uid * 100000}
                         className='cursor-pointer'
@@ -378,7 +389,7 @@ const HostDashboard = () => {
               <div className='flex flex-col items-center gap-1'>
                 {it.food.map((foodIt) =>
                   foodIt.comment === null ? (
-                    <p key={foodIt.fid + it.uid * 100000} >&nbsp;</p>
+                    <p key={foodIt.fid + it.uid * 100000}>&nbsp;</p>
                   ) : (
                     <p key={foodIt.fid + it.uid * 100000}>{foodIt.comment}</p>
                   )
@@ -452,7 +463,7 @@ const HostDashboard = () => {
               <div className='flex flex-col items-center gap-1'>
                 {it.Orderers.map((orderer) =>
                   orderer.note === null ? (
-                    <p key={orderer.note} >&nbsp;</p>
+                    <p key={orderer.note}>&nbsp;</p>
                   ) : (
                     <p key={orderer.note}>{orderer.note}</p>
                   )
@@ -476,7 +487,7 @@ const HostDashboard = () => {
         <p className='text-xl text-yellow font-bold'>
           Total Price: ${totalPrice}
         </p>
-        <button 
+        <button
           className='bg-red rounded-lg h-14 w-40 text-white text-lg'
           onClick={handleArrive}
         >

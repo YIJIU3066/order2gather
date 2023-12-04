@@ -75,17 +75,19 @@ export default function GroupDetail() {
     }
     console.log(deleteList);
     for (const mem of deleteList) {
-      const res = await api.post('/friend/removeUserFromGroup', 
+      const res = await api.post(
+        '/friend/removeUserFromGroup',
         JSON.stringify({
           fid: mem,
-          gid: group.id
-        }), {
+          gid: group.id,
+        }),
+        {
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
-        console.log(res.data.status)
+      console.log(res.data.status);
     }
     getGroupInfo();
   };

@@ -36,7 +36,7 @@ const HistoryOrderDetail = () => {
             oid: history.oid,
           },
         });
-        setAllOrderItem(response.data.data);
+        setAllOrderItem(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }

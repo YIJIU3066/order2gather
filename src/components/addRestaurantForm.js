@@ -1,34 +1,36 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import styles from '../styles/form.module.css';
 import styles_img from '../styles/addRestaurant.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faUpload,
-  faXmark,
-  faAngleRight,
-  faAngleLeft,
-} from '@fortawesome/free-solid-svg-icons';
+import { faUpload, faXmark } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import ImageDisplay from './imageDisplay';
+import ModifyFood from './modifyFood';
+import useAxios from '../hooks/useAxios';
+import AuthContext from '../context/AuthContext';
 
 const AddRestaurantForm = ({ onSave, onClose }) => {
-  const user = 1;
-  const [name, setName] = useState('');
-  const [address, setAddress] = useState('');
-  const [telephone, setTelephone] = useState('');
-  const [opentime, setOpentime] = useState('');
+  // const user = 1;
+  const axiosInstance = useAxios();
+  const { user } = useContext(AuthContext);
+
+  const [restaurantInfo, setRestaurantInfo] = useState({
+    restaurant: [{ address: '', name: '', openHour: '', phone: '' }],
+    food: [],
+    menu: [],
+  });
   const [menus, setMenus] = useState([]);
   const [menuURLs, setMenuURLs] = useState([]);
   const fileInputRef = useRef(null);
-  const [fullscreenImageIndex, setFullscreenImageIndex] = useState(null);
   const [showTooltip, setShowTooltip] = useState(false);
 
+  //圖片
   useEffect(() => {
     if (menus.length < 1) return;
 
     // Create new image URLs from the menus
     const newImageUrls = menus.map((menu) => URL.createObjectURL(menu));
-    setMenuURLs(newImageUrls);
+    setMenuURLs((prevMenuURLs) => prevMenuURLs.concat(newImageUrls));
 
     // Clean up previous image URLs when menus change
     return () => {
@@ -36,11 +38,75 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
     };
   }, [menus]);
 
+  //圖片字串轉換為Blob
+  const convertStringToImage = (stringData) => {
+    const byteArray = Uint8Array.from(atob(stringData), (c) => c.charCodeAt(0));
+    const blob = new Blob([byteArray], { type: 'image/jpeg' });
+    return URL.createObjectURL(blob);
+  };
+
+  //圖片Blob轉換為字串
+  const convertBlobToString = (blob) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const text = event.target.result;
+        resolve(text);
+      };
+      reader.onerror = function (event) {
+        reject(new Error('Error reading blob as text'));
+      };
+      reader.readAsDataURL(blob);
+    });
+  };
+
+  //儲存圖片
+  const handleSaveImg = async (uploadImg) => {
+    try {
+      const restaurantString = JSON.stringify(restaurantInfo.restaurant[0]);
+      const foodData = restaurantInfo.food.map(({ name, price }) => ({
+        name,
+        price,
+      }));
+      const foodString = JSON.stringify(foodData);
+      const formData = new FormData();
+      formData.append('restaurant', restaurantString);
+      formData.append('menu', uploadImg); // Add the image file directly to FormData
+      formData.append('food', foodString);
+
+      const response = await axiosInstance.put('/restaurant/update', formData);
+      console.log(response);
+      Swal.fire({
+        title: 'Success!',
+        text: 'Edit Restaurant Success!',
+        icon: 'success',
+        iconColor: '#CF9546',
+        confirmButtonColor: '#7A989A',
+      });
+    } catch (error) {
+      console.log(`Update Restaurant Data Error, ${error}`);
+    }
+  };
+
   // 選擇圖片
-  const handleMenuChange = (event) => {
+  const handleMenuChange = async (event) => {
     const file = event.target.files[0];
     if (file && file.type.startsWith('image/')) {
-      setMenus([...menus, file]);
+      try {
+        setMenus([...menus, file]);
+        const imageDataString = await convertBlobToString(file);
+        const base64ImageData = imageDataString.split(',')[1];
+        setRestaurantInfo((prevRestaurantInfo) => {
+          return {
+            ...prevRestaurantInfo,
+            menu: [...prevRestaurantInfo.menu, base64ImageData],
+          };
+        });
+        // handleSaveImg(base64ImageData);
+        handleSaveImg(file);
+      } catch (error) {
+        console.error('Error converting image blob to string:', error);
+      }
     } else {
       Swal.fire({
         title: 'Error!',
@@ -78,6 +144,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
     }).then((result) => {
       if (result.isConfirmed) {
         const updatedMenus = [...menus];
+
         updatedMenus.splice(indexToDelete, 1);
         setMenus(updatedMenus);
 
@@ -86,6 +153,15 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
         updatedMenuURLs.splice(indexToDelete, 1);
 
         setMenuURLs(updatedMenuURLs);
+
+        const remainMenus = restaurantInfo.menu.filter(
+          (_, index) => index !== indexToDelete
+        );
+
+        setRestaurantInfo((prevRestaurantInfo) => ({
+          ...prevRestaurantInfo,
+          menu: remainMenus,
+        }));
 
         Swal.fire({
           title: 'Deleted!',
@@ -98,56 +174,42 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
     });
   };
 
+  const handleInputRestantantInfo = (e, type) => {
+    const updatedValue = e.target.value;
+
+    setRestaurantInfo((prevRestaurantInfo) => ({
+      ...prevRestaurantInfo,
+      restaurant: [
+        {
+          ...prevRestaurantInfo.restaurant[0],
+          [type]: updatedValue,
+        },
+      ],
+    }));
+  };
+
+  const handleDeleteFoodSave = async (selectedItems) => {
+    for (const deleteFood of selectedItems) {
+      try {
+        const response = await axiosInstance.delete('/restaurant/deleteFood', {
+          params: { rid: restaurantInfo.restaurant[0].id, fid: deleteFood },
+        });
+        console.log('Food Deleted:', response);
+      } catch (error) {
+        console.log('Failed to Delete Food', error);
+      }
+    }
+  };
+
+  // useEffect(() => {
+  //   console.log(restaurantInfo);
+  // }, [restaurantInfo]);
+
   // 儲存餐廳資料
   const handleSave = () => {
     // 檢查表單是否有效
-    if (name && telephone) {
-      onSave({ name, address, telephone });
-      setName('');
-      setAddress('');
-      setTelephone('');
-      setOpentime('');
-      // setMenu("");
-      setMenus([]);
-
-      const restaurant = {
-        uid: user,
-        name: name,
-        address: address,
-        phone: telephone,
-        openHour: opentime,
-        menu: menus,
-      };
-      // 資料存到後端
-
-      Swal.fire({
-        title: 'Success!',
-        text: 'Add Restaurant Succussful!',
-        icon: 'success',
-        iconColor: '#CF9546',
-        confirmButtonColor: '#7A989A',
-        confirmButtonText: 'OK!',
-      });
-    } else {
-      Swal.fire({
-        title: 'Error!',
-        text: 'Please fill in all required fields',
-        icon: 'warning',
-        iconColor: '#CF9546',
-        showCancelButton: true,
-        confirmButtonColor: '#7A989A',
-        cancelButtonColor: '#C67052',
-        confirmButtonText: 'OK!',
-        cancelButtonText: 'Quit Create',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          console.log('Confirmed!');
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-          console.log('Cancelled!');
-          handleClose();
-        }
-      });
-    }
+    console.log(restaurantInfo);
+    onSave(restaurantInfo);
   };
 
   // 關閉新增餐廳視窗
@@ -156,8 +218,8 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
   };
 
   return (
-    <div className='restaurant_form_container w-full h-full flex justify-center items-center overflow-auto '>
-      <div className='w-fit border-8 px-20 border-blue p-4 rounded shadow flex flex-col items-center bg-slate-50 relative'>
+    <div className='restaurant_form_container w-full h-full flex justify-center items-center'>
+      <div className='h-[95%] w-10/12 border-8 px-20 border-blue p-4 rounded shadow flex flex-col items-center bg-slate-50 relative overflow-auto'>
         <div
           className='cursor-pointer absolute top-0 right-0 px-6 py-4'
           onClick={() => handleClose()}
@@ -172,7 +234,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
           Add Restaurant
         </div>
 
-        <div className='input_container text-lg mt-4 mx-14 flex flex-col items-center overflow-x-auto overflow-y-auto h-1/2 w-[95%]'>
+        <div className='input_container text-lg mt-4 flex w-full flex-col items-center overflow-auto '>
           <table className=''>
             <tbody>
               <tr className='border-b'>
@@ -180,10 +242,10 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
                 <td className=''>
                   <input
                     className={`${styles.form_input}`}
-                    placeholder='Restaurant Name'
+                    placeholder='(Required) Restaurant Name'
                     type='text'
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={restaurantInfo.restaurant.name}
+                    onChange={(e) => handleInputRestantantInfo(e, 'name')}
                   />
                 </td>
               </tr>
@@ -193,8 +255,9 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
                   <input
                     className={`${styles.form_input}`}
                     placeholder='Address'
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
+                    type='text'
+                    value={restaurantInfo.restaurant.address}
+                    onChange={(e) => handleInputRestantantInfo(e, 'address')}
                   />
                 </td>
               </tr>
@@ -203,23 +266,23 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
                 <td className=''>
                   <input
                     className={`${styles.form_input}`}
-                    placeholder='Phone Number'
-                    value={telephone}
-                    onChange={(e) => setTelephone(e.target.value)}
+                    placeholder='(Required) Phone Number'
+                    type='text'
+                    value={restaurantInfo.restaurant.phone}
+                    onChange={(e) => handleInputRestantantInfo(e, 'phone')}
                   />
                 </td>
               </tr>
-              {/* <tr className='border-b'>
-                <td className={`${styles.form_name}`}>Open Time</td>
+              <tr className='border-b'>
+                <td className={`${styles.form_name}`}>Food</td>
                 <td className=''>
-                  <input
-                    className={`${styles.form_input}`}
-                    placeholder='Open Time'
-                    value={opentime}
-                    onChange={(e) => setOpentime(e.target.value)}
+                  <ModifyFood
+                    restaurantInfo={restaurantInfo}
+                    setRestaurantInfo={setRestaurantInfo}
+                    handleDeleteFoodSave={handleDeleteFoodSave}
                   />
                 </td>
-              </tr> */}
+              </tr>
               <tr className=''>
                 <td className={`${styles.form_name}`}>
                   <div className='flex items-center'>
