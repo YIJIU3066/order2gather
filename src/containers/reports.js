@@ -1,6 +1,8 @@
 import NavBar from '../components/navbar';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useAxios from '../hooks/useAxios';
+import AuthContext from '../context/AuthContext';
 const mock_report_list = [
   {
     id: 0,
@@ -19,13 +21,14 @@ const mock_report_list = [
 ];
 const Reports = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
   const [reportList, setReportList] = useState([]);
   useEffect(() => {
     setReportList(mock_report_list);
   }, []);
   const handleRowClick = (type, id) => {
     // 導航至相應的詳細頁面，假設路由設置為 `/historyOrderDetail/:id`
-    navigate(`/report/${type}/${id}`);
+    navigate(`/report/${type}/${id}/${user.id}`);
   };
 
   return (
@@ -60,7 +63,7 @@ const Reports = () => {
                       onClick={() => handleRowClick('read', report.id)}
                     >
                       <td className='whitespace-nowrap px-12 py-4'>
-                        {report.name}|{report.email}
+                        {report.name} | {report.email}
                       </td>
                       <td className='whitespace-nowrap px-12 py-4'>
                         {report.title}
