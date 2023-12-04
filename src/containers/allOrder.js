@@ -20,7 +20,6 @@ const AllOrder = () => {
     const getOrderList = async () => {
       try {
         const response = await axiosInstance.get('/orderEvent/view');
-        console.log(response.data);
         response.data.forEach((item) => {
           // 使用 Set 來追蹤已經出現的 id
           if (!uniqueIds.has(item.id)) {
@@ -28,7 +27,6 @@ const AllOrder = () => {
             uniqueData.push(item);
           }
         });
-        console.log(uniqueData);
         setOrderList(uniqueData);
       } catch (error) {
         console.error('Error fetching data:', error);
