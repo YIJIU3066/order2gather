@@ -58,7 +58,7 @@ const Ordering = () => {
         //console.log(typeof responseRestaurant.data);
         //console.log(responseRestaurant.data.food);
         setMenu(responseRestaurant.data.menu);
-        //console.log(responseRestaurant.data.menu);
+        console.log(responseRestaurant.data.menu);
         setFoodList(
           responseRestaurant.data.food.map((food) => ({
             ...food,
@@ -200,7 +200,7 @@ const Ordering = () => {
         oid: Order.id,
         uid: user.uid,
         hostViewPrice: rest.price, // Add hostViewPrice property
-        hostViewName: name, // Add hostViewName property
+        hostViewFoodName: name, // Add hostViewName property
       }));
     console.log(updatedFoodList);
     try {
@@ -218,6 +218,7 @@ const Ordering = () => {
     }
   };
   const handleMenuClick = () => {
+    console.log(menu);
     if (menu && menu.length > 0) {
       // The menu array is not empty
       setMenuOpen(true);
