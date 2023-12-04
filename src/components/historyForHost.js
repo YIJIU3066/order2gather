@@ -15,6 +15,7 @@ const HistoryForHost = ({ history, allOrderItem, historyInfo }) => {
     const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     return formattedDate;
   };
+  console.log(allOrderItem);
 
   return (
     <>
@@ -29,21 +30,27 @@ const HistoryForHost = ({ history, allOrderItem, historyInfo }) => {
           <div className='px-4'>Restaurant: {history.rname}</div>
           <div className='px-4'>Host: Me</div>
         </div>
-        <div className='flex flex-col w-full items-center'>
-          {allOrderItem &&
-            allOrderItem.orders.map((orderItems, index) => (
-              <div className='my-4 border-b border-blue pb-4' key={index}>
-                <div className='text-blue font-semibold text-lg px-10'>
-                  Orderer: {orderItems.username}
+        {allOrderItem.orders == 0 ? (
+          <div className='flex justify-center w-full font-semibold text-lg text-blue mt-4'>
+            No Data{' '}
+          </div>
+        ) : (
+          <div className='flex flex-col w-full items-center'>
+            {allOrderItem &&
+              allOrderItem.orders.map((orderItems, index) => (
+                <div className='my-4 border-b border-blue pb-4' key={index}>
+                  <div className='text-blue font-semibold text-lg px-10'>
+                    Orderer: {orderItems.username}
+                  </div>
+                  <HistoryTable
+                    orderItems={orderItems}
+                    totalPrice={allOrderItem.totalPrice}
+                    notHost={false}
+                  />
                 </div>
-                <HistoryTable
-                  orderItems={orderItems}
-                  totalPrice={allOrderItem.totalPrice}
-                  notHost={false}
-                />
-              </div>
-            ))}
-        </div>
+              ))}
+          </div>
+        )}
         <div className='buttonContainer my-8'>
           <Link to='/history'>
             <button className='bg-blue hover:bg-red text-white font-bold py-2 px-6 rounded text-center'>

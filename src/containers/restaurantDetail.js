@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLocation, Link } from 'react-router-dom';
 import NavBar from '../components/navbar';
 import styles from '../styles/form.module.css';
@@ -10,45 +11,53 @@ import {
   faAngleRight,
   faAngleLeft,
   faPenToSquare,
+  faPlus,
+  faMinus,
 } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import useAxios from '../hooks/useAxios';
 import AuthContext from '../context/AuthContext';
+import ImageDisplay from '../components/imageDisplay';
 
 const RestaurantDetail = () => {
   const location = useLocation();
   const axiosInstance = useAxios();
-
+  const navigate = useNavigate();
   const { restaurant } = location.state || {};
   const [restaurantInfo, setRestaurantInfo] = useState(null);
   const [menus, setMenus] = useState([]);
   const [menuURLs, setMenuURLs] = useState([]);
   const fileInputRef = useRef(null);
-  const [fullscreenImageIndex, setFullscreenImageIndex] = useState(null);
+
   const [showTooltip, setShowTooltip] = useState(false);
+  const [addFood, setAddFood] = useState(false);
+  const [deleteFood, setDeleteFood] = useState(false);
+  const [newFood, setNewFood] = useState('');
+  const [newPrice, setNewPrice] = useState('');
+  const [showNumTip, setShowNumTip] = useState(false);
+  const [selectedItems, setSelectedItems] = useState([]);
 
   //從後端拿餐廳資料
+  const getRestaurantInfo = async () => {
+    try {
+      const response = await axiosInstance.get('/restaurant/display', {
+        params: { rid: restaurant.id },
+      });
+      setRestaurantInfo({
+        menu: response.data.menu,
+        restaurant: response.data.restaurant,
+        food: response.data.food,
+      });
+
+      const newImageUrls = response.data.menu.map((menuString) =>
+        convertStringToImage(menuString)
+      );
+      setMenuURLs(newImageUrls);
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
   useEffect(() => {
-    const getRestaurantInfo = async () => {
-      try {
-        const response = await axiosInstance.get('/restaurant/display', {
-          params: { rid: restaurant.id },
-        });
-
-        setRestaurantInfo({
-          // food: response.data.food,
-          menu: response.data.menu,
-          restaurant: response.data.restaurant,
-        });
-
-        const newImageUrls = response.data.menu.map((menuString) =>
-          convertStringToImage(menuString)
-        );
-        setMenuURLs(newImageUrls);
-      } catch (error) {
-        console.log('error', error);
-      }
-    };
     getRestaurantInfo();
   }, []);
 
@@ -65,11 +74,6 @@ const RestaurantDetail = () => {
       menus.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [menus]);
-
-  // useEffect(() => {
-  //   console.log('menuURLs', menuURLs);
-  //   console.log('menus', menus);
-  // }, [menus, menuURLs]);
 
   //圖片字串轉換為Blob
   const convertStringToImage = (stringData) => {
@@ -100,12 +104,15 @@ const RestaurantDetail = () => {
       try {
         setMenus([...menus, file]);
         const imageDataString = await convertBlobToString(file);
+        const base64ImageData = imageDataString.split(',')[1];
         setRestaurantInfo((prevRestaurantInfo) => {
           return {
             ...prevRestaurantInfo,
-            menu: [...prevRestaurantInfo.menu, imageDataString],
+            menu: [...prevRestaurantInfo.menu, base64ImageData],
           };
         });
+        // handleSaveImg(base64ImageData);
+        handleSaveImg(file);
       } catch (error) {
         console.error('Error converting image blob to string:', error);
       }
@@ -146,6 +153,7 @@ const RestaurantDetail = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         const updatedMenus = [...menus];
+
         updatedMenus.splice(indexToDelete, 1);
         setMenus(updatedMenus);
 
@@ -154,6 +162,15 @@ const RestaurantDetail = () => {
         updatedMenuURLs.splice(indexToDelete, 1);
 
         setMenuURLs(updatedMenuURLs);
+
+        const remainMenus = restaurantInfo.menu.filter(
+          (_, index) => index !== indexToDelete
+        );
+
+        setRestaurantInfo((prevRestaurantInfo) => ({
+          ...prevRestaurantInfo,
+          menu: remainMenus,
+        }));
 
         Swal.fire({
           title: 'Deleted!',
@@ -166,91 +183,125 @@ const RestaurantDetail = () => {
     });
   };
 
-  // 點擊圖片全螢幕
-  const handleFullScreen = (index) => {
-    setFullscreenImageIndex(index);
-  };
-
-  // 點擊關閉全螢幕
-  const handleCloseFullScreen = () => {
-    setFullscreenImageIndex(null);
-  };
-
-  // 前一張全螢幕
-  const handlePrevImage = () => {
-    if (fullscreenImageIndex !== null && fullscreenImageIndex > 0) {
-      setFullscreenImageIndex(fullscreenImageIndex - 1);
-    }
-  };
-
-  // 下一張全螢幕
-  const handleNextImage = () => {
-    if (
-      fullscreenImageIndex !== null &&
-      fullscreenImageIndex < menuURLs.length - 1
-    ) {
-      setFullscreenImageIndex(fullscreenImageIndex + 1);
-    }
-  };
+  //刪除不能用!
+  // useEffect(() => {
+  //   handleSave();
+  // }, [handleDeleteMenu]);
 
   //轉換資料格式
-  // const restructureData = (restaurantInfo) => {
-  //   console.log(restaurantInfo)
-  //   let formData = new FormData();
-  //   // Loop through the object
-  //   for (let [key, val] of Object.entries(restaurantInfo)) {
-  //     // append each item to the formData (converted to JSON strings)
-  //     formData.append(key, JSON.stringify(val));
-  //   }
-  //   console.log(formData);
-  //   return formData;
-
-  // const { name, openHour, phone } = restaurantInfo.restaurant[0];
-  // console.log(name, openHour, phone)
-
-  // formData.append('restaurant', JSON.stringify({ name, openHour, phone }));
-  // console.log(formData)
-  // restaurantInfo.menu.forEach((image, index) => {
-  //   formData.append(`image${index}`, image);
-  // });
-
-  // return formData;
-  // };
-
-  const convertToFormData = (restaurantInfo) => {
+  const convertToFormData = (restaurantString, restaurantInfo, foodString) => {
     const formData = new FormData();
-    const restaurantData = restaurantInfo.restaurant[0];
-    for (const key in restaurantData) {
-      formData.append(`${key}`, restaurantData[key]);
-    }
-
-    // restaurantInfo.menu.forEach((imageData, index) => {
-    //   formData.append(`menu[${index}]`, imageData);
-    // });
-    console.log(formData);
-
-    for (const entry of formData.entries()) {
-      console.log(entry);
-    }
+    console.log(foodString);
+    console.log(restaurantString);
+    formData.append('restaurant', restaurantString);
+    formData.append('menu', restaurantInfo.menus);
+    formData.append('food', foodString);
     return formData;
   };
 
   // 儲存資料
   const handleSave = async () => {
     try {
-      const restaurantInfoFormData = convertToFormData(restaurantInfo);
-      await axiosInstance.put('/restaurant/update', restaurantInfoFormData);
+      const restaurantString = JSON.stringify(restaurantInfo.restaurant[0]);
+      const foodData = restaurantInfo.food.map(({ name, price }) => ({
+        name,
+        price,
+      }));
+      const foodString = JSON.stringify(foodData);
+      const restaurantInfoFormData = convertToFormData(
+        restaurantString,
+        restaurantInfo,
+        foodString
+      );
+
+      const response = await axiosInstance.put(
+        '/restaurant/update',
+        restaurantInfoFormData
+      );
+      console.log(response);
+      Swal.fire({
+        title: 'Success!',
+        text: 'Edit Restaurant Success!.',
+        icon: 'success',
+        iconColor: '#CF9546',
+        confirmButtonColor: '#7A989A',
+      });
     } catch (error) {
       console.log(`Update Restaurant Data Error, ${error}`);
     }
   };
 
-  if (!restaurant) {
-    return <div>No restaurant data found</div>;
-  }
+  // 儲存圖片
+  const handleSaveImg = async (uploadImg) => {
+    try {
+      const restaurantString = JSON.stringify(restaurantInfo.restaurant[0]);
+      const foodData = restaurantInfo.food.map(({ name, price }) => ({
+        name,
+        price,
+      }));
+      const foodString = JSON.stringify(foodData);
+      const formData = new FormData();
+      formData.append('restaurant', restaurantString);
+      formData.append('menu', uploadImg); // Add the image file directly to FormData
+      formData.append('food', foodString);
 
-  const handleDelete = () => {
+      const response = await axiosInstance.put('/restaurant/update', formData);
+      console.log(response);
+      Swal.fire({
+        title: 'Success!',
+        text: 'Edit Restaurant Success!',
+        icon: 'success',
+        iconColor: '#CF9546',
+        confirmButtonColor: '#7A989A',
+      });
+    } catch (error) {
+      console.log(`Update Restaurant Data Error, ${error}`);
+    }
+  };
+
+  const handleDelete = async () => {
     console.log('handleDelete');
+    try {
+      const confirmation = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to delete this restaurant?',
+        icon: 'warning',
+        iconColor: '#CF9546',
+        showCancelButton: true,
+        confirmButtonColor: '#7A989A',
+        cancelButtonColor: '#C67052',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
+      });
+      if (confirmation.isConfirmed) {
+        const response = await axiosInstance.delete('/restaurant/delete', {
+          params: {
+            rid: restaurant.id,
+          },
+        });
+        console.log(response);
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Restaurant has been deleted.',
+          icon: 'success',
+          iconColor: '#CF9546',
+          confirmButtonColor: '#7A989A',
+        });
+        navigate('/allRestaurant');
+      } else {
+        // User clicked Cancel or outside the modal
+        console.log('Deletion canceled');
+      }
+    } catch (error) {
+      console.log('Delete Restaurant Error!', error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to delete the restaurant.',
+        icon: 'error',
+        iconColor: '#CF9546',
+        confirmButtonColor: '#7A989A',
+      });
+    }
   };
 
   //修改資料
@@ -267,15 +318,116 @@ const RestaurantDetail = () => {
     }));
   };
 
-  useEffect(() => {
-    console.log(restaurantInfo);
-  }, [restaurantInfo]);
+  //修改食物資料
+  const handleChangeFoodInfo = (e, id, type) => {
+    const updatedValue = e.target.textContent;
 
+    setRestaurantInfo((prevRestaurantInfo) => {
+      const updatedFood = prevRestaurantInfo.food.map((foodItem) => {
+        if (foodItem.id === id) {
+          return {
+            ...foodItem,
+            [type]: updatedValue,
+          };
+        }
+        return foodItem;
+      });
+
+      return {
+        ...prevRestaurantInfo,
+        food: updatedFood,
+      };
+    });
+  };
+
+  const handleShowAddFood = () => {
+    if (addFood == true) {
+      setAddFood(false);
+    } else {
+      setAddFood(true);
+    }
+  };
+
+  const handleAddFood = () => {
+    const numNewPrice = parseFloat(newPrice);
+    if (typeof numNewPrice === 'number' && newFood !== '') {
+      setRestaurantInfo((prevRestaurantInfo) => {
+        const newFoodItem = {
+          // rid: restaurant.id,
+          name: newFood,
+          price: numNewPrice,
+        };
+
+        const updatedFood = [...prevRestaurantInfo.food, newFoodItem];
+
+        return {
+          ...prevRestaurantInfo,
+          food: updatedFood,
+        };
+      });
+
+      setNewFood('');
+      setNewPrice('');
+    } else {
+      setShowNumTip(true);
+    }
+  };
+
+  const handleShowDeleteFood = () => {
+    if (deleteFood == false) {
+      setDeleteFood(true);
+    } else {
+      setDeleteFood(false);
+    }
+    // /restaurant/deleteFood
+  };
+
+  //處理刪除中被選中的項目
+  const handleCheckboxChange = (index) => {
+    const newSelectedItems = [...selectedItems];
+    if (newSelectedItems.includes(index)) {
+      newSelectedItems.splice(newSelectedItems.indexOf(index), 1);
+    } else {
+      newSelectedItems.push(index);
+    }
+    setSelectedItems(newSelectedItems);
+  };
+  // 處理刪除食物
+  const handleDeleteFood = async () => {
+    const updatedFoodList = restaurantInfo.food.filter(
+      (foodItem, index) => !selectedItems.includes(foodItem.id)
+    );
+
+    setRestaurantInfo((prevRestaurantInfo) => ({
+      ...prevRestaurantInfo,
+      food: updatedFoodList,
+    }));
+    for (const deleteFood of selectedItems) {
+      try {
+        const response = await axiosInstance.delete('/restaurant/deleteFood', {
+          params: { rid: restaurant.id, fid: deleteFood },
+        });
+        console.log('Food Deleted:', response);
+      } catch (error) {
+        console.log('Failed to Delete Food', error);
+      }
+    }
+  };
+
+  if (!restaurant) {
+    return <div>No restaurant data found</div>;
+  }
+
+  useEffect(() => {
+    if (restaurantInfo) {
+      console.log(restaurantInfo);
+    }
+  }, [restaurantInfo]);
   return (
     <>
       <NavBar />
       {restaurantInfo && (
-        <div className='restaurant_detail_container flex flex-col justify-center'>
+        <div className='restaurant_detail_container flex flex-col justify-center overflow-auto'>
           <div className='w-full flex items-center justify-center'>
             <FontAwesomeIcon
               icon={faPenToSquare}
@@ -291,7 +443,7 @@ const RestaurantDetail = () => {
               {restaurant?.name}
             </div>
           </div>
-          <div className='input_container text-lg mt-4 mx-14 flex flex-col items-center overflow-x-auto overflow-y-auto h-1/2 w-[95%]'>
+          <div className='input_container text-lg mt-4  flex flex-col items-center overflow-x-auto overflow-y-auto h-1/2 w-[95%]'>
             <table className=''>
               <tbody>
                 <tr className='border-b'>
@@ -330,17 +482,142 @@ const RestaurantDetail = () => {
                     </div>
                   </td>
                 </tr>
-                {/* <tr className='border-b'>
-                <td className={`${styles.form_name}`}>Open Time</td>
-                <td className=''>
-                  <input
-                    className={`${styles.form_input}`}
-                    placeholder='Open Time'
-                    value={opentime}
-                    onChange={(e) => setOpentime(e.target.value)}
-                  />
-                </td>
-              </tr> */}
+                <tr className='border-b'>
+                  <td className={`${styles.form_name}`}>Food</td>
+                  <td className='py-4 flex flex-row'>
+                    <ul className='food_container flex flex-col'>
+                      {restaurantInfo?.food.map((foodItem, index) => (
+                        <li
+                          key={index}
+                          className='pl-4 text-blue font-semibold flex flex-row items-center'
+                        >
+                          {deleteFood && (
+                            <div>
+                              <label
+                                className='cursor-pointer flex items-center justify-center'
+                                id={`food_${foodItem.id}`}
+                              />
+                              <input
+                                id={`food_${foodItem.id}`}
+                                type='checkbox'
+                                checked={selectedItems.includes(foodItem.id)}
+                                className='appearance-none w-4 h-4 mx-2 rounded focus:outline-none border-2 cursor-pointer border-blue checked:bg-yellow'
+                                onChange={() =>
+                                  handleCheckboxChange(foodItem.id)
+                                }
+                              />
+                            </div>
+                          )}
+                          <div
+                            onInput={(e) =>
+                              handleChangeFoodInfo(e, foodItem.id, 'name')
+                            }
+                            className='border-b-2 border-white focus:border-blue focus:border-b-2 focus:outline-none px-2 flex-1'
+                            contentEditable='true'
+                            suppressContentEditableWarning={true}
+                          >
+                            {foodItem.name}
+                          </div>
+                          <div
+                            onInput={(e) =>
+                              handleChangeFoodInfo(e, foodItem.id, 'price')
+                            }
+                            className='border-b-2 border-white focus:border-blue focus:border-b-2 focus:outline-none px-2'
+                            contentEditable='true'
+                            suppressContentEditableWarning={true}
+                          >
+                            {foodItem.price}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className='modify_food_container flex flex-col items-center justify-between w-fit'>
+                      <div className='add relative flex items-center justify-center'>
+                        <button
+                          className='border-2 bg-blue hover:bg-blue text-white hover:bg-blue/[0.9] focus:outline-none shadow-md font-bold py-2 px-2 mx-3 rounded text-center text-base flex justify-center items-center'
+                          onClick={handleShowAddFood}
+                        >
+                          <FontAwesomeIcon
+                            icon={faPlus}
+                            style={{ color: '#ffffff' }}
+                          />
+                        </button>
+                        {addFood && (
+                          <div className='more_food_container flex rounded ml-2 px-2 py-2 absolute w-max left-full border-2'>
+                            <div className='food flex flex-row w-1/2 mr-2 relative'>
+                              {showNumTip && (
+                                <span className='absolute top-full w-max bg-red text-white px-2 py-1.5 mt-4 -left-2.5 shadow-md rounded text-xs font-medium duration-100'>
+                                  Please Check Food is not empty & <br /> Price
+                                  is number!
+                                </span>
+                              )}
+                              <input
+                                type='text'
+                                value={newFood}
+                                placeholder='food'
+                                onChange={(e) => {
+                                  setShowNumTip(false);
+                                  setNewFood(e.target.value);
+                                }}
+                                className={`border-b-2 text-sm text-gray-700 font-medium px-1  focus:outline-none w-12 mx-1 ${
+                                  showNumTip
+                                    ? 'border-red focus:border-red'
+                                    : 'border-blue focus:border-yellow'
+                                }`}
+                              />
+                            </div>
+                            <div className='price flex flex-row relative'>
+                              <div className='text-blue font-medium'>$ </div>
+                              <input
+                                type='num'
+                                value={newPrice}
+                                placeholder='num'
+                                onChange={(e) => {
+                                  setShowNumTip(false);
+                                  setNewPrice(e.target.value);
+                                }}
+                                className={`border-b-2 text-sm text-gray-700 font-medium px-1  focus:outline-none w-12 mx-1 ${
+                                  showNumTip
+                                    ? 'border-red focus:border-red'
+                                    : 'border-blue focus:border-yellow'
+                                }`}
+                              />
+                            </div>
+                            <div className='mx-1'>
+                              <button
+                                className='bg-yellow hover:bg-blue text-white font-bold rounded text-center px-2 text-sm py-1'
+                                onClick={handleAddFood}
+                              >
+                                Add
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <div className='delete relative flex items-center justify-center'>
+                        <button
+                          className='border-2 bg-blue hover:bg-blue text-white hover:bg-blue/[0.9] focus:outline-none shadow-md font-bold py-2 px-2 mx-3 rounded text-center text-base relative flex justify-center items-center'
+                          onClick={handleShowDeleteFood}
+                        >
+                          <FontAwesomeIcon
+                            icon={faMinus}
+                            style={{ color: '#ffffff' }}
+                          />
+                        </button>
+                        {deleteFood && (
+                          <div className='flex rounded ml-2 py-2 absolute w-max left-full '>
+                            <button
+                              className='bg-yellow hover:bg-blue text-white font-bold rounded text-center px-2 text-sm py-2'
+                              onClick={handleDeleteFood}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                </tr>
                 <tr className=''>
                   <td className={`${styles.form_name}`}>
                     <div className='flex items-center'>
@@ -353,7 +630,7 @@ const RestaurantDetail = () => {
                         onMouseLeave={() => setShowTooltip(false)}
                       >
                         {showTooltip && (
-                          <span className='absolute top-full w-max bg-blue text-white px-2 py-1.5 mt-1.5 shadow-md rounded text-xs font-normal duration-100'>
+                          <span className='absolute top-full w-max bg-blue hover:bg-blue/[0.9] text-white px-2 py-1.5 mt-1.5 shadow-md rounded text-xs font-normal duration-100'>
                             Upload Menu
                           </span>
                         )}
@@ -374,112 +651,13 @@ const RestaurantDetail = () => {
                     </div>
                   </td>
                   <td className=''>
-                    <div className='flex items-center justify-center my-2'>
-                      <div className='menu_container overflow-x-auto w-80 flex items-center justify-start h-[130px]'>
-                        {menus &&
-                          menuURLs.map((menuSrc, index) => (
-                            <div
-                              className='relative mr-2 w-[150px] h-[100px] min-w-[150px] min-h-[100px] bg-black flex justify-center items-center'
-                              key={index}
-                            >
-                              <div className='relative w-full h-full'>
-                                <button
-                                  className='cursor-pointer bg-transport bg-blue/[0.8] hover:bg-yellow/[0.8] w-4 h-4 hover:w-5 hover:h-5 hover:-top-2.5 hover:-right-2.5 shadow-md rounded-full absolute -top-2 -right-2 flex justify-center items-center'
-                                  onClick={() => handleDeleteMenu(index)}
-                                >
-                                  <FontAwesomeIcon
-                                    icon={faXmark}
-                                    size='2xs'
-                                    style={{ color: '#ffffff' }}
-                                  />
-                                </button>
-                                <img
-                                  src={menuSrc}
-                                  alt='Selected'
-                                  className='w-full h-full object-cover menu_img cursor-pointer'
-                                  onClick={() => handleFullScreen(index)}
-                                />
-                              </div>
-
-                              {/* 全螢幕圖片 */}
-                              {fullscreenImageIndex === index && (
-                                <div
-                                  className={`${styles_img.zoom_img_container}`}
-                                  onClick={(e) => {
-                                    handleCloseFullScreen(); // 關閉全螢幕
-                                  }}
-                                >
-                                  {/* 前一張 */}
-                                  <button
-                                    style={{
-                                      visibility:
-                                        index !== 0 ? 'visible' : 'hidden',
-                                    }}
-                                    className='text-white z-50 hover:bg-gray-600/[0.7] w-10 h-10 mr-3 rounded-full shadow-md flex justify-center items-center'
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handlePrevImage();
-                                    }}
-                                  >
-                                    <FontAwesomeIcon
-                                      icon={faAngleLeft}
-                                      size='lg'
-                                    />
-                                  </button>
-                                  <div className='relative flex justify-center w-10/12'>
-                                    {/* 圖片 */}
-                                    <button
-                                      className='cursor-pointer bg-transport  hover:bg-grey/[0.8] w-10 h-10 rounded-full absolute top-2 right-2 flex justify-center items-center'
-                                      onClick={(e) => handleCloseFullScreen()}
-                                    >
-                                      <FontAwesomeIcon
-                                        icon={faXmark}
-                                        size='lg'
-                                        style={{ color: '#fff' }}
-                                        className='faXmark_full'
-                                      />
-                                    </button>
-                                    <img
-                                      src={menuSrc}
-                                      alt='Fullscreen'
-                                      className={`${styles_img.zoom_img}`}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                      }}
-                                    />
-                                  </div>
-
-                                  {/* 下一張 */}
-                                  <button
-                                    style={{
-                                      visibility:
-                                        index !== menuURLs.length - 1
-                                          ? 'visible'
-                                          : 'hidden',
-                                    }}
-                                    className='text-white z-50 hover:bg-gray-600 bg-gray-700/[0.6] w-10 h-10 ml-3 rounded-full shadow-md flex justify-center items-center'
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleNextImage();
-                                    }}
-                                  >
-                                    <FontAwesomeIcon
-                                      icon={faAngleRight}
-                                      size='lg'
-                                    />
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                      </div>
-                    </div>
+                    <ImageDisplay menuURLs={menuURLs} menus={menus} />
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <div className='text-center mt-8'>
+          <div className='text-center my-6'>
             <button
               className='bg-yellow hover:bg-blue text-white font-bold py-2 px-6 rounded text-center'
               onClick={() => handleSave()}

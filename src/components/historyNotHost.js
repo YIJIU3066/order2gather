@@ -15,7 +15,7 @@ const HistoryNotHost = ({ history, orderItem, historyInfo }) => {
     const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     return formattedDate;
   };
-
+  console.log(orderItem);
   return (
     <>
       <div className='history_container flex flex-col justify-center items-center '>
@@ -29,11 +29,18 @@ const HistoryNotHost = ({ history, orderItem, historyInfo }) => {
           <div className='px-4'>Restaurant: {history.rname}</div>
           <div className='px-4'>Host: {history.hostName}</div>
         </div>
-        <HistoryTable
-          orderItems={orderItem[0]}
-          totalPrice={orderItem[0].userTotalPrice}
-          notHost={true}
-        />
+
+        {orderItem.length == 0 ? (
+          <div className='flex justify-center w-full font-semibold text-lg text-blue mt-4'>
+            No Data{' '}
+          </div>
+        ) : (
+          <HistoryTable
+            orderItems={orderItem[0]}
+            totalPrice={orderItem[0].userTotalPrice}
+            notHost={true}
+          />
+        )}
         <div className='buttonContainer mt-8'>
           <Link to='/history'>
             <button className='bg-blue hover:bg-red text-white font-bold py-2 px-6 rounded text-center'>

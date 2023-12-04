@@ -361,12 +361,12 @@ const CreateOrder = () => {
           >
             Save & Launch
           </button>
-          <button
+          {/* <button
             className='bg-red hover:bg-yellow text-white font-bold py-2 px-3 ml-6 rounded text-center'
             onClick={() => handleDelete()}
           >
             Delete
-          </button>
+          </button> */}
         </div>
       </div>
     </>
