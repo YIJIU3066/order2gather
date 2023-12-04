@@ -189,19 +189,31 @@ const Ordering = () => {
     //TODO: sent order to backend
     console.log(foodList);
     console.log(user);
-    const updatedFoodList = foodList
-      .filter((food) => food.quantity > 0) // Filter out items with quantity <= 0
-      .map(({ id, name, quantity, note, ...rest }) => ({
-        fid: id, // Rename id to fid
-        foodName: name,
-        num: quantity,
-        comment: note,
-        ...rest,
+    const updatedFoodList = [
+      {
+        fid: -1,
+        foodName: 'test',
+        num: 0,
+        comment: '',
         oid: Order.id,
         uid: user.uid,
-        hostViewPrice: rest.price, // Add hostViewPrice property
-        hostViewFoodName: name, // Add hostViewName property
-      }));
+        hostViewPrice: 0,
+        hostViewFoodName: 'test',
+      },
+      ...foodList
+        .filter((food) => food.quantity > 0) // Filter out items with quantity <= 0
+        .map(({ id, name, quantity, note, ...rest }) => ({
+          fid: id, // Rename id to fid
+          foodName: name,
+          num: quantity,
+          comment: note,
+          ...rest,
+          oid: Order.id,
+          uid: user.uid,
+          hostViewPrice: rest.price, // Add hostViewPrice property
+          hostViewFoodName: name, // Add hostViewName property
+        })),
+    ];
     console.log(updatedFoodList);
     try {
       // Set success and confirmOpen states
@@ -209,6 +221,7 @@ const Ordering = () => {
       setConfirmOpen(1);
 
       // Execute getOrderDetails after setting states
+      console.log(updatedFoodList);
       const response = await axiosInstance.post(`/ordering/add`, {
         updatedFoodList: updatedFoodList,
       });
