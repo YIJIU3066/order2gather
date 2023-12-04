@@ -1,5 +1,5 @@
 import NavBar from '../components/navbar';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAxios from '../hooks/useAxios';
 import AuthContext from '../context/AuthContext';
@@ -28,7 +28,7 @@ const Reports = () => {
   }, []);
   const handleRowClick = (type, id) => {
     // 導航至相應的詳細頁面，假設路由設置為 `/historyOrderDetail/:id`
-    navigate(`/report/${type}/${id}/${uid}`);
+    navigate(`/report/${type}/${id}/${user.id}`);
   };
 
   return (
