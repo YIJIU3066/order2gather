@@ -6,10 +6,7 @@ import AuthContext from '../context/AuthContext';
 
 const useAxios = () => {
   const { accessToken, user, logoutUser } = useContext(AuthContext);
-  const baseUrl =
-    window.location.origin === 'http://localhost:3000'
-      ? 'http://localhost:8080'
-      : window.location.origin;
+  const baseUrl = process.env.REACT_APP_BACKEND_URL
 
   const axiosInstance = axios.create({
     baseURL: baseUrl,
