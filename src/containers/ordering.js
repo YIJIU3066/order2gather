@@ -190,17 +190,6 @@ const Ordering = () => {
     console.log(foodList);
     console.log(user);
     const updatedFoodList = [
-      {
-        fid: -1,
-        foodName: 'test',
-        num: 1,
-        comment: '',
-        oid: Order.id,
-        uid: user.uid,
-        price: 1,
-        hostViewPrice: 1,
-        hostViewFoodName: 'test',
-      },
       ...foodList
         .filter((food) => food.quantity > 0) // Filter out items with quantity <= 0
         .map(({ id, name, quantity, note, ...rest }) => ({
