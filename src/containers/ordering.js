@@ -1,41 +1,84 @@
 import NavBar from '../components/navbar';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import OrderingSuccessMessage from '../components/orderingMessage';
 import Showmenu from '../components/showMenu';
 import OrderingEmptyMessage from '../components/orderingEmptyMessage';
+import useAxios from '../hooks/useAxios';
+import AuthContext from '../context/AuthContext';
+import { useParams } from 'react-router-dom';
 
 const Ordering = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [addFood, setAddFood] = useState(1);
+  const [addFood, setAddFood] = useState(0);
   const [confirmOrder, setConfirmOrder] = useState(0);
   const [emptyMessage, setEmptyMessage] = useState(false);
-  const Order = {
+  const axiosInstance = useAxios();
+  const { user } = useContext(AuthContext);
+  const { id } = useParams();
+  const [Order, setOrder] = useState({
+    id: 0,
+    rname: 'Restaurant AAAA',
+    stopOrderingTime: '2023-07-29 10:00',
+    host: 'Host 1',
+  });
+  const [menu, setMenu] = useState('');
+  const dateFormatTransform = (isoDateString) => {
+    const date = isoDateString.substring(0, 10);
+    const time = isoDateString.substring(11, 16);
+
+    const formattedDate = `${date} ${time}`;
+    return formattedDate;
+  };
+  //const [Order, setOOrder] = useState([]);
+  const mockOrder = {
     id: 0,
     restaurant: 'Restaurant AAAA',
     openDeadline: '2023-07-29 10:00',
     deliverTime: '2023-07-29 12:00',
     host: 'Host 1',
   };
-  const [foodList, setFoodList] = useState([
-    {
-      id: 0,
-      name: 'noodle',
-      price: '100',
-      note: '',
-      quantity: 0,
-    },
-    {
-      id: 1,
-      name: 'beef',
-      price: '200',
-      note: '',
-      quantity: 0,
-    },
-  ]);
+
+  const [foodList, setFoodList] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   useEffect(() => {
+    const getOrderDetails = async () => {
+      try {
+        const response = await axiosInstance.get(`/orderEvent/view?oid=${id}`);
+        //console.log(response.data);
+        setOrder(response.data);
+        const responseRestaurant = await axiosInstance.get(
+          `/restaurant/display?rid=${response.data.rid}`
+        );
+        console.log(typeof responseRestaurant.data);
+        console.log(responseRestaurant.data);
+        //const parsedData = JSON.parse(responseRestaurant.data);
+        //console.log(parsedData.food)
+        //console.log(typeof responseRestaurant.data);
+        //console.log(responseRestaurant.data.food);
+        setMenu(responseRestaurant.data.menu);
+        console.log(responseRestaurant.data.menu);
+        setFoodList(
+          responseRestaurant.data.food.map((food) => ({
+            ...food,
+            note: '',
+            quantity: 0,
+          }))
+        );
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    const fetchData = async () => {
+      await getOrderDetails();
+    };
+
+    fetchData();
+  }, []); // 移除 foodList 作為依賴陣列，確保只在剛進入頁面時執行
+  useEffect(() => {
+    // 在 foodList 變更時執行 calculateTotalPrice
     const calculateTotalPrice = () => {
       const totalPrice = foodList.reduce((accumulator, food) => {
         const price = parseInt(food.price, 10);
@@ -117,7 +160,7 @@ const Ordering = () => {
   const addNewItemClick = () => {
     if (newFood[0].name !== '' && newFood[0].price !== '') {
       const newFoodItem = {
-        id: foodList.length,
+        id: foodList.length + 1,
         name: newFood[0].name,
         price: newFood[0].price,
         note: '',
@@ -142,13 +185,49 @@ const Ordering = () => {
   const handleModifyClick = () => {
     setConfirmOrder(0);
   };
-  const handleConfirmClick = () => {
+  const handleConfirmClick = async () => {
     //TODO: sent order to backend
-    setSuccess(true);
-    setConfirmOpen(1);
+    console.log(foodList);
+    console.log(user);
+    const updatedFoodList = [
+      ...foodList
+        .filter((food) => food.quantity > 0) // Filter out items with quantity <= 0
+        .map(({ id, name, quantity, note, ...rest }) => ({
+          fid: id, // Rename id to fid
+          foodName: name,
+          num: quantity,
+          comment: note,
+          ...rest,
+          oid: Order.id,
+          uid: user.uid,
+          hostViewPrice: rest.price, // Add hostViewPrice property
+          hostViewFoodName: name, // Add hostViewName property
+        })),
+    ];
+    console.log(updatedFoodList);
+    console.log(typeof updatedFoodList);
+    try {
+      // Set success and confirmOpen states
+      setSuccess(true);
+      setConfirmOpen(1);
+
+      // Execute getOrderDetails after setting states
+      console.log(updatedFoodList);
+      const response = await axiosInstance.post(
+        `/ordering/add`,
+        updatedFoodList
+      );
+      console.log(response);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
   };
   const handleMenuClick = () => {
-    setMenuOpen(true);
+    console.log(menu);
+    if (menu && menu.length > 0) {
+      // The menu array is not empty
+      setMenuOpen(true);
+    }
   };
   return (
     <>
@@ -159,14 +238,14 @@ const Ordering = () => {
       <div className='flex pl-20 pr-20 items-center justify-center flex-wrap gap-6'>
         {confirmOrder === 0 && (
           <>
-            <h2 className='text-blue font-bold text-2xl'>{Order.restaurant}</h2>
+            <h2 className='text-blue font-bold text-2xl'>{Order.rname}</h2>
             <h2 className='text-blue font-bold text-1xl flex-grow'>
-              Deadline: {Order.openDeadline}
+              Deadline: {dateFormatTransform(Order.stopOrderingTime)}
             </h2>
             <div
               className='border-b hover:text-white cursor-pointer pl-2 pr-2 w-40 h-10 rounded-2xl bg-yellow'
               key={Order.id}
-              onClick={() => handleMenuClick(Order.id)}
+              onClick={() => handleMenuClick()}
             >
               <h2 className='pt-2 text-center text-white font-bold text-1xl'>
                 Menu
@@ -367,7 +446,11 @@ const Ordering = () => {
       )}
       {menuOpen && (
         <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100'>
-          <Showmenu menuid={Order.id} setMenuOpen={setMenuOpen} />
+          <Showmenu
+            menuid={Order.id}
+            setMenuOpen={setMenuOpen}
+            menu_photo={menu}
+          />
         </div>
       )}
       {emptyMessage && (
