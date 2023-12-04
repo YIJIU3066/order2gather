@@ -40,7 +40,7 @@ describe('Add/Delete Friends', function() {
     await driver.switchTo().window(vars["root"])
     await driver.wait(until.stalenessOf(await driver.findElement(By.css(".text-6xl"))), 30000)
     await driver.wait(until.elementLocated(By.css(".text-4xl")), 50000)
-    await driver.findElement(By.xpath("//div[5]/a/button")).click()
+    await driver.findElement(By.xpath('//*[@id="root"]/div[4]/div[5]/button')).click()
     await driver.findElement(By.xpath("//a/button")).click()
     await driver.wait(until.elementLocated(By.css(".text-4xl")), 30000)
     {
