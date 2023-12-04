@@ -1,7 +1,10 @@
 import NavBar from '../components/navbar';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ReportSuccessMessage from '../components/reportSuccessMessage';
+import useAxios from '../hooks/useAxios';
+import AuthContext from '../context/AuthContext';
+import ReportWrittenMessage from '../components/reportWrittenMessage';
 const mock_report = [
   {
     id: 0,
@@ -17,10 +20,14 @@ const mock_report = [
   },
 ];
 const Report = () => {
+  const axiosInstance = useAxios();
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [success, setSuccess] = useState(false);
-  const [reportSent, setReportSent] = useState(0);
-  const { type, id } = useParams(); //write id: report id and read id: order id
+  const [reportSent, setReportSent] = useState(false);
+  const { type, id, uid } = useParams(); //write id: report id and read id: order id
+  const [reportWritten, setReportWritten] = useState(false);
+  const api = useAxios();
   //check whether type is valid
   useEffect(() => {
     if (type !== 'read' && type !== 'write') {
@@ -29,15 +36,87 @@ const Report = () => {
   }, [type, navigate]);
   const [reportData, setReportData] = useState([]);
   useEffect(() => {
-    //Todo: 針對寫或讀report
-    setReportData(mock_report);
+    const fetchData = async () => {
+      try {
+        const restaurantResponse = await axiosInstance.get(
+          `/orderEvent/view?oid=${id}`
+        );
+        console.log(restaurantResponse);
+        console.log(typeof restaurantResponse.data);
+        setOrder(restaurantResponse.data);
+
+        if (restaurantResponse.data) {
+          if (type === 'read') {
+            try {
+              const reportResponse = await axiosInstance.get('/getUserReport', {
+                params: {
+                  uid: uid,
+                  oid: restaurantResponse.data.id,
+                },
+              });
+              console.log(reportResponse);
+              console.log(reportResponse.data[0]);
+              console.log(user.uid);
+              console.log(restaurantResponse.data.id);
+              setReportData([{ details: reportResponse.data[0] }]);
+            } catch (error) {
+              navigate(`/`);
+              console.log('Error fetching report data:', error);
+            }
+          } else {
+            try {
+              const reportResponse = await axiosInstance.get('/getUserReport', {
+                params: {
+                  uid: uid,
+                  oid: restaurantResponse.data.id,
+                },
+              });
+              if (reportResponse.data !== '') {
+                setReportWritten(true);
+              }
+            } catch (error) {
+              navigate(`/`);
+              console.log('Error fetching report data:', error);
+            }
+          }
+        }
+      } catch (error) {
+        navigate(`/`);
+        console.log('Error fetching restaurant data:', error);
+      }
+    };
+
+    fetchData();
+  }, [id, type, user.uid]);
+
+  useEffect(() => {
+    const getReporterMail = async () => {
+      try {
+        const emailResponse = await axiosInstance.get(`getGmail`, {
+          params: { oid: id },
+        });
+        console.log(emailResponse);
+      } catch (error) {
+        console.log('Error fetching restaurant data:', error);
+      }
+    };
+    if (type === 'read') getReporterMail();
   }, []);
   const [order, setOrder] = useState([
     {
-      id: 0,
-      restaurant: 'Morning flavor',
-      orderTime: '2023/7/19 12:00', //order delivery time
-      host: 'Olivia@gmail.com', //email
+      createTime: '2023-12-20T07:50:00.000+00:00',
+      endEventTime: '2023-12-02T12:30:00.000+00:00',
+      estimatedArrivalTime: '2023-12-01T08:15:00.000+00:00',
+      hostID: 1,
+      id: 3,
+      memberList: null,
+      rid: 1,
+      rname: 'abcc',
+      secretCode: '490147',
+      status: 1,
+      stopOrderingTime: '2023-12-01T15:30:00.000+00:00',
+      totalPeople: 1,
+      totalPrice: 0,
     },
   ]);
   const [title, setTitle] = useState('');
@@ -55,10 +134,51 @@ const Report = () => {
       navigate(`/reports`);
     }
   };
+  function normalizeTime() {
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.005`;
+  }
+  const handleSendReport = async () => {
+    const now = new Date();
+    console.log({ type: typeof now });
+    console.log(type);
+    const res = await api.post(
+      '/report',
+      JSON.stringify({
+        uid: user.uid,
+        oid: order.id,
+        time: normalizeTime(),
+        comment: details,
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  };
   const handleReportClick = () => {
-    //TODO: sent report to backend
+    handleSendReport();
     setSuccess(true);
-    setReportSent(1);
+    setReportSent(true);
+  };
+  const dateFormatTransform = (isoDateString) => {
+    if (!isoDateString) {
+      return 'Invalid Date';
+    }
+    const date = isoDateString.substring(0, 10);
+    const time = isoDateString.substring(11, 16);
+
+    const formattedDate = `${date} ${time}`;
+    return formattedDate;
   };
   return (
     <>
@@ -68,51 +188,37 @@ const Report = () => {
       </div>
       <div className='flex pl-1/8 pr-1/8 items-center justify-center gap-6'>
         <ul>
-          {reportData.map((item) => (
-            <div key={item.id}>
-              <div className='p-4 w-180 h-18 items-start grid grid-cols-3 gap-2'>
-                <div className='text-center text-blue text-2xl'>
-                  Restaurant: {item.restaurant}
-                </div>
-                {type == 'write' && (
-                  <div className='text-center text-blue text-2xl'>
-                    {item.orderTime}
-                  </div>
-                )}
-                {type == 'read' && (
-                  <div className='text-center text-blue text-2xl'>
-                    {item.reportTime}
-                  </div>
-                )}
-                {type == 'write' && (
-                  <div className='text-center text-blue text-2xl'>
-                    Host: {item.host}
-                  </div>
-                )}
-                {type == 'read' && (
-                  <div className='text-center text-blue text-2xl'>
-                    Reporter: {item.email}
-                  </div>
-                )}
+          <div key={order.id}>
+            <div className='p-4 w-180 h-18 items-start grid grid-cols-3 gap-2'>
+              <div className='text-center text-blue text-2xl'>
+                Restaurant: {order.rname}
               </div>
+              {type == 'write' && (
+                <div className='text-center text-blue text-2xl'>
+                  {dateFormatTransform(order.estimatedArrivalTime)}
+                </div>
+              )}
+              {type == 'read' && (
+                <div className='text-center text-blue text-2xl'>
+                  {dateFormatTransform(order.estimatedArrivalTime)}
+                </div>
+              )}
+              {type == 'write' && (
+                <div className='text-center text-blue text-2xl'>
+                  Host: {order.hostGmail}
+                </div>
+              )}
+              {type == 'read' && (
+                <div className='text-center text-blue text-2xl'>
+                  Reporter: {order.hostID}
+                </div>
+              )}
             </div>
-          ))}
+          </div>
         </ul>
       </div>
       {type == 'write' && (
         <div>
-          <div className='flex pb-6 pt-4'>
-            <div className='w-1/6'></div>
-            <span className='text-yellow font-bold pr-4 text-2xl'>Title: </span>
-            <input
-              className='flex-grow text-black border border-2 border-yellow rounded-md'
-              type='text'
-              placeholder=' Enter title'
-              value={title}
-              onChange={handleTitleChange}
-            />
-            <div className='w-1/6 be-green'></div>
-          </div>
           <div className='flex items-center'>
             <div className='w-1/6'></div>
             <span className='text-yellow font-bold pr-4 text-2xl'>
@@ -159,22 +265,6 @@ const Report = () => {
       )}
       {type == 'read' && (
         <div>
-          <div className='flex pb-6 pt-4'>
-            <div className='w-1/6'></div>
-            <span className='text-yellow font-bold pr-4 text-2xl'>Title: </span>
-            {reportData.map((item) => (
-              <div
-                key={item.id}
-                className='flex-grow text-black border border-2 border-yellow rounded-md'
-              >
-                <div className='pl-2 text-left text-blue text-1xl'>
-                  {' '}
-                  {item.title}
-                </div>
-              </div>
-            ))}
-            <div className='w-1/6 be-green'></div>
-          </div>
           <div className='flex items-center'>
             <div className='w-1/6'></div>
             <span className='text-yellow font-bold pr-4 text-2xl'>
@@ -213,14 +303,17 @@ const Report = () => {
           </div>
         </div>
       )}
-      <div>{title}</div>
-      <div>{details}</div>
       {reportSent && (
         <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100'>
           <ReportSuccessMessage
             success={success}
             setReportSent={setReportSent}
           />
+        </div>
+      )}
+      {reportWritten && (
+        <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100'>
+          <ReportWrittenMessage setReportWritten={setReportWritten} />
         </div>
       )}
     </>

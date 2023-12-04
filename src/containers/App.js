@@ -48,7 +48,7 @@ const App = () => {
           <Route exact path='/ordering/:id' element={<Ordering />} />
           <Route exact path='/groupDetail/:id' element={<GroupDetail />} />
           <Route path='/login' element={<Login />} />
-          <Route exact path='/report/:type/:id' element={<Report />} />
+          <Route exact path='/report/:type/:id/:uid' element={<Report />} />
         </Routes>
       </AuthProvider>
     </Router>

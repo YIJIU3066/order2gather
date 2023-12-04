@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import Multiselect from './Multiselect';
-import { Link, useNavigate } from 'react-router-dom';
-import Base64ImageConverter from './Base64ImageConverter.js';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-export default function SuccessMessage({ menuid, setMenuOpen, menu_photo }) {
+export default function ReportWritten({ setReportWritten }) {
   const navigate = useNavigate();
   const handleClose = () => {
-    setMenuOpen(false);
+    navigate('/');
+  };
+
+  const handleSubmit = () => {
+    navigate('/');
   };
 
   return (
@@ -22,8 +24,16 @@ export default function SuccessMessage({ menuid, setMenuOpen, menu_photo }) {
           </button>
           <div></div>
         </div>
-        <div>
-          <Base64ImageConverter base64Image={menu_photo} />
+        <p className='text-lg text-blue text-2xl'>You have written a report!</p>
+        <div className='grid grid-cols-3 w-4/5 gap-3 my-4 items-center'>
+          <div></div>
+          <div></div>
+          <button
+            onClick={handleSubmit}
+            className='text-center bg-blue text-white text-xl py-1.5 px-5 rounded-md'
+          >
+            Finish
+          </button>
         </div>
       </div>
     </div>
