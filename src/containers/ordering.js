@@ -193,11 +193,12 @@ const Ordering = () => {
       {
         fid: -1,
         foodName: 'test',
-        num: 0,
+        num: 1,
         comment: '',
         oid: Order.id,
         uid: user.uid,
-        hostViewPrice: 0,
+        price: 1,
+        hostViewPrice: 1,
         hostViewFoodName: 'test',
       },
       ...foodList
@@ -215,6 +216,7 @@ const Ordering = () => {
         })),
     ];
     console.log(updatedFoodList);
+    console.log(typeof updatedFoodList);
     try {
       // Set success and confirmOpen states
       setSuccess(true);
@@ -222,9 +224,10 @@ const Ordering = () => {
 
       // Execute getOrderDetails after setting states
       console.log(updatedFoodList);
-      const response = await axiosInstance.post(`/ordering/add`, {
-        updatedFoodList: updatedFoodList,
-      });
+      const response = await axiosInstance.post(
+        `/ordering/add`,
+        updatedFoodList
+      );
       console.log(response);
     } catch (error) {
       console.error('Error fetching data:', error);

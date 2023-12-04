@@ -30,6 +30,7 @@ const Home = () => {
     try {
       const response = await axiosInstance.get('/orderEvent/view');
       console.log('input', inputValue);
+      console.log(response.data);
       for (const item of response.data) {
         if (item.secretCode === inputValue) {
           setOid(item.id);
