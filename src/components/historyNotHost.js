@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import HistoryTable from './historyTable';
+import AuthContext from '../context/AuthContext';
 
 const HistoryNotHost = ({ history, orderItem, historyInfo }) => {
+  const { user } = useContext(AuthContext);
+
   //轉換顯示的日期格式
   const dateFormatTransform = (isoDateString) => {
     const isoDate = new Date(isoDateString);
@@ -47,7 +50,7 @@ const HistoryNotHost = ({ history, orderItem, historyInfo }) => {
               Back
             </button>
           </Link>
-          <Link to={`/report/write/${oid}/${uid}`}>
+          <Link to={`/report/write/${history.oid}/${user.uid}`}>
             <button className='bg-yellow hover:bg-green text-white font-bold py-2 px-6 ml-6 rounded text-center'>
               Report
             </button>

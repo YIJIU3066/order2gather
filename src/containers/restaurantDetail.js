@@ -4,12 +4,7 @@ import { useLocation, Link } from 'react-router-dom';
 import NavBar from '../components/navbar';
 import styles from '../styles/form.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faUpload,
-  faPenToSquare,
-  faPlus,
-  faMinus,
-} from '@fortawesome/free-solid-svg-icons';
+import { faUpload, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import useAxios from '../hooks/useAxios';
 import AuthContext from '../context/AuthContext';
