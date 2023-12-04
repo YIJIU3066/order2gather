@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 
@@ -7,6 +7,7 @@ const ModifyFood = ({
   restaurantInfo,
   setRestaurantInfo,
   handleDeleteFoodSave,
+  isNew,
 }) => {
   const [addFood, setAddFood] = useState(false);
   const [deleteFood, setDeleteFood] = useState(false);
@@ -33,11 +34,11 @@ const ModifyFood = ({
 
   const handleAddFood = () => {
     const numNewPrice = parseFloat(newPrice);
-    console.log(typeof numNewPrice);
     if (typeof numNewPrice === 'number' && newFood && numNewPrice) {
       setRestaurantInfo((prevRestaurantInfo) => {
         const newFoodItem = {
           // rid: restaurant.id,
+          id: restaurantInfo.food.length,
           name: newFood,
           price: numNewPrice,
         };
@@ -151,60 +152,65 @@ const ModifyFood = ({
 
       <div className='modify_food_container flex flex-col items-center justify-between w-fit'>
         <div className='add relative flex items-center justify-center'>
-          <button
-            className='border-2 bg-blue hover:bg-blue text-white hover:bg-blue/[0.9] focus:outline-none shadow-md font-bold py-2 px-2 mx-3 rounded text-center text-base flex justify-center items-center'
-            onClick={handleShowAddFood}
-          >
-            <FontAwesomeIcon icon={faPlus} style={{ color: '#ffffff' }} />
-          </button>
-          {addFood && (
-            <div className='more_food_container flex rounded ml-2 px-2 py-2 absolute w-max left-full border-2'>
-              <div className='food flex flex-row w-1/2 mr-2 relative'>
-                {showNumTip && (
-                  <span className='absolute top-full w-max bg-red text-white px-2 py-1.5 mt-4 -left-2.5 shadow-md rounded text-xs font-medium duration-100'>
-                    Please Check Food is not empty & <br /> Price is number!
-                  </span>
-                )}
-                <input
-                  type='text'
-                  value={newFood}
-                  placeholder='food'
-                  onChange={(e) => {
-                    setShowNumTip(false);
-                    setNewFood(e.target.value);
-                  }}
-                  className={`border-b-2 text-sm text-gray-700 font-medium px-1 focus:outline-none w-24 mx-1 ${
-                    showNumTip
-                      ? 'border-red focus:border-red'
-                      : 'border-blue focus:border-yellow'
-                  }`}
-                />
-              </div>
-              <div className='price flex flex-row relative'>
-                <div className='text-blue font-medium'>$ </div>
-                <input
-                  type='num'
-                  value={newPrice}
-                  placeholder='num'
-                  onChange={(e) => {
-                    setShowNumTip(false);
-                    setNewPrice(e.target.value);
-                  }}
-                  className={`border-b-2 text-sm text-gray-700 font-medium px-1 focus:outline-none w-12 mx-1 ${
-                    showNumTip
-                      ? 'border-red focus:border-red'
-                      : 'border-blue focus:border-yellow'
-                  }`}
-                />
-              </div>
-              <div className='mx-1'>
-                <button
-                  className='bg-yellow hover:bg-blue text-white font-bold rounded text-center px-2 text-sm py-1 focus:outline-none'
-                  onClick={handleAddFood}
-                >
-                  Add
-                </button>
-              </div>
+          {isNew && (
+            <div>
+              <button
+                className='border-2 bg-blue hover:bg-blue text-white hover:bg-blue/[0.9] focus:outline-none shadow-md font-bold py-2 px-2 mx-3 rounded text-center text-base flex justify-center items-center'
+                onClick={handleShowAddFood}
+              >
+                <FontAwesomeIcon icon={faPlus} style={{ color: '#ffffff' }} />
+              </button>
+
+              {addFood && (
+                <div className='more_food_container flex rounded ml-2 px-2 py-2 absolute w-max left-full border-2'>
+                  <div className='food flex flex-row w-1/2 mr-2 relative'>
+                    {showNumTip && (
+                      <span className='absolute top-full w-max bg-red text-white px-2 py-1.5 mt-4 -left-2.5 shadow-md rounded text-xs font-medium duration-100'>
+                        Please Check Food is not empty & <br /> Price is number!
+                      </span>
+                    )}
+                    <input
+                      type='text'
+                      value={newFood}
+                      placeholder='food'
+                      onChange={(e) => {
+                        setShowNumTip(false);
+                        setNewFood(e.target.value);
+                      }}
+                      className={`border-b-2 text-sm text-gray-700 font-medium px-1 bg-transparent focus:outline-none w-24 mx-1 ${
+                        showNumTip
+                          ? 'border-red focus:border-red'
+                          : 'border-blue focus:border-yellow'
+                      }`}
+                    />
+                  </div>
+                  <div className='price flex flex-row relative'>
+                    <div className='text-blue font-medium'>$ </div>
+                    <input
+                      type='num'
+                      value={newPrice}
+                      placeholder='num'
+                      onChange={(e) => {
+                        setShowNumTip(false);
+                        setNewPrice(e.target.value);
+                      }}
+                      className={`border-b-2 text-sm text-gray-700 font-medium px-1 bg-transparent focus:outline-none w-12 mx-1 ${
+                        showNumTip
+                          ? 'border-red focus:border-red'
+                          : 'border-blue focus:border-yellow'
+                      }`}
+                    />
+                  </div>
+                  <div className='mx-1'>
+                    <button
+                      className='bg-yellow hover:bg-blue text-white font-bold rounded text-center px-2 text-sm py-1 focus:outline-none'
+                      onClick={handleAddFood}
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import styles from '../styles/form.module.css';
-import styles_img from '../styles/addRestaurant.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUpload, faXmark } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
@@ -29,21 +28,18 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
     if (menus.length < 1) return;
 
     // Create new image URLs from the menus
-    const newImageUrls = menus.map((menu) => URL.createObjectURL(menu));
-    setMenuURLs((prevMenuURLs) => prevMenuURLs.concat(newImageUrls));
 
+    const newImageUrls = menus.map((menu) => URL.createObjectURL(menu));
+    setMenuURLs((prevMenuURLs) => {
+      // Clean up previous image URLs before adding new ones
+      prevMenuURLs.forEach((url) => URL.revokeObjectURL(url));
+      return [...newImageUrls];
+    });
     // Clean up previous image URLs when menus change
     return () => {
       menus.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [menus]);
-
-  //圖片字串轉換為Blob
-  const convertStringToImage = (stringData) => {
-    const byteArray = Uint8Array.from(atob(stringData), (c) => c.charCodeAt(0));
-    const blob = new Blob([byteArray], { type: 'image/jpeg' });
-    return URL.createObjectURL(blob);
-  };
 
   //圖片Blob轉換為字串
   const convertBlobToString = (blob) => {
@@ -60,34 +56,6 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
     });
   };
 
-  //儲存圖片
-  const handleSaveImg = async (uploadImg) => {
-    try {
-      const restaurantString = JSON.stringify(restaurantInfo.restaurant[0]);
-      const foodData = restaurantInfo.food.map(({ name, price }) => ({
-        name,
-        price,
-      }));
-      const foodString = JSON.stringify(foodData);
-      const formData = new FormData();
-      formData.append('restaurant', restaurantString);
-      formData.append('menu', uploadImg); // Add the image file directly to FormData
-      formData.append('food', foodString);
-
-      const response = await axiosInstance.put('/restaurant/update', formData);
-      console.log(response);
-      Swal.fire({
-        title: 'Success!',
-        text: 'Edit Restaurant Success!',
-        icon: 'success',
-        iconColor: '#CF9546',
-        confirmButtonColor: '#7A989A',
-      });
-    } catch (error) {
-      console.log(`Update Restaurant Data Error, ${error}`);
-    }
-  };
-
   // 選擇圖片
   const handleMenuChange = async (event) => {
     const file = event.target.files[0];
@@ -99,7 +67,8 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
         setRestaurantInfo((prevRestaurantInfo) => {
           return {
             ...prevRestaurantInfo,
-            menu: [...prevRestaurantInfo.menu, base64ImageData],
+            // menu: [...prevRestaurantInfo.menu, base64ImageData],
+            menu: [...prevRestaurantInfo.menu, file],
           };
         });
         // handleSaveImg(base64ImageData);
@@ -129,54 +98,36 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
     }
   };
 
-  //刪除圖片
-  const handleDeleteMenu = (indexToDelete) => {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete this menu?',
-      icon: 'warning',
-      iconColor: '#CF9546',
-      showCancelButton: true,
-      confirmButtonColor: '#7A989A',
-      cancelButtonColor: '#C67052',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const updatedMenus = [...menus];
+  //儲存圖片
+  const handleSaveImg = async (uploadImg) => {
+    try {
+      const restaurantString = JSON.stringify(restaurantInfo.restaurant[0]);
+      const foodData = restaurantInfo.food.map(({ name, price }) => ({
+        name,
+        price,
+      }));
+      const foodString = JSON.stringify(foodData);
+      const formData = new FormData();
+      formData.append('restaurant', restaurantString);
+      formData.append('image', uploadImg); // Add the image file directly to FormData
+      formData.append('food', foodString);
 
-        updatedMenus.splice(indexToDelete, 1);
-        setMenus(updatedMenus);
+      // const response = await axiosInstance.post('/restaurant/save', formData);
 
-        const updatedMenuURLs = [...menuURLs];
-        URL.revokeObjectURL(updatedMenuURLs[indexToDelete]);
-        updatedMenuURLs.splice(indexToDelete, 1);
-
-        setMenuURLs(updatedMenuURLs);
-
-        const remainMenus = restaurantInfo.menu.filter(
-          (_, index) => index !== indexToDelete
-        );
-
-        setRestaurantInfo((prevRestaurantInfo) => ({
-          ...prevRestaurantInfo,
-          menu: remainMenus,
-        }));
-
-        Swal.fire({
-          title: 'Deleted!',
-          text: 'Your menu has been deleted.',
-          icon: 'success',
-          iconColor: '#CF9546',
-          confirmButtonColor: '#7A989A',
-        });
-      }
-    });
+      // Swal.fire({
+      //   title: 'Success!',
+      //   text: 'Edit Restaurant Success!',
+      //   icon: 'success',
+      //   iconColor: '#CF9546',
+      //   confirmButtonColor: '#7A989A',
+      // });
+    } catch (error) {
+      console.log(`Update Restaurant Data Error, ${error}`);
+    }
   };
 
   const handleInputRestantantInfo = (e, type) => {
     const updatedValue = e.target.value;
-
     setRestaurantInfo((prevRestaurantInfo) => ({
       ...prevRestaurantInfo,
       restaurant: [
@@ -201,14 +152,9 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
     }
   };
 
-  // useEffect(() => {
-  //   console.log(restaurantInfo);
-  // }, [restaurantInfo]);
-
   // 儲存餐廳資料
   const handleSave = () => {
     // 檢查表單是否有效
-    console.log(restaurantInfo);
     onSave(restaurantInfo);
   };
 
@@ -280,6 +226,7 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
                     restaurantInfo={restaurantInfo}
                     setRestaurantInfo={setRestaurantInfo}
                     handleDeleteFoodSave={handleDeleteFoodSave}
+                    isNew={true}
                   />
                 </td>
               </tr>
@@ -316,7 +263,12 @@ const AddRestaurantForm = ({ onSave, onClose }) => {
                   </div>
                 </td>
                 <td className=''>
-                  <ImageDisplay menuURLs={menuURLs} menus={menus} />
+                  <ImageDisplay
+                    menuURLs={menuURLs}
+                    menus={menus}
+                    setMenus={setMenus}
+                    setMenuURLs={setMenuURLs}
+                  />
                 </td>
               </tr>
             </tbody>

@@ -28,7 +28,7 @@ const HostDashboard = () => {
     });
     if (res.status === 200) {
       let foods = [];
-      for (const uIt of res.data.data.orders) {
+      for (const uIt of res.data.orders) {
         for (const fIt of uIt.food) {
           let flag = false;
           for (const existFIt of foods) {
@@ -64,7 +64,7 @@ const HostDashboard = () => {
       }
       setFoodList(foods);
       setOrderItems(
-        res.data.data.orders.map((it) => {
+        res.data.orders.map((it) => {
           return {
             uid: it.uid,
             username: it.username,
@@ -76,7 +76,7 @@ const HostDashboard = () => {
           };
         })
       );
-      setTotalPrice(res.data.data.totalPrice);
+      setTotalPrice(res.data.totalPrice);
     }
   };
 
@@ -272,7 +272,7 @@ const HostDashboard = () => {
         uid: user.uid,
         oid: oid,
         comment: 'Food arrived, guys!',
-        time: time.toString(),
+        time: time.getTime(),
       }),
       {
         headers: {

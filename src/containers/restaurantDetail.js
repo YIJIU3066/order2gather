@@ -54,8 +54,8 @@ const RestaurantDetail = () => {
 
     // Create new image URLs from the menus
     const newImageUrls = menus.map((menu) => URL.createObjectURL(menu));
-    setMenuURLs((prevMenuURLs) => prevMenuURLs.concat(newImageUrls));
-
+    // setMenuURLs((prevMenuURLs) => prevMenuURLs.concat(newImageUrls));
+    setMenuURLs((prevMenuURLs) => [...prevMenuURLs, ...newImageUrls]);
     // Clean up previous image URLs when menus change
     return () => {
       menus.forEach((url) => URL.revokeObjectURL(url));
@@ -420,7 +420,11 @@ const RestaurantDetail = () => {
                     </div>
                   </td>
                   <td className=''>
-                    <ImageDisplay menuURLs={menuURLs} menus={menus} />
+                    <ImageDisplay
+                      menuURLs={menuURLs}
+                      menus={menus}
+                      isNew={false}
+                    />
                   </td>
                 </tr>
               </tbody>

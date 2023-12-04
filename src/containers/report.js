@@ -229,7 +229,7 @@ const Report = () => {
           <div className='flex items-center'>
             <div className='w-1/4'></div>
             <textarea
-              className='w-full p-2 border border-yellow border-2 rounded-md'
+              className='w-full p-2 border-yellow border-2 rounded-md'
               placeholder='Enter Details'
               rows='8'
               value={details}
@@ -238,17 +238,7 @@ const Report = () => {
             <div className='w-1/4'></div>
           </div>
           <div className='flex pl-2 pr-2 items-center justify-center gap-6'>
-            <div className='p-4 w-180 h-18 items-start grid grid-cols-2 gap-2'>
-              <div className='flex pl-20 pr-20 items-center justify-center flex-wrap gap-6'>
-                <div
-                  className='border-b hover:text-white cursor-pointer pl-2 pr-2 w-40 h-10 rounded-2xl bg-blue'
-                  onClick={() => handleBackClick(id, reportData[0])}
-                >
-                  <h2 className='pt-2 text-center text-white font-bold text-1xl'>
-                    Back
-                  </h2>
-                </div>
-              </div>
+            <div className='p-4 w-180 h-18 items-start grid grid-cols-1 gap-2'>
               <div className='flex pl-20 pr-20 items-center justify-center flex-wrap gap-6'>
                 <div
                   className='border-b hover:text-white cursor-pointer pl-2 pr-2 w-40 h-10 rounded-2xl bg-yellow'
@@ -277,7 +267,7 @@ const Report = () => {
             {reportData.map((item) => (
               <div
                 key={item.id}
-                className='w-full p-2 border border-yellow border-2 rounded-md'
+                className='w-full p-2 border-yellow border-2 rounded-md'
               >
                 <div className='pl-2 text-left text-blue text-1xl'>
                   {' '}
