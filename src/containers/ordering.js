@@ -58,7 +58,7 @@ const Ordering = () => {
         //console.log(typeof responseRestaurant.data);
         //console.log(responseRestaurant.data.food);
         setMenu(responseRestaurant.data.menu);
-        //console.log(responseRestaurant.data.menu);
+        console.log(responseRestaurant.data.menu);
         setFoodList(
           responseRestaurant.data.food.map((food) => ({
             ...food,
@@ -160,7 +160,7 @@ const Ordering = () => {
   const addNewItemClick = () => {
     if (newFood[0].name !== '' && newFood[0].price !== '') {
       const newFoodItem = {
-        id: foodList.length,
+        id: foodList.length + 1,
         name: newFood[0].name,
         price: newFood[0].price,
         note: '',
@@ -185,12 +185,45 @@ const Ordering = () => {
   const handleModifyClick = () => {
     setConfirmOrder(0);
   };
-  const handleConfirmClick = () => {
+  const handleConfirmClick = async () => {
     //TODO: sent order to backend
-    setSuccess(true);
-    setConfirmOpen(1);
+    console.log(foodList);
+    console.log(user);
+    const updatedFoodList = [
+      ...foodList
+        .filter((food) => food.quantity > 0) // Filter out items with quantity <= 0
+        .map(({ id, name, quantity, note, ...rest }) => ({
+          fid: id, // Rename id to fid
+          foodName: name,
+          num: quantity,
+          comment: note,
+          ...rest,
+          oid: Order.id,
+          uid: user.uid,
+          hostViewPrice: rest.price, // Add hostViewPrice property
+          hostViewFoodName: name, // Add hostViewName property
+        })),
+    ];
+    console.log(updatedFoodList);
+    console.log(typeof updatedFoodList);
+    try {
+      // Set success and confirmOpen states
+      setSuccess(true);
+      setConfirmOpen(1);
+
+      // Execute getOrderDetails after setting states
+      console.log(updatedFoodList);
+      const response = await axiosInstance.post(
+        `/ordering/add`,
+        updatedFoodList
+      );
+      console.log(response);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
   };
   const handleMenuClick = () => {
+    console.log(menu);
     if (menu && menu.length > 0) {
       // The menu array is not empty
       setMenuOpen(true);
