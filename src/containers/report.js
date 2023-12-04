@@ -25,7 +25,7 @@ const Report = () => {
   const navigate = useNavigate();
   const [success, setSuccess] = useState(false);
   const [reportSent, setReportSent] = useState(false);
-  const { type, id } = useParams(); //write id: report id and read id: order id
+  const { type, id, uid } = useParams(); //write id: report id and read id: order id
   const [reportWritten, setReportWritten] = useState(false);
   const api = useAxios();
   //check whether type is valid
@@ -50,7 +50,7 @@ const Report = () => {
             try {
               const reportResponse = await axiosInstance.get('/getUserReport', {
                 params: {
-                  uid: user.uid,
+                  uid: uid,
                   oid: restaurantResponse.data.id,
                 },
               });
@@ -67,7 +67,7 @@ const Report = () => {
             try {
               const reportResponse = await axiosInstance.get('/getUserReport', {
                 params: {
-                  uid: user.uid,
+                  uid: uid,
                   oid: restaurantResponse.data.id,
                 },
               });
@@ -205,7 +205,7 @@ const Report = () => {
               )}
               {type == 'write' && (
                 <div className='text-center text-blue text-2xl'>
-                  Host: {order.hostID}
+                  Host: {order.hostGmail}
                 </div>
               )}
               {type == 'read' && (
