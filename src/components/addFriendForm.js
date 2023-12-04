@@ -16,6 +16,7 @@ export default function AddFriendForm({ groups, setAddOpen, addFriend }) {
       setAddOpen(false);
     }
   };
+  console.log(groups);
 
   return (
     <div className='w-full h-full flex justify-center items-center'>
