@@ -3,7 +3,7 @@ import Navbar from '../components/navbar';
 import { useLocation, Link } from 'react-router-dom';
 import ListNav from '../components/listNav';
 import Multiselect from '../components/Multiselect';
-import useAxios from '../hooks/useAxios'
+import useAxios from '../hooks/useAxios';
 
 export default function GroupDetail() {
   const location = useLocation();
@@ -14,16 +14,15 @@ export default function GroupDetail() {
   const api = useAxios();
 
   const getGroupInfo = async () => {
-    const res = await api.get("/friend/getGroupInfo", {
-        params: {
-          id: group.id
-        }
-      }
-    );
+    const res = await api.get('/friend/getGroupInfo', {
+      params: {
+        id: group.id,
+      },
+    });
     let memList = [];
     for (const m of res.data.members) memList.push({ ...m, checked: false });
     setMemberList(memList);
-  }
+  };
 
   useEffect(() => {
     getGroupInfo();
@@ -34,14 +33,17 @@ export default function GroupDetail() {
     if (selectedFriend.length == 0) return;
     for (const f of selectedFriend) fidList.push(f.id);
     console.log(fidList, group.id);
-    const res = await api.post("/friend/addUsersToGroup", 
+
+    const res = await api.post(
+      '/friend/addUsersToGroup',
       JSON.stringify({
         fids: fidList,
-        gid: group.id
-      }), {
+        gid: group.id,
+      }),
+      {
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
     setSelectedFriend([]);
@@ -120,8 +122,12 @@ export default function GroupDetail() {
                     className='accent-blue w-4 h-4 border-blue my-4'
                     key={index}
                   />
-                  <p className='text-2xl text-blue font-bold' key={index}>{member.username}</p>
-                  <p className='text-xl text-blue col-span-2' key={index}>{member.email}</p>
+                  <p className='text-2xl text-blue font-bold' key={index}>
+                    {member.username}
+                  </p>
+                  <p className='text-xl text-blue col-span-2' key={index}>
+                    {member.email}
+                  </p>
                   <div key={index}></div>
                 </div>
               );

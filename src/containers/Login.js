@@ -5,22 +5,21 @@ import AuthContext from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
+  const { loginUser } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-    const { loginUser } = useContext(AuthContext);
-    const navigate = useNavigate();
+  const handleLogin = async (response) => {
+    const res = await loginUser(response.access_token);
+    if (res === 'success') navigate('/');
+    else alert('Cannot Login');
+  };
 
-    const handleLogin = async (response) => {
-        const res = await loginUser(response.access_token);
-        if (res === 'success') navigate('/');
-        else alert('Cannot Login');
-    }
-
-    const googleLogin = useGoogleLogin({
-        onSuccess: Response => {
-            handleLogin(Response);
-        },
-        onError: () => alert("Login failed")
-    })
+  const googleLogin = useGoogleLogin({
+    onSuccess: (Response) => {
+      handleLogin(Response);
+    },
+    onError: () => alert('Login failed'),
+  });
 
   return (
     <>

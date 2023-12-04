@@ -25,7 +25,9 @@ export const AuthProvider = ({ children }) => {
       : null
   );
   const [loading, setLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem('accessToken') ? true : false
+  );
 
   const navigate = useNavigate();
 
@@ -45,7 +47,7 @@ export const AuthProvider = ({ children }) => {
 
       if (response.status === 200) {
         setAccessToken(response.data.jwt);
-        console.log(response.data.jwt)
+        console.log(response.data.jwt);
         setUser(jwtDecode(response.data.jwt));
         setIsLoggedIn(true);
         localStorage.setItem('accessToken', JSON.stringify(response.data.jwt));

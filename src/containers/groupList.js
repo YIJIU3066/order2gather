@@ -4,7 +4,7 @@ import AddItem from '../components/addItem';
 import AddGroupForm from '../components/addGroupForm';
 import ListNav from '../components/listNav';
 import { Link } from 'react-router-dom';
-import useAxios from '../hooks/useAxios'
+import useAxios from '../hooks/useAxios';
 
 export default function GroupList() {
   const [groupList, setGroupList] = useState([]);
@@ -14,49 +14,54 @@ export default function GroupList() {
   const api = useAxios();
 
   const fetchGroupList = async () => {
-    const res = await api.get("/friend/get");
-    let newGList = [], newFList = []
+    const res = await api.get('/friend/get');
+    let newGList = [],
+      newFList = [];
     for (const g of res.data.groups) {
       newGList.push({
         name: g.name,
         checked: false,
-        id: g.gid
+        id: g.gid,
       });
     }
     for (const f of res.data.friends) {
       newFList.push({
         ...f,
         name: f.nickname,
-        checked: false
-      })
+        checked: false,
+      });
     }
     setGroupList(newGList);
     setFriendList(newFList);
-    console.log(res.data.friends)
-  }
+    console.log(res.data.friends);
+  };
 
   const addGroup = async ({ groupName, friend }) => {
-    const res = await api.post("/friend/createGroup", 
+    const res = await api.post(
+      '/friend/createGroup',
       JSON.stringify({
-        name: groupName
-      }), {
+        name: groupName,
+      }),
+      {
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
     if (res.status === 200) {
-      let fidList = []
+      let fidList = [];
       for (const f of friend) fidList.push(f.id);
       console.log(fidList, res.data.gid);
-      const resp = await api.post("/friend/addUsersToGroup", 
+      const resp = await api.post(
+        '/friend/addUsersToGroup',
         JSON.stringify({
           fids: fidList,
-          gid: res.data.gid
-        }), {
+          gid: res.data.gid,
+        }),
+        {
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
       console.log(resp);

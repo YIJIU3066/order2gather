@@ -1,26 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import NavBar from '../components/navbar';
 import RestaurantCard from '../components/restaurantCard';
 import SearchBar from '../components/searchBar';
 import AddItem from '../components/addItem';
 import AddRestaurantForm from '../components/addRestaurantForm';
+import useAxios from '../hooks/useAxios';
+import AuthContext from '../context/AuthContext';
 
 const AllRestaurant = () => {
+  const axiosInstance = useAxios();
+  const { user } = useContext(AuthContext);
+
   const [showRestaurantForm, setShowRestaurantForm] = useState(false);
-  const [restaurantList, setRestaurantList] = useState([
-    {
-      id: 1,
-      name: '八方雲集',
-      address: '地址地址地址',
-      telephone: '02-12345678',
-    },
-    {
-      id: 2,
-      name: '邱奶奶早餐店',
-      address: '這裡是地址!',
-      telephone: '02-23456789',
-    },
-  ]);
+  const [restaurantList, setRestaurantList] = useState([]);
+
+  useEffect(() => {
+    const getAllRestaurant = async () => {
+      try {
+        const response = await axiosInstance.get('/restaurant/display');
+        console.log(response);
+        setRestaurantList(response.data.restaurant);
+      } catch (error) {
+        console.error('Error fetching data:', error.response);
+      }
+    };
+
+    getAllRestaurant();
+  }, []);
 
   const handleAddRestaurant = () => {
     setShowRestaurantForm(true);
