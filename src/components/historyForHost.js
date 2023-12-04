@@ -57,7 +57,7 @@ const HistoryForHost = ({ history, allOrderItem, historyInfo }) => {
               Back
             </button>
           </Link>
-          <Link to='/report/write/0'>
+          <Link to={`/report/write/${oid}/${uid}`}>
             <button className='bg-yellow hover:bg-green text-white font-bold py-2 px-6 ml-6 rounded text-center'>
               Report
             </button>

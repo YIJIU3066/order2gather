@@ -287,7 +287,6 @@ const CreateOrder = () => {
                       value={searchText}
                       onChange={handleInputChange}
                       onFocus={openRestaurantSearch}
-                      // ref={inputRef}
                     />
                   </label>
                   {restaurantFocus && (

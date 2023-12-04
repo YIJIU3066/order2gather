@@ -3,13 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useLocation, Link } from 'react-router-dom';
 import NavBar from '../components/navbar';
 import styles from '../styles/form.module.css';
-import styles_img from '../styles/addRestaurant.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faUpload,
-  faXmark,
-  faAngleRight,
-  faAngleLeft,
   faPenToSquare,
   faPlus,
   faMinus,
@@ -18,6 +14,7 @@ import Swal from 'sweetalert2';
 import useAxios from '../hooks/useAxios';
 import AuthContext from '../context/AuthContext';
 import ImageDisplay from '../components/imageDisplay';
+import ModifyFood from '../components/modifyFood';
 
 const RestaurantDetail = () => {
   const location = useLocation();
@@ -28,36 +25,31 @@ const RestaurantDetail = () => {
   const [menus, setMenus] = useState([]);
   const [menuURLs, setMenuURLs] = useState([]);
   const fileInputRef = useRef(null);
-
   const [showTooltip, setShowTooltip] = useState(false);
-  const [addFood, setAddFood] = useState(false);
-  const [deleteFood, setDeleteFood] = useState(false);
-  const [newFood, setNewFood] = useState('');
-  const [newPrice, setNewPrice] = useState('');
-  const [showNumTip, setShowNumTip] = useState(false);
-  const [selectedItems, setSelectedItems] = useState([]);
 
-  //從後端拿餐廳資料
-  const getRestaurantInfo = async () => {
-    try {
-      const response = await axiosInstance.get('/restaurant/display', {
-        params: { rid: restaurant.id },
-      });
-      setRestaurantInfo({
-        menu: response.data.menu,
-        restaurant: response.data.restaurant,
-        food: response.data.food,
-      });
-
-      const newImageUrls = response.data.menu.map((menuString) =>
-        convertStringToImage(menuString)
-      );
-      setMenuURLs(newImageUrls);
-    } catch (error) {
-      console.log('error', error);
-    }
-  };
   useEffect(() => {
+    //從後端拿餐廳資料
+    const getRestaurantInfo = async () => {
+      try {
+        const response = await axiosInstance.get('/restaurant/display', {
+          params: { rid: restaurant.id },
+        });
+
+        setRestaurantInfo({
+          menu: response.data.menu,
+          restaurant: response.data.restaurant,
+          food: response.data.food,
+        });
+
+        const newImageUrls = response.data.menu.map((menuString) =>
+          convertStringToImage(menuString)
+        );
+        setMenuURLs(newImageUrls);
+      } catch (error) {
+        console.log('error', error);
+      }
+    };
+
     getRestaurantInfo();
   }, []);
 
@@ -189,10 +181,9 @@ const RestaurantDetail = () => {
   // }, [handleDeleteMenu]);
 
   //轉換資料格式
-  const convertToFormData = (restaurantString, restaurantInfo, foodString) => {
+
+  const convertToFormData = (restaurantString, foodString, restaurantInfo) => {
     const formData = new FormData();
-    console.log(foodString);
-    console.log(restaurantString);
     formData.append('restaurant', restaurantString);
     formData.append('menu', restaurantInfo.menus);
     formData.append('food', foodString);
@@ -203,22 +194,19 @@ const RestaurantDetail = () => {
   const handleSave = async () => {
     try {
       const restaurantString = JSON.stringify(restaurantInfo.restaurant[0]);
-      const foodData = restaurantInfo.food.map(({ name, price }) => ({
-        name,
-        price,
-      }));
-      const foodString = JSON.stringify(foodData);
+
+      const foodString = JSON.stringify(restaurantInfo.food);
       const restaurantInfoFormData = convertToFormData(
         restaurantString,
-        restaurantInfo,
-        foodString
+        foodString,
+        restaurantInfo
       );
 
       const response = await axiosInstance.put(
         '/restaurant/update',
         restaurantInfoFormData
       );
-      console.log(response);
+
       Swal.fire({
         title: 'Success!',
         text: 'Edit Restaurant Success!.',
@@ -246,7 +234,7 @@ const RestaurantDetail = () => {
       formData.append('food', foodString);
 
       const response = await axiosInstance.put('/restaurant/update', formData);
-      console.log(response);
+      // console.log(response);
       Swal.fire({
         title: 'Success!',
         text: 'Edit Restaurant Success!',
@@ -260,7 +248,6 @@ const RestaurantDetail = () => {
   };
 
   const handleDelete = async () => {
-    console.log('handleDelete');
     try {
       const confirmation = await Swal.fire({
         title: 'Are you sure?',
@@ -279,7 +266,7 @@ const RestaurantDetail = () => {
             rid: restaurant.id,
           },
         });
-        console.log(response);
+
         Swal.fire({
           title: 'Deleted!',
           text: 'Restaurant has been deleted.',
@@ -318,94 +305,12 @@ const RestaurantDetail = () => {
     }));
   };
 
-  //修改食物資料
-  const handleChangeFoodInfo = (e, id, type) => {
-    const updatedValue = e.target.textContent;
-
-    setRestaurantInfo((prevRestaurantInfo) => {
-      const updatedFood = prevRestaurantInfo.food.map((foodItem) => {
-        if (foodItem.id === id) {
-          return {
-            ...foodItem,
-            [type]: updatedValue,
-          };
-        }
-        return foodItem;
-      });
-
-      return {
-        ...prevRestaurantInfo,
-        food: updatedFood,
-      };
-    });
-  };
-
-  const handleShowAddFood = () => {
-    if (addFood == true) {
-      setAddFood(false);
-    } else {
-      setAddFood(true);
-    }
-  };
-
-  const handleAddFood = () => {
-    const numNewPrice = parseFloat(newPrice);
-    if (typeof numNewPrice === 'number' && newFood !== '') {
-      setRestaurantInfo((prevRestaurantInfo) => {
-        const newFoodItem = {
-          // rid: restaurant.id,
-          name: newFood,
-          price: numNewPrice,
-        };
-
-        const updatedFood = [...prevRestaurantInfo.food, newFoodItem];
-
-        return {
-          ...prevRestaurantInfo,
-          food: updatedFood,
-        };
-      });
-
-      setNewFood('');
-      setNewPrice('');
-    } else {
-      setShowNumTip(true);
-    }
-  };
-
-  const handleShowDeleteFood = () => {
-    if (deleteFood == false) {
-      setDeleteFood(true);
-    } else {
-      setDeleteFood(false);
-    }
-    // /restaurant/deleteFood
-  };
-
-  //處理刪除中被選中的項目
-  const handleCheckboxChange = (index) => {
-    const newSelectedItems = [...selectedItems];
-    if (newSelectedItems.includes(index)) {
-      newSelectedItems.splice(newSelectedItems.indexOf(index), 1);
-    } else {
-      newSelectedItems.push(index);
-    }
-    setSelectedItems(newSelectedItems);
-  };
-  // 處理刪除食物
-  const handleDeleteFood = async () => {
-    const updatedFoodList = restaurantInfo.food.filter(
-      (foodItem, index) => !selectedItems.includes(foodItem.id)
-    );
-
-    setRestaurantInfo((prevRestaurantInfo) => ({
-      ...prevRestaurantInfo,
-      food: updatedFoodList,
-    }));
+  // 刪除食物的結果存到後端
+  const handleDeleteFoodSave = async (selectedItems) => {
     for (const deleteFood of selectedItems) {
       try {
         const response = await axiosInstance.delete('/restaurant/deleteFood', {
-          params: { rid: restaurant.id, fid: deleteFood },
+          params: { rid: restaurantInfo.restaurant[0].id, fid: deleteFood },
         });
         console.log('Food Deleted:', response);
       } catch (error) {
@@ -418,11 +323,6 @@ const RestaurantDetail = () => {
     return <div>No restaurant data found</div>;
   }
 
-  useEffect(() => {
-    if (restaurantInfo) {
-      console.log(restaurantInfo);
-    }
-  }, [restaurantInfo]);
   return (
     <>
       <NavBar />
@@ -484,138 +384,12 @@ const RestaurantDetail = () => {
                 </tr>
                 <tr className='border-b'>
                   <td className={`${styles.form_name}`}>Food</td>
-                  <td className='py-4 flex flex-row'>
-                    <ul className='food_container flex flex-col'>
-                      {restaurantInfo?.food.map((foodItem, index) => (
-                        <li
-                          key={index}
-                          className='pl-4 text-blue font-semibold flex flex-row items-center'
-                        >
-                          {deleteFood && (
-                            <div>
-                              <label
-                                className='cursor-pointer flex items-center justify-center'
-                                id={`food_${foodItem.id}`}
-                              />
-                              <input
-                                id={`food_${foodItem.id}`}
-                                type='checkbox'
-                                checked={selectedItems.includes(foodItem.id)}
-                                className='appearance-none w-4 h-4 mx-2 rounded focus:outline-none border-2 cursor-pointer border-blue checked:bg-yellow'
-                                onChange={() =>
-                                  handleCheckboxChange(foodItem.id)
-                                }
-                              />
-                            </div>
-                          )}
-                          <div
-                            onInput={(e) =>
-                              handleChangeFoodInfo(e, foodItem.id, 'name')
-                            }
-                            className='border-b-2 border-white focus:border-blue focus:border-b-2 focus:outline-none px-2 flex-1'
-                            contentEditable='true'
-                            suppressContentEditableWarning={true}
-                          >
-                            {foodItem.name}
-                          </div>
-                          <div
-                            onInput={(e) =>
-                              handleChangeFoodInfo(e, foodItem.id, 'price')
-                            }
-                            className='border-b-2 border-white focus:border-blue focus:border-b-2 focus:outline-none px-2'
-                            contentEditable='true'
-                            suppressContentEditableWarning={true}
-                          >
-                            {foodItem.price}
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                    <div className='modify_food_container flex flex-col items-center justify-between w-fit'>
-                      <div className='add relative flex items-center justify-center'>
-                        <button
-                          className='border-2 bg-blue hover:bg-blue text-white hover:bg-blue/[0.9] focus:outline-none shadow-md font-bold py-2 px-2 mx-3 rounded text-center text-base flex justify-center items-center'
-                          onClick={handleShowAddFood}
-                        >
-                          <FontAwesomeIcon
-                            icon={faPlus}
-                            style={{ color: '#ffffff' }}
-                          />
-                        </button>
-                        {addFood && (
-                          <div className='more_food_container flex rounded ml-2 px-2 py-2 absolute w-max left-full border-2'>
-                            <div className='food flex flex-row w-1/2 mr-2 relative'>
-                              {showNumTip && (
-                                <span className='absolute top-full w-max bg-red text-white px-2 py-1.5 mt-4 -left-2.5 shadow-md rounded text-xs font-medium duration-100'>
-                                  Please Check Food is not empty & <br /> Price
-                                  is number!
-                                </span>
-                              )}
-                              <input
-                                type='text'
-                                value={newFood}
-                                placeholder='food'
-                                onChange={(e) => {
-                                  setShowNumTip(false);
-                                  setNewFood(e.target.value);
-                                }}
-                                className={`border-b-2 text-sm text-gray-700 font-medium px-1 focus:outline-none w-24 mx-1 ${
-                                  showNumTip
-                                    ? 'border-red focus:border-red'
-                                    : 'border-blue focus:border-yellow'
-                                }`}
-                              />
-                            </div>
-                            <div className='price flex flex-row relative'>
-                              <div className='text-blue font-medium'>$ </div>
-                              <input
-                                type='num'
-                                value={newPrice}
-                                placeholder='num'
-                                onChange={(e) => {
-                                  setShowNumTip(false);
-                                  setNewPrice(e.target.value);
-                                }}
-                                className={`border-b-2 text-sm text-gray-700 font-medium px-1  focus:outline-none w-12 mx-1 ${
-                                  showNumTip
-                                    ? 'border-red focus:border-red'
-                                    : 'border-blue focus:border-yellow'
-                                }`}
-                              />
-                            </div>
-                            <div className='mx-1'>
-                              <button
-                                className='bg-yellow hover:bg-blue text-white font-bold rounded text-center px-2 text-sm py-1'
-                                onClick={handleAddFood}
-                              >
-                                Add
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      <div className='delete relative flex items-center justify-center'>
-                        <button
-                          className='border-2 bg-blue hover:bg-blue text-white hover:bg-blue/[0.9] focus:outline-none shadow-md font-bold py-2 px-2 mx-3 rounded text-center text-base relative flex justify-center items-center'
-                          onClick={handleShowDeleteFood}
-                        >
-                          <FontAwesomeIcon
-                            icon={faMinus}
-                            style={{ color: '#ffffff' }}
-                          />
-                        </button>
-                        {deleteFood && (
-                          <div className='flex rounded ml-2 py-2 absolute w-max left-full '>
-                            <button
-                              className='bg-yellow hover:bg-blue text-white font-bold rounded text-center px-2 text-sm py-2'
-                              onClick={handleDeleteFood}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                  <td className=''>
+                    <ModifyFood
+                      restaurantInfo={restaurantInfo}
+                      setRestaurantInfo={setRestaurantInfo}
+                      handleDeleteFoodSave={handleDeleteFoodSave}
+                    />
                   </td>
                 </tr>
                 <tr className=''>

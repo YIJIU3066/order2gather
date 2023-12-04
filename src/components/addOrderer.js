@@ -101,7 +101,6 @@ const AddOrderer = ({
                 >
                   <label className='cursor-pointer flex items-center justify-center'>
                     <input
-                      id='red-checkbox'
                       type='checkbox'
                       checked={group.checked}
                       className='appearance-none w-4 h-4 mx-2 rounded focus:outline-none border-2 cursor-pointer border-blue checked:bg-blue'
