@@ -2,7 +2,7 @@
 const { Builder, By, Key, until } = require('selenium-webdriver')
 const assert = require('assert')
 
-describe('Add/Delete Friends', function() {
+describe('Create Restaurant', function() {
   this.timeout(30000)
   let driver
   let vars
@@ -22,7 +22,7 @@ describe('Add/Delete Friends', function() {
     }
     throw new Error("New window did not appear before timeout")
   }
-  it('Add/Delete Friends', async function() {
+  it('Create Restaurant', async function() {
     await driver.get("http://localhost:3000/")
     await driver.manage().window().setRect({ width: 1052, height: 819 })
     await driver.findElement(By.css(".flex-row-reverse")).click()
@@ -40,34 +40,51 @@ describe('Add/Delete Friends', function() {
     await driver.switchTo().window(vars["root"])
     await driver.wait(until.stalenessOf(await driver.findElement(By.css(".text-6xl"))), 30000)
     await driver.wait(until.elementLocated(By.css(".text-4xl")), 50000)
-    await driver.findElement(By.xpath('//*[@id="root"]/div[4]/div[5]/button')).click()
-    await driver.findElement(By.xpath("//a/button")).click()
-    await driver.wait(until.elementLocated(By.css(".text-4xl")), 30000)
+    await driver.findElement(By.css(".flex:nth-child(5) .bg-blue")).click()
     {
-      const element = await driver.findElement(By.xpath("//div[2]/button"))
+      const element = await driver.findElement(By.css(".rounded-full"))
       await driver.actions({ bridge: true }).move(element).perform()
     }
     {
       const element = await driver.findElement(By.css("body"))
       await driver.actions({ bridge: true }).move(element, 0, 0).perform()
     }
-    await driver.findElement(By.xpath('//*[@id="root"]/div[2]/button')).click()
+    await driver.findElement(By.css(".fa-plus")).click()
     {
-      const element = await driver.findElement(By.xpath('//*[@id="root"]/div[2]/button'))
+      const element = await driver.findElement(By.css(".fa-plus"))
       await driver.actions({ bridge: true }).move(element).perform()
     }
     {
       const element = await driver.findElement(By.css("body"))
       await driver.actions({ bridge: true }).move(element, 0, 0).perform()
     }
-    await driver.findElement(By.xpath("//input")).click()
-    await driver.findElement(By.xpath("//input")).sendKeys("s0975247623@gmail.com")
-    await driver.findElement(By.xpath("//input[2]")).click()
-    await driver.findElement(By.xpath("//input[2]")).sendKeys("Weber")
-    await driver.findElement(By.xpath("//div[5]/div/div/div/button[2]")).click()
-    await driver.wait(until.elementLocated(By.css(".grid-cols-5 > .text-xl")), 30000)
-    assert(await driver.findElement(By.css(".grid-cols-5 > .text-xl")).getText() == "Weber")
-    await driver.findElement(By.css(".accent-blue")).click()
+    await driver.findElement(By.css(".border-b:nth-child(1) .form_form_input__\\+cWOH")).click()
+    await driver.findElement(By.css(".border-b:nth-child(1) .form_form_input__\\+cWOH")).sendKeys("Yummy")
+    await driver.findElement(By.css(".border-b:nth-child(2) .form_form_input__\\+cWOH")).click()
+    await driver.findElement(By.css(".border-b:nth-child(2) .form_form_input__\\+cWOH")).sendKeys("somewhere")
+    await driver.findElement(By.css(".border-b:nth-child(3) .form_form_input__\\+cWOH")).click()
+    await driver.findElement(By.css(".border-b:nth-child(3) .form_form_input__\\+cWOH")).sendKeys("0912345678")
+    await driver.findElement(By.css(".hover\\3A bg-green")).click()
+    await driver.findElement(By.css(".fa-xmark")).click()
+    await driver.findElement(By.css(".fa-house > path")).click()
+    await driver.wait(until.elementLocated(By.css(".flex:nth-child(5) .bg-blue")), 30000)
+    await driver.findElement(By.css(".flex:nth-child(5) .bg-blue")).click()
+    await driver.findElement(By.css(".w-44")).click()
+    assert(await driver.findElement(By.css(".text-3xl")).getText() == "Yummy")
     await driver.findElement(By.css(".bg-red")).click()
+    {
+      const element = await driver.findElement(By.css(".bg-red"))
+      await driver.actions({ bridge: true }).move(element).perform()
+    }
+    {
+      const element = await driver.findElement(By.css("body"))
+      await driver.actions({ bridge: true }).move(element, 0, 0).perform()
+    }
+    await driver.findElement(By.css(".swal2-confirm")).click()
+    {
+      const element = await driver.findElement(By.css(".swal2-confirm"))
+      await driver.actions({ bridge: true }).move(element).perform()
+    }
+    await driver.findElement(By.css(".swal2-confirm")).click()
   })
 })
