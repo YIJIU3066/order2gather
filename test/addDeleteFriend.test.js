@@ -2,7 +2,7 @@
 const { Builder, By, Key, until } = require('selenium-webdriver')
 const assert = require('assert')
 
-describe('Login', function() {
+describe('Add/Delete Friends', function() {
   this.timeout(30000)
   let driver
   let vars
@@ -22,12 +22,9 @@ describe('Login', function() {
     }
     throw new Error("New window did not appear before timeout")
   }
-  it('Login', async function() {
+  it('Add/Delete Friends', async function() {
     await driver.get("http://localhost:3000/")
-    await driver.manage().window().setRect({ width: 1058, height: 822 })
-    // for other e2e test cases
-    // copy the code segment below and recode actions after login in Selenium IDE
-    // ================================================================================
+    await driver.manage().window().setRect({ width: 1052, height: 819 })
     await driver.findElement(By.css(".flex-row-reverse")).click()
     vars["windowHandles"] = await driver.getAllWindowHandles()
     await driver.findElement(By.css(".text-grey")).click()
@@ -43,7 +40,34 @@ describe('Login', function() {
     await driver.switchTo().window(vars["root"])
     await driver.wait(until.stalenessOf(await driver.findElement(By.css(".text-6xl"))), 30000)
     await driver.wait(until.elementLocated(By.css(".text-4xl")), 50000)
-    // ====================================================================================================
-    assert(await driver.findElement(By.css(".text-4xl")).getText() == "Order 2Gather")
+    await driver.findElement(By.xpath("//div[5]/a/button")).click()
+    await driver.findElement(By.xpath("//a/button")).click()
+    await driver.wait(until.elementLocated(By.css(".text-4xl")), 30000)
+    {
+      const element = await driver.findElement(By.xpath("//div[2]/button"))
+      await driver.actions({ bridge: true }).move(element).perform()
+    }
+    {
+      const element = await driver.findElement(By.css("body"))
+      await driver.actions({ bridge: true }).move(element, 0, 0).perform()
+    }
+    await driver.findElement(By.xpath('//*[@id="root"]/div[2]/button')).click()
+    {
+      const element = await driver.findElement(By.xpath('//*[@id="root"]/div[2]/button'))
+      await driver.actions({ bridge: true }).move(element).perform()
+    }
+    {
+      const element = await driver.findElement(By.css("body"))
+      await driver.actions({ bridge: true }).move(element, 0, 0).perform()
+    }
+    await driver.findElement(By.xpath("//input")).click()
+    await driver.findElement(By.xpath("//input")).sendKeys("s0975247623@gmail.com")
+    await driver.findElement(By.xpath("//input[2]")).click()
+    await driver.findElement(By.xpath("//input[2]")).sendKeys("Weber")
+    await driver.findElement(By.xpath("//div[5]/div/div/div/button[2]")).click()
+    await driver.wait(until.elementLocated(By.css(".grid-cols-5 > .text-xl")), 30000)
+    assert(await driver.findElement(By.css(".grid-cols-5 > .text-xl")).getText() == "Weber")
+    await driver.findElement(By.css(".accent-blue")).click()
+    await driver.findElement(By.css(".bg-red")).click()
   })
 })
