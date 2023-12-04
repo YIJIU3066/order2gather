@@ -124,13 +124,15 @@ export default function FriendList() {
     }
     console.log(deleteList);
     for (const d of deleteList) {
-      const res = await api.post('/friend/delete', 
+      const res = await api.post(
+        '/friend/delete',
         JSON.stringify({
           fid: d,
-        }), {
+        }),
+        {
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
