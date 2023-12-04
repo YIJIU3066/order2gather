@@ -109,7 +109,7 @@ const Home = () => {
                 <input
                   type='text'
                   placeholder='Enter code here'
-                  className='input mr-2'
+                  className='input mr-2 focus:outline-none'
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}

@@ -122,9 +122,75 @@ const CreateOrder = () => {
     setShowRestaurantForm(false);
   };
 
-  const handleSaveRestaurant = (newRestaurantData) => {
-    setRestaurantList([...restaurantList, newRestaurantData]);
-    setShowRestaurantForm(false);
+  const convertToFormData = (restaurantString, restaurantInfo, foodString) => {
+    const formData = new FormData();
+    formData.append('restaurant', restaurantString);
+    formData.append('image', restaurantInfo.menus);
+    formData.append('food', foodString);
+    return formData;
+  };
+
+  //儲存
+  const handleInputRestantantInfo = async (restaurantInfo) => {
+    // 檢查
+    const requiredFields = [
+      restaurantInfo.restaurant[0]?.name,
+      restaurantInfo.restaurant[0]?.phone,
+    ];
+    const isAllFilled = requiredFields.every(
+      (field) => field !== undefined && field.trim() !== ''
+    );
+
+    if (isAllFilled) {
+      try {
+        const restaurantString = JSON.stringify(restaurantInfo.restaurant[0]);
+        const foodData = restaurantInfo.food.map(({ name, price }) => ({
+          name,
+          price,
+        }));
+        const foodString = JSON.stringify(foodData);
+        const restaurantInfoFormData = convertToFormData(
+          restaurantString,
+          restaurantInfo,
+          foodString
+        );
+        const response = await axiosInstance.post(
+          '/restaurant/save',
+          restaurantInfoFormData
+        );
+        getAllRestaurant();
+        // setRestaurantList((prevList) => [...prevList, restaurantInfo.restaurant[0]]);
+        // setFilteredRestaurants((prevList) => [...prevList, restaurantInfo.restaurant[0]]);
+        Swal.fire({
+          title: 'Success!',
+          text: 'Add Restaurant Succussful!',
+          icon: 'success',
+          iconColor: '#CF9546',
+          confirmButtonColor: '#7A989A',
+          confirmButtonText: 'OK!',
+        });
+        handleCloseRestaurantForm;
+      } catch (error) {
+        console.error('Error adding restaurant:', error);
+      }
+    } else {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Please fill in all required fields',
+        icon: 'warning',
+        iconColor: '#CF9546',
+        showCancelButton: true,
+        confirmButtonColor: '#7A989A',
+        cancelButtonColor: '#C67052',
+        confirmButtonText: 'OK!',
+        cancelButtonText: 'Quit Create',
+      }).then((result) => {
+        if (result.dismiss === Swal.DismissReason.cancel) {
+          console.log('Cancelled!');
+          handleCloseRestaurantForm();
+        }
+      });
+    }
   };
 
   const handleAddFriend = () => {
@@ -302,7 +368,7 @@ const CreateOrder = () => {
                   <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100 z-50'>
                     <AddRestaurantForm
                       onClose={handleCloseRestaurantForm}
-                      onSave={handleSaveRestaurant}
+                      onSave={handleInputRestantantInfo}
                     />
                   </div>
                 )}

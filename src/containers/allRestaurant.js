@@ -36,7 +36,8 @@ const AllRestaurant = () => {
 
   useEffect(() => {
     if (searchText === '') {
-      setFilteredRestaurants(restaurantList); // 如果搜索字串為空，顯示所有餐廳
+      // 如果搜索字串為空，顯示所有餐廳
+      setFilteredRestaurants(restaurantList);
     } else {
       const filtered = restaurantList.filter((restaurant) =>
         restaurant.name.toLowerCase().includes(searchText.toLowerCase())
@@ -56,7 +57,9 @@ const AllRestaurant = () => {
   const convertToFormData = (restaurantString, restaurantInfo, foodString) => {
     const formData = new FormData();
     formData.append('restaurant', restaurantString);
-    formData.append('image', restaurantInfo.menus);
+    restaurantInfo.menu.forEach((file, index) => {
+      formData.append('menu', file);
+    });
     formData.append('food', foodString);
     return formData;
   };

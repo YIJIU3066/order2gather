@@ -6,8 +6,9 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import styles_img from '../styles/addRestaurant.module.css';
+import Swal from 'sweetalert2';
 
-const ImageDisplay = ({ menuURLs, menus }) => {
+const ImageDisplay = ({ menuURLs, menus, setMenus, setMenuURLs }) => {
   const [fullscreenImageIndex, setFullscreenImageIndex] = useState(null);
 
   //設定哪張圖片是全螢幕
@@ -37,6 +38,51 @@ const ImageDisplay = ({ menuURLs, menus }) => {
     }
   };
 
+  //刪除圖片
+  const handleDeleteMenu = (indexToDelete) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this menu?',
+      icon: 'warning',
+      iconColor: '#CF9546',
+      showCancelButton: true,
+      confirmButtonColor: '#7A989A',
+      cancelButtonColor: '#C67052',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const updatedMenus = [...menus];
+
+        updatedMenus.splice(indexToDelete, 1);
+        setMenus(updatedMenus);
+
+        const updatedMenuURLs = [...menuURLs];
+        URL.revokeObjectURL(updatedMenuURLs[indexToDelete]);
+        updatedMenuURLs.splice(indexToDelete, 1);
+
+        setMenuURLs(updatedMenuURLs);
+
+        // const remainMenus = restaurantInfo.menu.filter(
+        //   (_, index) => index !== indexToDelete
+        // );
+
+        // setRestaurantInfo((prevRestaurantInfo) => ({
+        //   ...prevRestaurantInfo,
+        //   menu: remainMenus,
+        // }));
+
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Your menu has been deleted.',
+          icon: 'success',
+          iconColor: '#CF9546',
+          confirmButtonColor: '#7A989A',
+        });
+      }
+    });
+  };
+
   return (
     <>
       <div className='flex items-center justify-center my-2'>
@@ -48,16 +94,16 @@ const ImageDisplay = ({ menuURLs, menus }) => {
                 key={index}
               >
                 <div className='relative w-full h-full'>
-                  <button
+                  {/* <button
                     className='cursor-pointer bg-transport bg-blue/[0.8] hover:bg-yellow/[0.8] w-4 h-4 hover:w-5 hover:h-5 hover:-top-2.5 hover:-right-2.5 shadow-md rounded-full absolute -top-2 -right-2 flex justify-center items-center'
-                    // onClick={() => handleDeleteMenu(index)}
+                    onClick={() => handleDeleteMenu(index)}
                   >
                     <FontAwesomeIcon
                       icon={faXmark}
                       size='2xs'
                       style={{ color: '#ffffff' }}
                     />
-                  </button>
+                  </button> */}
                   <img
                     src={menuSrc}
                     alt='Selected'
