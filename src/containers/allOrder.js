@@ -13,13 +13,23 @@ const AllOrder = () => {
   const { user } = useContext(AuthContext);
   const [orderList, setOrderList] = useState([]);
   const [code, setCode] = useState('000000');
+  const uniqueData = [];
+  const uniqueIds = new Set();
   useEffect(() => {
     setUid(user.uid);
     const getOrderList = async () => {
       try {
         const response = await axiosInstance.get('/orderEvent/view');
         console.log(response.data);
-        setOrderList(response.data);
+        response.data.forEach((item) => {
+          // 使用 Set 來追蹤已經出現的 id
+          if (!uniqueIds.has(item.id)) {
+            uniqueIds.add(item.id);
+            uniqueData.push(item);
+          }
+        });
+        console.log(uniqueData);
+        setOrderList(uniqueData);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
