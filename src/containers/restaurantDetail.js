@@ -559,7 +559,7 @@ const RestaurantDetail = () => {
                                   setShowNumTip(false);
                                   setNewFood(e.target.value);
                                 }}
-                                className={`border-b-2 text-sm text-gray-700 font-medium px-1  focus:outline-none w-12 mx-1 ${
+                                className={`border-b-2 text-sm text-gray-700 font-medium px-1 focus:outline-none w-24 mx-1 ${
                                   showNumTip
                                     ? 'border-red focus:border-red'
                                     : 'border-blue focus:border-yellow'
