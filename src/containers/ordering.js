@@ -1,11 +1,14 @@
 import NavBar from '../components/navbar';
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useReducer } from 'react';
 import OrderingSuccessMessage from '../components/orderingMessage';
 import Showmenu from '../components/showMenu';
 import OrderingEmptyMessage from '../components/orderingEmptyMessage';
 import useAxios from '../hooks/useAxios';
 import AuthContext from '../context/AuthContext';
 import { useParams } from 'react-router-dom';
+import ImageDisplay from '../components/imageDisplay';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 const Ordering = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -14,6 +17,8 @@ const Ordering = () => {
   const [addFood, setAddFood] = useState(0);
   const [confirmOrder, setConfirmOrder] = useState(0);
   const [emptyMessage, setEmptyMessage] = useState(false);
+  const [menus, setMenus] = useState([]);
+  const [menuURLs, setMenuURLs] = useState([]);
   const axiosInstance = useAxios();
   const { user } = useContext(AuthContext);
   const { id } = useParams();
@@ -51,14 +56,15 @@ const Ordering = () => {
         const responseRestaurant = await axiosInstance.get(
           `/restaurant/display?rid=${response.data.rid}`
         );
-        console.log(typeof responseRestaurant.data);
-        console.log(responseRestaurant.data);
+        // console.log(typeof responseRestaurant.data);
+        // console.log(responseRestaurant.data);
         //const parsedData = JSON.parse(responseRestaurant.data);
         //console.log(parsedData.food)
         //console.log(typeof responseRestaurant.data);
         //console.log(responseRestaurant.data.food);
         setMenu(responseRestaurant.data.menu);
-        console.log(responseRestaurant.data.menu);
+        // console.log(responseRestaurant.data.menu);
+
         setFoodList(
           responseRestaurant.data.food.map((food) => ({
             ...food,
@@ -66,6 +72,11 @@ const Ordering = () => {
             quantity: 0,
           }))
         );
+
+        const newImageUrls = responseRestaurant.data.menu.map((menuString) =>
+          convertStringToImage(menuString)
+        );
+        setMenuURLs(newImageUrls);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -77,6 +88,7 @@ const Ordering = () => {
 
     fetchData();
   }, []); // 移除 foodList 作為依賴陣列，確保只在剛進入頁面時執行
+
   useEffect(() => {
     // 在 foodList 變更時執行 calculateTotalPrice
     const calculateTotalPrice = () => {
@@ -89,6 +101,7 @@ const Ordering = () => {
     };
     calculateTotalPrice();
   }, [foodList]);
+
   const [newFood, setNewFood] = useState([
     {
       id: 0,
@@ -96,6 +109,14 @@ const Ordering = () => {
       price: '',
     },
   ]);
+
+  //圖片字串轉換為Blob
+  const convertStringToImage = (stringData) => {
+    const byteArray = Uint8Array.from(atob(stringData), (c) => c.charCodeAt(0));
+    const blob = new Blob([byteArray], { type: 'image/jpeg' });
+    return URL.createObjectURL(blob);
+  };
+
   const handleNoteChange = (id, newNote) => {
     if (newNote.length < 20) {
       const updatedFoodList = foodList.map((food) =>
@@ -229,6 +250,10 @@ const Ordering = () => {
       setMenuOpen(true);
     }
   };
+
+  useEffect(() => {
+    console.log(menuOpen);
+  }, [menuOpen]);
   return (
     <>
       <NavBar />
@@ -284,7 +309,7 @@ const Ordering = () => {
                     </>
                   ) : (
                     <input
-                      className='p-2 text-center border border-blue border-2 rounded-2xl'
+                      className='p-2 text-center border-blue border-2 rounded-2xl'
                       type='text'
                       value={food.note}
                       onChange={(e) =>
@@ -300,7 +325,7 @@ const Ordering = () => {
                       >
                         -
                       </button>
-                      <span className='p-2 text-center border border-blue border-2 rounded-2xl'>
+                      <span className='p-2 text-center border-blue border-2 rounded-2xl'>
                         {food.quantity}
                       </span>
                       <button
@@ -325,7 +350,7 @@ const Ordering = () => {
                     className='p-4 mb-4 w-180 h-18 items-start bg-lightgrey grid grid-cols-4 gap-2 rounded-2xl'
                   >
                     <input
-                      className='p-2 text-center border border-blue border-2 rounded-2xl'
+                      className='p-2 text-center  border-blue border-2 rounded-2xl'
                       type='text'
                       value={food.name}
                       onChange={(e) =>
@@ -333,7 +358,7 @@ const Ordering = () => {
                       }
                     />
                     <input
-                      className='p-2 text-center border border-blue border-2 rounded-2xl'
+                      className='p-2 text-center border-blue border-2 rounded-2xl'
                       type='text'
                       value={food.price}
                       onChange={(e) =>
@@ -445,12 +470,27 @@ const Ordering = () => {
         </div>
       )}
       {menuOpen && (
-        <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100'>
-          <Showmenu
+        <div className='fixed flex-col top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 duration-100'>
+          {/* <Showmenu
             menuid={Order.id}
             setMenuOpen={setMenuOpen}
             menu_photo={menu}
-          />
+          /> */}
+          <div
+            className='cursor-pointer absolute top-4 right-4 w-10 h-10 bg-blue/[0.8] rounded-full flex justify-center items-center hover:bg-blue'
+            onClick={() => setMenuOpen(false)}
+          >
+            <FontAwesomeIcon
+              icon={faXmark}
+              size='xl'
+              style={{ color: '#fff' }}
+            />
+          </div>
+          <div className='text-4xl font-bold text-white'>{`${Order.rname}'s Menu`}</div>
+          <div className='text-lg font-medium text-white'>
+            click the menu to zoom in!
+          </div>
+          <ImageDisplay menuURLs={menuURLs} menus={menus} isNew={false} />
         </div>
       )}
       {emptyMessage && (

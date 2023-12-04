@@ -206,7 +206,7 @@ const AllOrder = () => {
               onClick={() => handleOpenClick(item.id)}
             >
               <div
-                className={`p-0 pl-1 pr-20 w-180 h-24 items-start ${
+                className={`p-0 pl-1 pr-20 w-180 h-24 items-start rounded-lg ${
                   index === 0
                     ? 'bg-blue'
                     : index === 1
@@ -216,18 +216,27 @@ const AllOrder = () => {
                         : ''
                 }`}
               >
-                <strong className='items-start p-0'></strong> {item.rname}
+                <strong className='flex items-start text-white text-xl p-2'>
+                  {' '}
+                  {item.rname}
+                </strong>
               </div>
             </div>
 
             <ul className='mt-2'>
               <li>
-                <strong>Open until:</strong>
-                <div>{dateFormatTransform(item.stopOrderingTime)}</div>
+                <strong className='text-gray-900'>Open until:</strong>
+                <div className='text-gray-900'>
+                  {dateFormatTransform(item.stopOrderingTime)}
+                </div>
               </li>
               <li>
-                <strong>Estimated delivery time:</strong>
-                <div>{dateFormatTransform(item.estimatedArrivalTime)}</div>
+                <strong className='text-gray-900'>
+                  Estimated delivery time:
+                </strong>
+                <div className='text-gray-900'>
+                  {dateFormatTransform(item.estimatedArrivalTime)}
+                </div>
               </li>
             </ul>
             {item.hostID === uid && (
@@ -237,7 +246,7 @@ const AllOrder = () => {
                   key={item.id}
                   onClick={() => handleDashboardClick(item.id)}
                 >
-                  <div className='p-0 pl-2 pr-20 w-160 h-18 rounded-2xl bg-red text-center'>
+                  <div className='p-0 py-1 px-6 my-2 rounded-lg bg-red text-center text-white font-medium'>
                     Dashboard
                   </div>
                 </div>
@@ -267,7 +276,7 @@ const AllOrder = () => {
               onClick={() => handleDeliverClick(item.id)}
             >
               <div
-                className={`p-0 pl-1 pr-20 w-180 h-24 items-start ${
+                className={`p-0 pl-1 pr-20 w-180 h-24 items-start rounded-lg${
                   index === 0
                     ? 'bg-blue'
                     : index === 1
@@ -277,7 +286,10 @@ const AllOrder = () => {
                         : ''
                 }`}
               >
-                <strong className='items-start p-0'></strong> {item.rname}
+                <strong className='flex items-start text-white text-xl p-2'>
+                  {' '}
+                  {item.rname}
+                </strong>
               </div>
             </div>
 
@@ -294,7 +306,7 @@ const AllOrder = () => {
                   key={item.id}
                   onClick={() => handleDashboardClick(item.id)}
                 >
-                  <div className='p-0 pl-2 pr-20 w-160 h-18 rounded-2xl bg-red text-center'>
+                  <div className='p-0 py-1 px-6 my-2 rounded-lg bg-red text-center text-white font-medium'>
                     Dashboard
                   </div>
                 </div>

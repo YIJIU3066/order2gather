@@ -71,7 +71,6 @@ const ModifyFood = ({
 
   // 處理刪除食物
   const handleDeleteFood = async () => {
-    console.log(restaurantInfo.restaurant[0].id);
     const updatedFoodList = restaurantInfo.food.filter(
       (foodItem, index) => !selectedItems.includes(foodItem.id)
     );
@@ -153,7 +152,7 @@ const ModifyFood = ({
       <div className='modify_food_container flex flex-col items-center justify-between w-fit'>
         <div className='add relative flex items-center justify-center'>
           {isNew && (
-            <div>
+            <div className='add relative flex items-center justify-center'>
               <button
                 className='border-2 bg-blue hover:bg-blue text-white hover:bg-blue/[0.9] focus:outline-none shadow-md font-bold py-2 px-2 mx-3 rounded text-center text-base flex justify-center items-center'
                 onClick={handleShowAddFood}
@@ -224,7 +223,7 @@ const ModifyFood = ({
           {deleteFood && (
             <div className='flex rounded ml-2 py-2 absolute w-max left-full '>
               <button
-                className='bg-yellow hover:bg-blue text-white font-bold rounded text-center px-2 text-sm py-2 focus:outline-none'
+                className='bg-yellow hover:bg-blue text-white font-bold rounded text-center px-2 text-sm py-1 focus:outline-none'
                 onClick={handleDeleteFood}
               >
                 Delete
