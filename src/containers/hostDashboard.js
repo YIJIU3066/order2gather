@@ -1,130 +1,99 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import Navbar from '../components/navbar';
-
-const mockGetOrders = {
-  totalPrice: 300,
-  orders: [
-    {
-      uid: 1,
-      food: [
-        {
-          fid: 1,
-          foodName: '黑糖珍珠',
-          num: 1,
-          hostViewName: '黑糖珍珠',
-          comment: '去冰',
-          hostViewPrice: 50,
-        },
-        {
-          fid: 0,
-          foodName: '紅茶',
-          num: 2,
-          hostViewName: '紅茶',
-          comment: '大杯微微',
-          hostViewPrice: 35,
-        },
-      ],
-      username: 'Walter',
-    },
-    {
-      uid: 3,
-      food: [
-        {
-          fid: 3,
-          foodName: '可可歐雷',
-          num: 2,
-          hostViewName: '可可歐雷',
-          comment: null,
-          hostViewPrice: 60,
-        },
-      ],
-      username: 'Jesse',
-    },
-    {
-      uid: 4,
-      food: [
-        {
-          fid: 3,
-          foodName: '可可歐雷',
-          num: 1,
-          hostViewName: '可可歐雷',
-          comment: 'Hot',
-          hostViewPrice: 60,
-        },
-      ],
-      username: 'Gus',
-    },
-  ],
-};
-
-const mockGetInformation = {
-  stopOrderingTime: '2023-11-19T13:30:00.000+00:00',
-  estimatedArrivalTime: '2023-11-19T16:00:00.000+00:00',
-};
+import { useLocation } from 'react-router-dom';
+import useAxios from '../hooks/useAxios';
+import AuthContext from '../context/AuthContext';
 
 const HostDashboard = () => {
   const [deadlineIsEdit, setDeadlineIsEdit] = useState(false);
   const [estimatedIsEdit, setEstimatedIsEdit] = useState(false);
   const [estimated, setEstimated] = useState('');
   const [deadline, setDeadline] = useState('');
+  const [endEventTime, setEndEventTime] = useState('');
+  const [OrderEventStatus, setOrderEventStatus] = useState('');
   const [foodList, setFoodList] = useState([]);
   const [orderItems, setOrderItems] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const oid = parseInt(useLocation().pathname.replace('/hostDashboard/', ''));
+  const api = useAxios();
+  const { user, logoutUser } = useContext(AuthContext);
 
-  const getFoodList = () => {
-    let foods = [];
-    for (const uIt of mockGetOrders.orders) {
-      for (const fIt of uIt.food) {
-        let flag = false;
-        for (const existFIt of foods) {
-          if (existFIt.foodName === fIt.foodName) {
-            flag = true;
-            existFIt.Orderers.push({
-              uid: uIt.uid,
-              note: fIt.comment,
-              quantity: fIt.num,
-              username: uIt.username,
-            });
-            break;
-          }
-        }
-        if (!flag) {
-          foods.push({
-            foodName: fIt.foodName,
-            Orderers: [
-              {
+  const fetchFoodList = async () => {
+    const res = await api.get("/orderEvent/organize", {
+      params: {
+        oid: oid
+      }
+    })
+    if (res.status === 200) {
+      let foods = [];
+      for (const uIt of res.data.data.orders) {
+        for (const fIt of uIt.food) {
+          let flag = false;
+          for (const existFIt of foods) {
+            if (existFIt.hostViewFoodName === fIt.hostViewFoodName && existFIt.hostViewPrice === fIt.hostViewPrice) {
+              flag = true;
+              existFIt.Orderers.push({
                 uid: uIt.uid,
                 note: fIt.comment,
                 quantity: fIt.num,
                 username: uIt.username,
-              },
-            ],
-            hostViewPrice: fIt.hostViewPrice,
-          });
+              });
+              break;
+            }
+          }
+          if (!flag) {
+            foods.push({
+              hostViewFoodName: fIt.hostViewFoodName,
+              Orderers: [
+                {
+                  uid: uIt.uid,
+                  note: fIt.comment,
+                  quantity: fIt.num,
+                  username: uIt.username,
+                },
+              ],
+              hostViewPrice: fIt.hostViewPrice,
+            });
+          }
         }
       }
+      setFoodList(foods);
+      setOrderItems(
+        res.data.data.orders.map((it) => {
+          return {
+            uid: it.uid,
+            username: it.username,
+            food: it.food.map((fIt) => ({
+              ...fIt,
+              isFoodNameEdit: false,
+              isPriceEdit: false,
+            })),
+          };
+        })
+      );
+      setTotalPrice(res.data.data.totalPrice);
     }
-    setFoodList(foods);
-  };
+  }
+
+  const fetchEventInfo = async () => {
+    const res = await api.get('/orderEvent/view', {
+      params: {
+        oid: oid
+      }
+    });
+    if (res.status === 200) {
+      setEndEventTime(res.data.endEventTime);
+      setOrderEventStatus(res.data.status);
+      setDeadline(res.data.stopOrderingTime);
+      setEstimated(res.data.estimatedArrivalTime);
+    }
+  }
 
   useEffect(() => {
-    setEstimated(mockGetInformation.stopOrderingTime);
-    setDeadline(mockGetInformation.estimatedArrivalTime);
-    setOrderItems(
-      mockGetOrders.orders.map((it) => {
-        return {
-          uid: it.uid,
-          username: it.username,
-          food: it.food.map((fIt) => ({
-            ...fIt,
-            isFoodNameEdit: false,
-            isPriceEdit: false,
-          })),
-        };
-      })
-    );
-    getFoodList();
+    fetchEventInfo();
+    fetchFoodList();
   }, []);
 
   const handleFoodNameEdit = (uid, fid) => {
@@ -176,7 +145,7 @@ const HostDashboard = () => {
         let newFoodList = [];
         it.food.forEach((fIt) => {
           if (fIt.fid !== fid) newFoodList.push(fIt);
-          else newFoodList.push({ ...fIt, foodName: e.target.value });
+          else newFoodList.push({ ...fIt, hostViewFoodName: e.target.value });
         });
         newOrderList.push({
           uid: uid,
@@ -208,23 +177,101 @@ const HostDashboard = () => {
     setOrderItems((prevList) => newOrderList);
   };
 
-  const handleFoodNameOnBlur = (e, uid, fid) => {
-    handleFoodNameEdit(uid, fid);
-    console.log(`uid: ${uid}, fid: ${fid}, newName: ${e.target.value}`);
-  };
-
-  const handlePriceOnBlur = (e, uid, fid) => {
-    handlePriceEdit(uid, fid);
-    console.log(
-      `uid: ${uid}, fid: ${fid}, newHostViewPrice: ${e.target.value}`
+  const handleFoodNameOnBlur = async (e, uid, food) => {
+    handleFoodNameEdit(uid, food.fid);
+    if (!e.target.value) {
+      fetchFoodList();
+      return;
+    }
+    const res = await api.put("/ordering/modify/host", 
+      JSON.stringify({
+        uid: uid,
+        oid: oid,
+        fid: food.fid,
+        num: food.num,
+        price: food.price,
+        hostViewPrice: food.hostViewPrice,
+        foodName: food.foodName,
+        hostViewFoodName: e.target.value,
+        comment: food.comment
+      }), {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
     );
+    if (res.status === 200) {
+      fetchFoodList();
+    }
   };
 
-  const handleInformationOnBlur = () => {
-    setDeadlineIsEdit(false);
-    setEstimatedIsEdit(false);
-    // call /orderEvent/update/:oid
+  const handlePriceOnBlur = async (e, uid, food) => {
+    handlePriceEdit(uid, food.fid);
+    if (!e.target.value) {
+      fetchFoodList();
+      return;
+    }
+    const res = await api.put("/ordering/modify/host", 
+      JSON.stringify({
+        uid: uid,
+        oid: oid,
+        fid: food.fid,
+        num: food.num,
+        price: food.price,
+        hostViewPrice: e.target.value,
+        foodName: food.foodName,
+        hostViewFoodName: food.hostViewFoodName,
+        comment: food.comment
+      }), {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    if (res.status === 200) {
+      fetchFoodList();
+    }
   };
+
+  const handleInformationOnBlur = async () => {
+    const res = await api.patch(`/orderEvent/update/${oid}`, 
+      JSON.stringify({
+        eventId: oid,
+        stopOrderingTime: deadline,
+        estimatedArrivalTime: estimated,
+        endEventTime: endEventTime,
+        status: OrderEventStatus
+      }), {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    if (res.status === 200) {
+      fetchEventInfo();
+      setDeadlineIsEdit(false);
+      setEstimatedIsEdit(false);
+    }
+  };
+
+  const handleArrive = async () => {
+    if (user === null) logoutUser();
+    const time = new Date();
+    const res = await api.post('/notify', 
+      JSON.stringify({
+        uid: user.uid,
+        oid: oid,
+        comment: "Food arrived, guys!",
+        time: time.toString()
+      }), {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    if (res.data.status === 'success') alert('Successful Notification!');
+    else alert('Oops....Notification Failed...')
+  }
 
   return (
     <>
@@ -300,25 +347,25 @@ const HostDashboard = () => {
                 {it.food.map((foodIt) =>
                   foodIt.isFoodNameEdit ? (
                     <input
-                      key={foodIt.fid}
-                      value={foodIt.foodName}
+                      key={foodIt.fid + it.uid * 100000}
+                      value={foodIt.hostViewFoodName}
                       type='text'
                       onChange={(e) =>
                         handleFoodNameChange(e, it.uid, foodIt.fid)
                       }
                       onBlur={(e) =>
-                        handleFoodNameOnBlur(e, it.uid, foodIt.fid)
+                        handleFoodNameOnBlur(e, it.uid, foodIt)
                       }
                       className='px-1 w-full border border-blue border-2 rounded-md focus:outline-none focus:ring-0'
                     />
                   ) : (
                     <div
-                      key={foodIt.fid}
+                      key={foodIt.fid + it.uid * 100000}
                       className='flex flex-row items-center gap-2'
                     >
-                      <p key={foodIt.foodName}>{foodIt.foodName}</p>
+                      <p key={foodIt.hostviewFoodName}>{foodIt.hostViewFoodName}</p>
                       <FontAwesomeIcon
-                        key={foodIt.fid}
+                        key={foodIt.fid + it.uid * 100000}
                         className='cursor-pointer'
                         onClick={() => handleFoodNameEdit(it.uid, foodIt.fid)}
                         icon={faPenToSquare}
@@ -331,31 +378,31 @@ const HostDashboard = () => {
               <div className='flex flex-col items-center gap-1'>
                 {it.food.map((foodIt) =>
                   foodIt.comment === null ? (
-                    <br key={foodIt.comment} />
+                    <p key={foodIt.fid + it.uid * 100000} >&nbsp;</p>
                   ) : (
-                    <p key={foodIt.comment}>{foodIt.comment}</p>
+                    <p key={foodIt.fid + it.uid * 100000}>{foodIt.comment}</p>
                   )
                 )}
               </div>
               <div className='flex flex-col items-center gap-1'>
                 {it.food.map((foodIt) => (
-                  <p key={foodIt.num}>{foodIt.num}</p>
+                  <p key={foodIt.fid + it.uid * 100000}>{foodIt.num}</p>
                 ))}
               </div>
               <div className='flex flex-col items-center gap-1'>
                 {it.food.map((foodIt) =>
                   foodIt.isPriceEdit ? (
                     <input
-                      key={foodIt.fid}
+                      key={foodIt.fid + it.uid * 100000}
                       value={foodIt.hostViewPrice}
                       type='text'
                       onChange={(e) => handlePriceChange(e, it.uid, foodIt.fid)}
-                      onBlur={(e) => handlePriceOnBlur(e, it.uid, foodIt.fid)}
+                      onBlur={(e) => handlePriceOnBlur(e, it.uid, foodIt)}
                       className='px-1 w-full border border-blue border-2 rounded-md focus:outline-none focus:ring-0'
                     />
                   ) : (
                     <div
-                      key={foodIt.fid}
+                      key={foodIt.fid + it.uid * 100000}
                       className='flex flex-row items-center gap-2'
                     >
                       <p key={foodIt.hostViewPrice}>{foodIt.hostViewPrice}</p>
@@ -393,10 +440,10 @@ const HostDashboard = () => {
         return (
           <>
             <div
-              key={it.foodname}
+              key={it.hostViewFoodName}
               className='lg:px-[30vw] sm:px-[10vw] grid grid-cols-5 place-items-center'
             >
-              <p>{it.foodName}</p>
+              <p>{it.hostViewFoodName}</p>
               <div className='flex flex-col items-center gap-1'>
                 {it.Orderers.map((orderer) => (
                   <p key={orderer.uid}>{orderer.username}</p>
@@ -405,7 +452,7 @@ const HostDashboard = () => {
               <div className='flex flex-col items-center gap-1'>
                 {it.Orderers.map((orderer) =>
                   orderer.note === null ? (
-                    <br key={orderer.note} />
+                    <p key={orderer.note} >&nbsp;</p>
                   ) : (
                     <p key={orderer.note}>{orderer.note}</p>
                   )
@@ -427,9 +474,12 @@ const HostDashboard = () => {
 
       <div className='lg:px-[30vw] sm:px-[10vw] flex justify-between items-center py-10'>
         <p className='text-xl text-yellow font-bold'>
-          Total Price: ${mockGetOrders.totalPrice}
+          Total Price: ${totalPrice}
         </p>
-        <button className='bg-red rounded-lg h-14 w-40 text-white text-lg'>
+        <button 
+          className='bg-red rounded-lg h-14 w-40 text-white text-lg'
+          onClick={handleArrive}
+        >
           Order Delivered!
         </button>
       </div>
