@@ -8,10 +8,7 @@ const AuthContext = createContext();
 export default AuthContext;
 
 export const AuthProvider = ({ children }) => {
-  const BASE_URL =
-    window.location.origin === 'http://localhost:3000'
-      ? 'http://localhost:8080'
-      : window.location.origin;
+  const BASE_URL = process.env.REACT_APP_BACKEND_URL
 
   const [accessToken, setAccessToken] = useState(() =>
     localStorage.getItem('accessToken')
